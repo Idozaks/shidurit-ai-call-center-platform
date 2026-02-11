@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { 
@@ -45,7 +46,8 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20" dir="rtl">
+    <TooltipProvider>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20" dir="rtl">
       <div className="max-w-7xl mx-auto p-6 lg:p-8">
         {/* Header */}
         <motion.div 
@@ -62,12 +64,17 @@ export default function Home() {
                 פלטפורמת מוקד שירות אוטונומי מונע בינה מלאכותית
               </p>
             </div>
-            <Link to={createPageUrl('CreateTenant')}>
-              <Button className="bg-gradient-to-l from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-lg shadow-indigo-500/25">
-                <Plus className="w-4 h-4 ml-2" />
-                הוסף עסק חדש
-              </Button>
-            </Link>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link to={createPageUrl('CreateTenant')}>
+                  <Button className="bg-gradient-to-l from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-lg shadow-indigo-500/25">
+                    <Plus className="w-4 h-4 ml-2" />
+                    הוסף עסק חדש
+                  </Button>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>יצירת עסק חדש במערכת</TooltipContent>
+            </Tooltip>
           </div>
         </motion.div>
 
@@ -186,17 +193,27 @@ export default function Home() {
                       <span>{tenant.usage_count || 0}/{tenant.usage_limit || 100} שימושים</span>
                     </div>
                     <div className="flex gap-2">
-                      <Link to={createPageUrl('TenantDashboard') + `?id=${tenant.id}`} className="flex-1">
-                        <Button variant="outline" className="w-full" size="sm">
-                          <BarChart3 className="w-4 h-4 ml-2" />
-                          ניהול
-                        </Button>
-                      </Link>
-                      <Link to={createPageUrl('PublicChat') + `?slug=${tenant.slug}`}>
-                        <Button variant="ghost" size="sm">
-                          <ExternalLink className="w-4 h-4" />
-                        </Button>
-                      </Link>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Link to={createPageUrl('TenantDashboard') + `?id=${tenant.id}`} className="flex-1">
+                            <Button variant="outline" className="w-full" size="sm">
+                              <BarChart3 className="w-4 h-4 ml-2" />
+                              ניהול
+                            </Button>
+                          </Link>
+                        </TooltipTrigger>
+                        <TooltipContent>עבור לדשבורד העסק</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Link to={createPageUrl('PublicChat') + `?slug=${tenant.slug}`}>
+                            <Button variant="ghost" size="sm">
+                              <ExternalLink className="w-4 h-4" />
+                            </Button>
+                          </Link>
+                        </TooltipTrigger>
+                        <TooltipContent>פתח צ'אט ציבורי</TooltipContent>
+                      </Tooltip>
                     </div>
                   </CardContent>
                 </Card>
@@ -204,7 +221,7 @@ export default function Home() {
             ))
           )}
         </motion.div>
-      </div>
-    </TooltipProvider>
-  );
-}
+        </div>
+      </TooltipProvider>
+    );
+  }
