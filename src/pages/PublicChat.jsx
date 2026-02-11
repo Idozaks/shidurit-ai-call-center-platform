@@ -420,7 +420,7 @@ ${history}
       </div>
 
       {/* Input */}
-      {!showNameInput && (
+      {!showNameInput && chatMode === 'text' && (
         <div className="sticky bottom-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-t p-4">
           <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto flex gap-2">
             <Input
