@@ -18,14 +18,14 @@ export default function Layout({ children, currentPageName }) {
     const workerData = localStorage.getItem('shidurit_worker');
     if (workerData) {
       setCurrentWorker(JSON.parse(workerData));
-    } else if (currentPageName !== 'Login' && currentPageName !== 'PublicChat') {
+    } else if (currentPageName !== 'WorkerLogin' && currentPageName !== 'PublicChat') {
       // Redirect to login if not logged in and not on login/public pages
-      navigate(createPageUrl('Login'));
+      navigate(createPageUrl('WorkerLogin'));
     }
   }, [currentPageName, navigate]);
 
   // Pages that should not have the sidebar/header
-  const publicPages = ['PublicChat', 'Login'];
+  const publicPages = ['PublicChat', 'WorkerLogin'];
   const isPublicPage = publicPages.includes(currentPageName);
 
   if (isPublicPage) {
@@ -46,7 +46,7 @@ export default function Layout({ children, currentPageName }) {
       }
       // Clear session
       localStorage.removeItem('shidurit_worker');
-      navigate(createPageUrl('Login'));
+      navigate(createPageUrl('WorkerLogin'));
     } catch (e) {
       console.error('Logout error:', e);
     }
