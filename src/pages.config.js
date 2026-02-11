@@ -51,6 +51,7 @@ import Home from './pages/Home';
 import CreateTenant from './pages/CreateTenant';
 import TenantDashboard from './pages/TenantDashboard';
 import PublicChat from './pages/PublicChat';
+import WorkerLogin from './pages/WorkerLogin';
 import __Layout from './Layout.jsx';
 
 
@@ -59,6 +60,7 @@ export const PAGES = {
     "CreateTenant": CreateTenant,
     "TenantDashboard": TenantDashboard,
     "PublicChat": PublicChat,
+    "WorkerLogin": WorkerLogin,
 }
 
 export const pagesConfig = {

@@ -115,6 +115,12 @@ export default function Layout({ children, currentPageName }) {
                 ))}
               </nav>
               <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 dark:border-slate-800">
+                {currentWorker && (
+                  <div className="px-3 py-2 mb-2 text-sm">
+                    <p className="font-medium text-slate-900 dark:text-slate-100">{currentWorker.full_name}</p>
+                    <p className="text-xs text-slate-500">{currentWorker.email}</p>
+                  </div>
+                )}
                 <Button 
                   variant="ghost" 
                   className="w-full justify-start gap-3 text-red-600"
