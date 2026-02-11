@@ -17,7 +17,7 @@ import { format } from 'date-fns';
 import LeadDetailDialog from './LeadDetailDialog';
 import { toast } from "sonner";
 
-export default function LeadsTable({ tenantId, leads = [] }) {
+export default function LeadsTable({ tenantId, leads = [], onRefresh }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedLead, setSelectedLead] = useState(null);
