@@ -260,18 +260,34 @@ ${history}
                     required
                   />
                 </div>
-                <Button 
-                  type="submit" 
-                  className="w-full h-12 text-lg"
-                  style={{ backgroundColor: themeColor }}
-                  disabled={createSessionMutation.isPending}
-                >
-                  {createSessionMutation.isPending ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <>התחל שיחה</>
-                  )}
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    type="submit" 
+                    className="flex-1 h-12 text-lg"
+                    style={{ backgroundColor: themeColor }}
+                    disabled={createSessionMutation.isPending}
+                    onClick={() => setChatMode('text')}
+                  >
+                    {createSessionMutation.isPending && chatMode === 'text' ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <><Keyboard className="w-5 h-5 ml-2" /> צ'אט</>
+                    )}
+                  </Button>
+                  <Button 
+                    type="submit"
+                    className="flex-1 h-12 text-lg"
+                    style={{ backgroundColor: themeColor }}
+                    disabled={createSessionMutation.isPending}
+                    onClick={() => setChatMode('voice')}
+                  >
+                    {createSessionMutation.isPending && chatMode === 'voice' ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <><Phone className="w-5 h-5 ml-2" /> שיחה קולית</>
+                    )}
+                  </Button>
+                </div>
               </form>
             </Card>
           </motion.div>
