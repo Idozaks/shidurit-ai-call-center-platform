@@ -283,6 +283,7 @@ export default function TenantDashboard() {
           </Tabs>
         </motion.div>
       </div>
+    </div>
     </TooltipProvider>
   );
 }

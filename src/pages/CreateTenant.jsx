@@ -232,6 +232,7 @@ export default function CreateTenant() {
           </Card>
         </motion.div>
       </div>
+    </div>
     </TooltipProvider>
   );
 }
