@@ -175,28 +175,28 @@ export default function TenantDashboard() {
           transition={{ delay: 0.2 }}
         >
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="bg-white/70 dark:bg-slate-800/70 p-1 mb-6 flex-wrap h-auto gap-1">
-              <TabsTrigger value="overview" className="gap-2 text-xs sm:text-sm flex-shrink-0">
+            <TabsList className="bg-gradient-to-r from-amber-500 to-orange-500 p-1.5 mb-6 flex-wrap h-auto gap-1 mx-auto w-fit">
+              <TabsTrigger value="overview" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
                 <BarChart3 className="w-4 h-4" />
                 <span className="hidden sm:inline">סקירה</span>
               </TabsTrigger>
-              <TabsTrigger value="leads" className="gap-2 text-xs sm:text-sm flex-shrink-0">
+              <TabsTrigger value="leads" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
                 <Users className="w-4 h-4" />
                 <span className="hidden sm:inline">לידים</span>
               </TabsTrigger>
-              <TabsTrigger value="sessions" className="gap-2 text-xs sm:text-sm flex-shrink-0">
+              <TabsTrigger value="sessions" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
                 <MessageSquare className="w-4 h-4" />
                 <span className="hidden sm:inline">שיחות</span>
               </TabsTrigger>
-              <TabsTrigger value="knowledge" className="gap-2 text-xs sm:text-sm flex-shrink-0">
+              <TabsTrigger value="knowledge" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
                 <BookOpen className="w-4 h-4" />
                 <span className="hidden sm:inline">בסיס ידע</span>
               </TabsTrigger>
-              <TabsTrigger value="doctors" className="gap-2 text-xs sm:text-sm flex-shrink-0">
+              <TabsTrigger value="doctors" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
                 <UserPlus className="w-4 h-4" />
                 <span className="hidden sm:inline">מומחים</span>
               </TabsTrigger>
-              <TabsTrigger value="settings" className="gap-2 text-xs sm:text-sm flex-shrink-0">
+              <TabsTrigger value="settings" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
                 <Settings className="w-4 h-4" />
                 <span className="hidden sm:inline">הגדרות</span>
               </TabsTrigger>
