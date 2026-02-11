@@ -23,6 +23,7 @@ export default function PublicChat() {
   const [sessionId, setSessionId] = useState(null);
   const [customerName, setCustomerName] = useState('');
   const [showNameInput, setShowNameInput] = useState(true);
+  const [chatMode, setChatMode] = useState('voice'); // 'text' or 'voice'
   const messagesEndRef = useRef(null);
 
   const { data: tenant, isLoading: tenantLoading } = useQuery({
