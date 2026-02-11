@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Search, Eye, Phone, Mail,
-  AlertCircle, CheckCircle, XCircle, User, FileSpreadsheet, Loader2
+  AlertCircle, CheckCircle, XCircle, User, FileSpreadsheet, Loader2, RefreshCw
 } from "lucide-react";
 import { format } from 'date-fns';
 import LeadDetailDialog from './LeadDetailDialog';
