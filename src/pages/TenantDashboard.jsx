@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   ArrowRight, Settings, Users, MessageSquare, BookOpen, 
   ExternalLink, BarChart3, UserPlus, FileText, Sparkles,
-  Phone, Mail, Clock, TrendingUp, AlertCircle, Wrench, Key, UserCheck
+  Phone, Mail, Clock, TrendingUp, AlertCircle, Wrench, Key, UserCheck, RefreshCw
 } from "lucide-react";
 import { motion } from "framer-motion";
 
