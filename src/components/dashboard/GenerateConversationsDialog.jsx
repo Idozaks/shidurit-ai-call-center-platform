@@ -123,7 +123,7 @@ ${businessContext}
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
           <Wand2 className="w-4 h-4 text-violet-600" />
-          ייצור שיחות
+          צור שיחות מלאכותיות
         </Button>
       </DialogTrigger>
       <DialogContent dir="rtl" className="sm:max-w-md">
