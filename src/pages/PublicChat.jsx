@@ -291,6 +291,69 @@ ${history}
               </form>
             </Card>
           </motion.div>
+        ) : chatMode === 'voice' ? (
+          <div className="flex-1 flex flex-col items-center justify-center py-12 gap-6">
+            <div 
+              className="w-24 h-24 rounded-full flex items-center justify-center text-white shadow-xl"
+              style={{ backgroundColor: themeColor }}
+            >
+              {tenant.logo_url ? (
+                <img src={tenant.logo_url} alt="" className="w-full h-full object-cover rounded-full" />
+              ) : (
+                <Sparkles className="w-12 h-12" />
+              )}
+            </div>
+            <h2 className="text-xl font-bold">{tenant.ai_persona_name || 'נועה'}</h2>
+            
+            {/* Voice transcripts */}
+            {messages.length > 0 && (
+              <div className="w-full max-w-md space-y-2 mb-4">
+                {messages.slice(-4).map((msg, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`text-sm px-3 py-2 rounded-xl ${
+                      msg.role === 'user' ? 'bg-slate-200 mr-auto text-right' : 'bg-white border ml-auto text-right'
+                    } max-w-[85%]`}
+                  >
+                    {msg.content}
+                  </motion.div>
+                ))}
+              </div>
+            )}
+
+            <VoiceChat 
+              tenant={tenant} 
+              themeColor={themeColor}
+              onTranscript={(role, text) => {
+                if (role === 'user_transcript' || role === 'assistant_transcript') {
+                  setMessages(prev => {
+                    const displayRole = role === 'user_transcript' ? 'user' : 'assistant';
+                    // Append to last message of same role, or create new
+                    if (prev.length > 0 && prev[prev.length - 1].role === displayRole) {
+                      const updated = [...prev];
+                      updated[updated.length - 1] = {
+                        ...updated[updated.length - 1],
+                        content: updated[updated.length - 1].content + text
+                      };
+                      return updated;
+                    }
+                    return [...prev, { id: Date.now(), role: displayRole, content: text }];
+                  });
+                }
+              }}
+            />
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-slate-500"
+              onClick={() => setChatMode('text')}
+            >
+              <Keyboard className="w-4 h-4 ml-1" /> עבור לצ'אט טקסט
+            </Button>
+          </div>
         ) : (
           <>
             {/* Messages */}
