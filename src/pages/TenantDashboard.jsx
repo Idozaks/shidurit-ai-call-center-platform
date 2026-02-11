@@ -14,11 +14,11 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-import LeadsTable from '@/components/dashboard/LeadsTable';
-import KnowledgeManager from '@/components/dashboard/KnowledgeManager';
-import DoctorsManager from '@/components/dashboard/DoctorsManager';
-import TenantSettings from '@/components/dashboard/TenantSettings';
-import SessionsList from '@/components/dashboard/SessionsList';
+import LeadsTable from '@/components/dashboard/LeadsTable.jsx';
+import KnowledgeManager from '@/components/dashboard/KnowledgeManager.jsx';
+import DoctorsManager from '@/components/dashboard/DoctorsManager.jsx';
+import TenantSettings from '@/components/dashboard/TenantSettings.jsx';
+import SessionsList from '@/components/dashboard/SessionsList.jsx';
 
 export default function TenantDashboard() {
   const navigate = useNavigate();
