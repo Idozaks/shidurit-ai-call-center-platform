@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -129,10 +130,15 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
               if (!open) resetForm();
             }}>
               <DialogTrigger asChild>
-                <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700">
-                  <Plus className="w-4 h-4" />
-                  הוסף פריט
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700">
+                      <Plus className="w-4 h-4" />
+                      הוסף פריט
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>הוסף ידע חדש לבוט</TooltipContent>
+                </Tooltip>
               </DialogTrigger>
               <DialogContent className="max-w-lg" dir="rtl">
                 <DialogHeader>
@@ -234,17 +240,27 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
                     </div>
                   </div>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" onClick={() => handleEdit(entry)}>
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      onClick={() => deleteMutation.mutate(entry.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" onClick={() => handleEdit(entry)}>
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>ערוך פריט</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => deleteMutation.mutate(entry.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>מחק פריט</TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
               </div>
