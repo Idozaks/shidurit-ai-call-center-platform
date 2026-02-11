@@ -1,9 +1,10 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
 Deno.serve(async (req) => {
+  const base44 = createClientFromRequest(req);
   try {
-    const base44 = createClientFromRequest(req);
-    const { system_prompt, persona_name, company_name } = await req.json();
+    const body = await req.json();
+    const { system_prompt, persona_name, company_name } = body;
 
     const apiKey = Deno.env.get("GOOGLE_AI_API_KEY");
     if (!apiKey) {
