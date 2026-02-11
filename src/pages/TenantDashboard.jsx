@@ -295,9 +295,7 @@ export default function TenantDashboard() {
               <SessionsList tenantId={tenantId} sessions={sessions} />
             </TabsContent>
 
-            <TabsContent value="knowledge">
-              <KnowledgeManager tenantId={tenantId} knowledge={knowledge} />
-            </TabsContent>
+            {/* knowledge moved to "info" tab */}
 
             <TabsContent value="toolbox">
               <AIToolbox tenantId={tenantId} tenant={tenant} leads={leads} sessions={sessions} />
