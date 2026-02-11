@@ -30,7 +30,7 @@ const CATEGORIES = [
   { value: 'locations', label: 'מיקומים' }
 ];
 
-export default function KnowledgeManager({ tenantId }) {
+export default function KnowledgeManager({ tenantId, knowledge = [] }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState(null);
@@ -42,11 +42,8 @@ export default function KnowledgeManager({ tenantId }) {
   });
   const queryClient = useQueryClient();
 
-  const { data: entries = [], isLoading } = useQuery({
-    queryKey: ['knowledge', tenantId],
-    queryFn: () => base44.entities.KnowledgeEntry.filter({ tenant_id: tenantId }),
-    enabled: !!tenantId
-  });
+  const entries = knowledge;
+  const isLoading = false;
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.KnowledgeEntry.create({ ...data, tenant_id: tenantId }),
