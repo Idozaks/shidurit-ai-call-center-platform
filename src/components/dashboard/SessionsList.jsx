@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import GenerateConversationsDialog from './GenerateConversationsDialog';
 import ConvertToLeadsButton from './ConvertToLeadsButton';
 
-export default function SessionsList({ tenantId, sessions = [] }) {
+export default function SessionsList({ tenantId, sessions = [], tenant, onRefresh }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedSession, setSelectedSession] = useState(null);
