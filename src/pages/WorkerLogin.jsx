@@ -6,15 +6,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Sparkles, Loader2, AlertCircle } from "lucide-react";
+import { Sparkles, Loader2, AlertCircle, Eye, EyeOff, UserPlus, Building2, Briefcase } from "lucide-react";
 import { motion } from "framer-motion";
 import { base44 } from '@/api/base44Client';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export default function WorkerLogin() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [registerData, setRegisterData] = useState({
+    full_name: '',
+    email: '',
+    password: '',
+    role: 'worker' // worker or tenant
+  });
+  const [registerError, setRegisterError] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false);
 
   // Check if already logged in
   useEffect(() => {
@@ -73,6 +85,77 @@ export default function WorkerLogin() {
     }
   };
 
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setRegisterError('');
+    setIsRegistering(true);
+
+    try {
+      if (registerData.role === 'worker') {
+        // Create worker with admin role (no tenant)
+        const newWorker = await base44.entities.Worker.create({
+          full_name: registerData.full_name,
+          email: registerData.email,
+          password: registerData.password,
+          role: 'admin',
+          status: 'active',
+          tenant_id: 'shidurit-internal'
+        });
+
+        // Log them in
+        localStorage.setItem('shidurit_worker', JSON.stringify({
+          id: newWorker.id,
+          email: newWorker.email,
+          full_name: newWorker.full_name,
+          role: newWorker.role,
+          tenant_id: newWorker.tenant_id
+        }));
+
+        await base44.entities.Worker.update(newWorker.id, { is_online: true });
+        navigate(createPageUrl('Home'));
+      } else {
+        // Create tenant
+        const slug = registerData.full_name.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Date.now();
+        const newTenant = await base44.entities.Tenant.create({
+          company_name: registerData.full_name,
+          slug: slug,
+          theme_color: '#6366f1',
+          ai_persona_name: 'נועה',
+          welcome_message: 'שלום! איך אוכל לעזור לך היום?',
+          is_active: true,
+          onboarding_complete: false
+        });
+
+        // Create worker for this tenant
+        const newWorker = await base44.entities.Worker.create({
+          tenant_id: newTenant.id,
+          full_name: registerData.full_name,
+          email: registerData.email,
+          password: registerData.password,
+          role: 'admin',
+          status: 'active'
+        });
+
+        // Log them in
+        localStorage.setItem('shidurit_worker', JSON.stringify({
+          id: newWorker.id,
+          email: newWorker.email,
+          full_name: newWorker.full_name,
+          role: newWorker.role,
+          tenant_id: newWorker.tenant_id
+        }));
+
+        await base44.entities.Worker.update(newWorker.id, { is_online: true });
+        navigate(createPageUrl('TenantDashboard') + `?id=${newTenant.id}`);
+      }
+    } catch (err) {
+      console.error('Registration error:', err);
+      setRegisterError('שגיאה ברישום. ייתכן שהאימייל כבר קיים במערכת.');
+    } finally {
+      setIsRegistering(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20 p-6" dir="rtl">
       <motion.div
@@ -115,15 +198,27 @@ export default function WorkerLogin() {
 
               <div className="space-y-2">
                 <Label htmlFor="password">סיסמה</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="••••••••"
-                  required
-                  disabled={isLoading}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    placeholder="••••••••"
+                    required
+                    disabled={isLoading}
+                    className="pl-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute left-0 top-0 h-full"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </Button>
+                </div>
               </div>
 
               <Button 
@@ -140,10 +235,116 @@ export default function WorkerLogin() {
                   'התחבר'
                 )}
               </Button>
+
+              <div className="text-center mt-4">
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={() => setShowRegisterModal(true)}
+                  className="text-indigo-600"
+                >
+                  <UserPlus className="w-4 h-4 ml-2" />
+                  הרשמה למערכת
+                </Button>
+              </div>
             </form>
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Registration Modal */}
+      <Dialog open={showRegisterModal} onOpenChange={setShowRegisterModal}>
+        <DialogContent className="sm:max-w-md" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>הרשמה למערכת</DialogTitle>
+            <DialogDescription>בחר את סוג החשבון שברצונך ליצור</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleRegister} className="space-y-4 mt-4">
+            {registerError && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{registerError}</AlertDescription>
+              </Alert>
+            )}
+
+            <RadioGroup value={registerData.role} onValueChange={(value) => setRegisterData({ ...registerData, role: value })}>
+              <div className="flex items-center space-x-2 space-x-reverse p-4 border rounded-lg hover:bg-slate-50 cursor-pointer">
+                <RadioGroupItem value="tenant" id="tenant" />
+                <Label htmlFor="tenant" className="flex items-center gap-2 cursor-pointer flex-1">
+                  <Building2 className="w-5 h-5 text-indigo-600" />
+                  <div>
+                    <p className="font-medium">בעל עסק / לקוח</p>
+                    <p className="text-xs text-slate-500">יצירת עסק חדש במערכת</p>
+                  </div>
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2 space-x-reverse p-4 border rounded-lg hover:bg-slate-50 cursor-pointer">
+                <RadioGroupItem value="worker" id="worker" />
+                <Label htmlFor="worker" className="flex items-center gap-2 cursor-pointer flex-1">
+                  <Briefcase className="w-5 h-5 text-violet-600" />
+                  <div>
+                    <p className="font-medium">עובד שידורית</p>
+                    <p className="text-xs text-slate-500">הצטרפות לצוות שידורית AI</p>
+                  </div>
+                </Label>
+              </div>
+            </RadioGroup>
+
+            <div className="space-y-2">
+              <Label htmlFor="reg_name">שם מלא {registerData.role === 'tenant' && '/ שם העסק'}</Label>
+              <Input
+                id="reg_name"
+                value={registerData.full_name}
+                onChange={(e) => setRegisterData({ ...registerData, full_name: e.target.value })}
+                placeholder={registerData.role === 'tenant' ? 'שם העסק שלך' : 'שם מלא'}
+                required
+                disabled={isRegistering}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="reg_email">אימייל</Label>
+              <Input
+                id="reg_email"
+                type="email"
+                value={registerData.email}
+                onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
+                placeholder="your@email.com"
+                required
+                disabled={isRegistering}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="reg_password">סיסמה</Label>
+              <Input
+                id="reg_password"
+                type="password"
+                value={registerData.password}
+                onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
+                placeholder="••••••••"
+                required
+                disabled={isRegistering}
+              />
+            </div>
+
+            <Button 
+              type="submit" 
+              className="w-full bg-gradient-to-l from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700"
+              disabled={isRegistering}
+            >
+              {isRegistering ? (
+                <>
+                  <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                  נרשם...
+                </>
+              ) : (
+                'הירשם'
+              )}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
