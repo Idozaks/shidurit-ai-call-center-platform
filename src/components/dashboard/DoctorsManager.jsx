@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -141,10 +142,15 @@ export default function DoctorsManager({ tenantId }) {
               if (!open) resetForm();
             }}>
               <DialogTrigger asChild>
-                <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700">
-                  <Plus className="w-4 h-4" />
-                  הוסף מומחה
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700">
+                      <Plus className="w-4 h-4" />
+                      הוסף מומחה
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>הוסף מומחה חדש</TooltipContent>
+                </Tooltip>
               </DialogTrigger>
               <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" dir="rtl">
                 <DialogHeader>
@@ -314,17 +320,27 @@ export default function DoctorsManager({ tenantId }) {
                   </div>
                 </div>
                 <div className="flex justify-end gap-1 mt-3 pt-3 border-t border-slate-200 dark:border-slate-600">
-                  <Button variant="ghost" size="sm" onClick={() => handleEdit(doctor)}>
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    onClick={() => deleteMutation.mutate(doctor.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="sm" onClick={() => handleEdit(doctor)}>
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>ערוך מומחה</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => deleteMutation.mutate(doctor.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>מחק מומחה</TooltipContent>
+                  </Tooltip>
                 </div>
               </div>
             ))}
