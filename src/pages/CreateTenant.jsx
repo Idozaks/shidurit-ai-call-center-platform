@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -52,7 +53,8 @@ export default function CreateTenant() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20" dir="rtl">
+    <TooltipProvider>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20" dir="rtl">
       <div className="max-w-2xl mx-auto p-6 lg:p-8">
         {/* Back Button */}
         <motion.div
@@ -60,14 +62,19 @@ export default function CreateTenant() {
           animate={{ opacity: 1, x: 0 }}
           className="mb-6"
         >
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate(createPageUrl('Home'))}
-            className="gap-2"
-          >
-            <ArrowRight className="w-4 h-4" />
-            חזרה
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="ghost" 
+                onClick={() => navigate(createPageUrl('Home'))}
+                className="gap-2"
+              >
+                <ArrowRight className="w-4 h-4" />
+                חזרה
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>חזרה לדף הבית</TooltipContent>
+          </Tooltip>
         </motion.div>
 
         <motion.div
@@ -198,28 +205,33 @@ export default function CreateTenant() {
                   </div>
                 </div>
 
-                <Button 
-                  type="submit" 
-                  className="w-full bg-gradient-to-l from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700"
-                  disabled={createMutation.isPending}
-                >
-                  {createMutation.isPending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 ml-2 animate-spin" />
-                      יוצר עסק...
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="w-4 h-4 ml-2" />
-                      צור עסק
-                    </>
-                  )}
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-gradient-to-l from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700"
+                      disabled={createMutation.isPending}
+                    >
+                      {createMutation.isPending ? (
+                        <>
+                          <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                          יוצר עסק...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="w-4 h-4 ml-2" />
+                          צור עסק
+                        </>
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>שמור ויצור עסק חדש</TooltipContent>
+                </Tooltip>
               </form>
             </CardContent>
           </Card>
         </motion.div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 }
