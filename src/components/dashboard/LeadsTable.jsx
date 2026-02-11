@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -157,9 +158,14 @@ export default function LeadsTable({ tenantId, leads = [] }) {
                     <TableCell>
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="ghost" size="icon" onClick={() => setSelectedLead(lead)}>
-                            <Eye className="w-4 h-4" />
-                          </Button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button variant="ghost" size="icon" onClick={() => setSelectedLead(lead)}>
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>הצג פרטי ליד</TooltipContent>
+                          </Tooltip>
                         </DialogTrigger>
                         <DialogContent className="max-w-lg" dir="rtl">
                           <DialogHeader>
