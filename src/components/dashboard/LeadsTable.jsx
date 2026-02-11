@@ -88,6 +88,10 @@ export default function LeadsTable({ tenantId, leads = [], onRefresh }) {
             ניהול לידים
           </CardTitle>
           <div className="flex gap-2 flex-wrap">
+            <Button variant="ghost" size="sm" onClick={onRefresh} className="gap-1">
+              <RefreshCw className="w-4 h-4" />
+              רענן
+            </Button>
             <Button
               variant="outline"
               size="sm"
