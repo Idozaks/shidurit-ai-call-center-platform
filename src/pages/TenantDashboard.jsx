@@ -190,14 +190,7 @@ export default function TenantDashboard() {
                 <MessageSquare className="w-4 h-4" />
                 <span className="hidden sm:inline">שיחות</span>
               </TabsTrigger>
-              <TabsTrigger value="knowledge" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
-                <BookOpen className="w-4 h-4" />
-                <span className="hidden sm:inline">בסיס ידע</span>
-              </TabsTrigger>
-              <TabsTrigger value="doctors" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
-                <UserPlus className="w-4 h-4" />
-                <span className="hidden sm:inline">מומחים</span>
-              </TabsTrigger>
+              
               <TabsTrigger value="toolbox" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
                 <Wrench className="w-4 h-4" />
                 <span className="hidden sm:inline">ארגז כלים</span>
