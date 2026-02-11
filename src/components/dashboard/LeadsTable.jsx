@@ -141,7 +141,14 @@ export default function LeadsTable({ tenantId, leads = [], onRefresh }) {
                   <TableHead>פרטי קשר</TableHead>
                   <TableHead>סיבת פנייה</TableHead>
                   <TableHead>סטטוס</TableHead>
-                  <TableHead>ציון כוונה</TableHead>
+                  <TableHead>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="cursor-help border-b border-dashed border-slate-400">ציון כוונה</span>
+                      </TooltipTrigger>
+                      <TooltipContent>ציון מ-0 עד 100 שמעריך את רמת הכוונה של הליד לרכישה, על בסיס ניתוח AI של השיחה</TooltipContent>
+                    </Tooltip>
+                  </TableHead>
                   <TableHead>תאריך</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
