@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -213,18 +214,23 @@ export default function TenantSettings({ tenant }) {
           </CardContent>
         </Card>
 
-        <Button 
-          type="submit" 
-          className="w-full bg-indigo-600 hover:bg-indigo-700"
-          disabled={updateMutation.isPending}
-        >
-          {updateMutation.isPending ? (
-            <Loader2 className="w-4 h-4 animate-spin ml-2" />
-          ) : (
-            <Save className="w-4 h-4 ml-2" />
-          )}
-          שמור שינויים
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button 
+              type="submit" 
+              className="w-full bg-indigo-600 hover:bg-indigo-700"
+              disabled={updateMutation.isPending}
+            >
+              {updateMutation.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin ml-2" />
+              ) : (
+                <Save className="w-4 h-4 ml-2" />
+              )}
+              שמור שינויים
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>שמור את כל השינויים</TooltipContent>
+        </Tooltip>
       </form>
 
       {/* Danger Zone */}
@@ -237,18 +243,23 @@ export default function TenantSettings({ tenant }) {
           <CardDescription>פעולות אלו אינן הפיכות</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button 
-            variant="destructive" 
-            onClick={handleDelete}
-            disabled={deleteMutation.isPending}
-          >
-            {deleteMutation.isPending ? (
-              <Loader2 className="w-4 h-4 animate-spin ml-2" />
-            ) : (
-              <Trash2 className="w-4 h-4 ml-2" />
-            )}
-            מחק עסק
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="destructive" 
+                onClick={handleDelete}
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin ml-2" />
+                ) : (
+                  <Trash2 className="w-4 h-4 ml-2" />
+                )}
+                מחק עסק
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>מחק עסק לצמיתות</TooltipContent>
+          </Tooltip>
         </CardContent>
       </Card>
     </div>
