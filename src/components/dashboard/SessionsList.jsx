@@ -11,10 +11,12 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   MessageSquare, Search, Eye, Phone, Clock, User, 
-  Bot, Loader2, Mic, Sparkles
+  Bot, Loader2, Mic, Sparkles, RefreshCw
 } from "lucide-react";
 import { format } from 'date-fns';
 import { toast } from "sonner";
+import GenerateConversationsDialog from './GenerateConversationsDialog';
+import ConvertToLeadsButton from './ConvertToLeadsButton';
 
 export default function SessionsList({ tenantId, sessions = [] }) {
   const [searchQuery, setSearchQuery] = useState('');
