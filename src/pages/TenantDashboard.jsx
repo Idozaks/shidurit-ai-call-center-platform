@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -78,7 +79,8 @@ export default function TenantDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20" dir="rtl">
+    <TooltipProvider>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20" dir="rtl">
       <div className="max-w-7xl mx-auto p-6 lg:p-8">
         {/* Header */}
         <motion.div
@@ -86,14 +88,19 @@ export default function TenantDashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate(createPageUrl('Home'))}
-            className="mb-4 gap-2"
-          >
-            <ArrowRight className="w-4 h-4" />
-            חזרה
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="ghost" 
+                onClick={() => navigate(createPageUrl('Home'))}
+                className="mb-4 gap-2"
+              >
+                <ArrowRight className="w-4 h-4" />
+                חזרה
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>חזרה לדף הבית</TooltipContent>
+          </Tooltip>
           
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -118,12 +125,17 @@ export default function TenantDashboard() {
               </div>
             </div>
             <div className="flex gap-2">
-              <a href={createPageUrl('PublicChat') + `?slug=${tenant?.slug}`} target="_blank">
-                <Button variant="outline" className="gap-2">
-                  <ExternalLink className="w-4 h-4" />
-                  פתח צ׳אט
-                </Button>
-              </a>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <a href={createPageUrl('PublicChat') + `?slug=${tenant?.slug}`} target="_blank">
+                    <Button variant="outline" className="gap-2">
+                      <ExternalLink className="w-4 h-4" />
+                      פתח צ׳אט
+                    </Button>
+                  </a>
+                </TooltipTrigger>
+                <TooltipContent>פתח את הצ'אט הציבורי</TooltipContent>
+              </Tooltip>
             </div>
           </div>
         </motion.div>
@@ -271,6 +283,6 @@ export default function TenantDashboard() {
           </Tabs>
         </motion.div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 }
