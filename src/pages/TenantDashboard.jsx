@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   ArrowRight, Settings, Users, MessageSquare, BookOpen, 
   ExternalLink, BarChart3, UserPlus, FileText, Sparkles,
-  Phone, Mail, Clock, TrendingUp, AlertCircle
+  Phone, Mail, Clock, TrendingUp, AlertCircle, Wrench, Key, UserCheck
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -20,6 +20,8 @@ import KnowledgeManager from '@/components/dashboard/KnowledgeManager.jsx';
 import DoctorsManager from '@/components/dashboard/DoctorsManager.jsx';
 import TenantSettings from '@/components/dashboard/TenantSettings.jsx';
 import SessionsList from '@/components/dashboard/SessionsList.jsx';
+import AIToolbox from '@/components/dashboard/AIToolbox.jsx';
+import PerformanceDashboard from '@/components/dashboard/PerformanceDashboard.jsx';
 
 export default function TenantDashboard() {
   const navigate = useNavigate();
@@ -196,9 +198,33 @@ export default function TenantDashboard() {
                 <UserPlus className="w-4 h-4" />
                 <span className="hidden sm:inline">מומחים</span>
               </TabsTrigger>
+              <TabsTrigger value="toolbox" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
+                <Wrench className="w-4 h-4" />
+                <span className="hidden sm:inline">ארגז כלים</span>
+              </TabsTrigger>
+              <TabsTrigger value="performance" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
+                <BarChart3 className="w-4 h-4" />
+                <span className="hidden sm:inline">ביצועים</span>
+              </TabsTrigger>
               <TabsTrigger value="settings" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
                 <Settings className="w-4 h-4" />
-                <span className="hidden sm:inline">הגדרות</span>
+                <span className="hidden sm:inline">הגדרות בוט</span>
+              </TabsTrigger>
+              <TabsTrigger value="api" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
+                <Key className="w-4 h-4" />
+                <span className="hidden sm:inline">API</span>
+              </TabsTrigger>
+              <TabsTrigger value="doctors" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
+                <UserCheck className="w-4 h-4" />
+                <span className="hidden sm:inline">רופאים / אנשי קשר</span>
+              </TabsTrigger>
+              <TabsTrigger value="info" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
+                <FileText className="w-4 h-4" />
+                <span className="hidden sm:inline">מידע</span>
+              </TabsTrigger>
+              <TabsTrigger value="profile" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
+                <Users className="w-4 h-4" />
+                <span className="hidden sm:inline">פרופיל</span>
               </TabsTrigger>
             </TabsList>
 
@@ -273,12 +299,92 @@ export default function TenantDashboard() {
               <KnowledgeManager tenantId={tenantId} knowledge={knowledge} />
             </TabsContent>
 
+            <TabsContent value="toolbox">
+              <AIToolbox tenantId={tenantId} tenant={tenant} leads={leads} sessions={sessions} />
+            </TabsContent>
+
+            <TabsContent value="performance">
+              <PerformanceDashboard tenantId={tenantId} leads={leads} sessions={sessions} />
+            </TabsContent>
+
             <TabsContent value="doctors">
               <DoctorsManager tenantId={tenantId} />
             </TabsContent>
 
             <TabsContent value="settings">
               <TenantSettings tenant={tenant} />
+            </TabsContent>
+
+            <TabsContent value="api">
+              <Card className="border-0 shadow-lg bg-white/70 dark:bg-slate-800/70">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Key className="w-5 h-5 text-indigo-600" />
+                    מפתח API
+                  </CardTitle>
+                  <CardDescription>מפתח לגישה ישירה לבוט דרך API חיצוני</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg font-mono text-sm break-all direction-ltr text-left">
+                    sk-{tenantId?.slice(0, 8)}-{tenant?.slug}-{tenantId?.slice(-8)}
+                  </div>
+                  <p className="text-sm text-slate-500">השתמש במפתח זה בכותרת Authorization כ-Bearer token.</p>
+                  <div className="bg-slate-900 text-green-400 p-4 rounded-lg font-mono text-xs text-left direction-ltr overflow-x-auto">
+                    <pre>{`curl -X POST https://api.shidurit.ai/v1/chat \\
+  -H "Authorization: Bearer sk-${tenantId?.slice(0, 8)}-${tenant?.slug}-${tenantId?.slice(-8)}" \\
+  -H "Content-Type: application/json" \\
+  -d '{"message": "שלום", "customer_name": "ישראל"}'`}</pre>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="info">
+              <KnowledgeManager tenantId={tenantId} knowledge={knowledge} />
+            </TabsContent>
+
+            <TabsContent value="profile">
+              <Card className="border-0 shadow-lg bg-white/70 dark:bg-slate-800/70">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5 text-indigo-600" />
+                    פרופיל עסק
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-slate-500">שם העסק</p>
+                      <p className="font-medium">{tenant?.company_name}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-500">Slug</p>
+                      <p className="font-medium direction-ltr text-left">/{tenant?.slug}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-500">צבע מותג</p>
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-md" style={{ backgroundColor: tenant?.theme_color || '#6366f1' }} />
+                        <span className="text-sm">{tenant?.theme_color || '#6366f1'}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-500">סטטוס</p>
+                      <Badge variant={tenant?.is_active ? "default" : "secondary"}>
+                        {tenant?.is_active ? 'פעיל' : 'מושבת'}
+                      </Badge>
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-500">שם הבוט</p>
+                      <p className="font-medium">{tenant?.ai_persona_name || 'נועה'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-500">שימוש</p>
+                      <p className="font-medium">{tenant?.usage_count || 0} / {tenant?.usage_limit || 100}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </motion.div>
