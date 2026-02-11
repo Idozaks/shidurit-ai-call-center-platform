@@ -47,7 +47,7 @@ export default function PublicChat() {
         lead_id: lead.id,
         customer_name: name,
         status: 'active',
-        mode: 'text'
+        mode: chatMode === 'voice' ? 'voice' : 'text'
       });
       return session;
     },
