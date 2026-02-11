@@ -21,6 +21,7 @@ export default function LeadsTable({ tenantId, leads = [] }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedLead, setSelectedLead] = useState(null);
+  const [exporting, setExporting] = useState(false);
   const queryClient = useQueryClient();
 
   const updateMutation = useMutation({
