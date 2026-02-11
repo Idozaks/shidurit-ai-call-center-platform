@@ -8,13 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { 
-  Search, Filter, Eye, Phone, Mail, TrendingUp, 
-  AlertCircle, Clock, CheckCircle, XCircle, User
+  Search, Eye, Phone, Mail, 
+  AlertCircle, CheckCircle, XCircle, User
 } from "lucide-react";
 import { format } from 'date-fns';
+import LeadDetailDialog from './LeadDetailDialog';
 
 export default function LeadsTable({ tenantId, leads = [] }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -167,64 +167,9 @@ export default function LeadsTable({ tenantId, leads = [] }) {
                           </TooltipTrigger>
                           <TooltipContent>הצג פרטי ליד</TooltipContent>
                         </Tooltip>
-                        <DialogContent className="max-w-lg" dir="rtl">
-                          <DialogHeader>
-                            <DialogTitle>פרטי ליד</DialogTitle>
-                          </DialogHeader>
-                          {selectedLead && (
-                            <div className="space-y-4">
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <p className="text-sm text-slate-500">שם</p>
-                                  <p className="font-medium">{selectedLead.customer_name}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-slate-500">סטטוס</p>
-                                  <Select
-                                    value={selectedLead.status}
-                                    onValueChange={(value) => {
-                                      updateMutation.mutate({ id: selectedLead.id, data: { status: value } });
-                                      setSelectedLead({ ...selectedLead, status: value });
-                                    }}
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="new">חדש</SelectItem>
-                                      <SelectItem value="contacted">נוצר קשר</SelectItem>
-                                      <SelectItem value="converted">הומר</SelectItem>
-                                      <SelectItem value="lost">אבוד</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                              </div>
-                              {selectedLead.summary && (
-                                <div>
-                                  <p className="text-sm text-slate-500 mb-1">סיכום שיחה</p>
-                                  <p className="text-sm bg-slate-50 p-3 rounded-lg">{selectedLead.summary}</p>
-                                </div>
-                              )}
-                              {selectedLead.ai_suggested_action && (
-                                <div>
-                                  <p className="text-sm text-slate-500 mb-1">פעולה מומלצת</p>
-                                  <p className="text-sm bg-indigo-50 text-indigo-700 p-3 rounded-lg">
-                                    {selectedLead.ai_suggested_action}
-                                  </p>
-                                </div>
-                              )}
-                              <div>
-                                <p className="text-sm text-slate-500 mb-1">הערות</p>
-                                <Textarea
-                                  value={selectedLead.notes || ''}
-                                  onChange={(e) => setSelectedLead({ ...selectedLead, notes: e.target.value })}
-                                  onBlur={() => updateMutation.mutate({ id: selectedLead.id, data: { notes: selectedLead.notes } })}
-                                  placeholder="הוסף הערות..."
-                                />
-                              </div>
-                            </div>
-                          )}
-                        </DialogContent>
+                        {selectedLead && selectedLead.id === lead.id && (
+                          <LeadDetailDialog lead={selectedLead} tenantId={tenantId} onClose={() => setSelectedLead(null)} />
+                        )}
                       </Dialog>
                     </TableCell>
                   </TableRow>
