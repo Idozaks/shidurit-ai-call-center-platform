@@ -157,16 +157,16 @@ export default function LeadsTable({ tenantId, leads = [] }) {
                     </TableCell>
                     <TableCell>
                       <Dialog>
-                        <DialogTrigger asChild>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <DialogTrigger asChild>
                               <Button variant="ghost" size="icon" onClick={() => setSelectedLead(lead)}>
                                 <Eye className="w-4 h-4" />
                               </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>הצג פרטי ליד</TooltipContent>
-                          </Tooltip>
-                        </DialogTrigger>
+                            </DialogTrigger>
+                          </TooltipTrigger>
+                          <TooltipContent>הצג פרטי ליד</TooltipContent>
+                        </Tooltip>
                         <DialogContent className="max-w-lg" dir="rtl">
                           <DialogHeader>
                             <DialogTitle>פרטי ליד</DialogTitle>
