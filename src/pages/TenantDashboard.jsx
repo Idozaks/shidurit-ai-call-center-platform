@@ -25,9 +25,17 @@ import PerformanceDashboard from '@/components/dashboard/PerformanceDashboard.js
 
 export default function TenantDashboard() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const urlParams = new URLSearchParams(window.location.search);
   const tenantId = urlParams.get('id');
   const [activeTab, setActiveTab] = useState('overview');
+
+  const refreshAll = () => {
+    queryClient.invalidateQueries({ queryKey: ['tenant', tenantId] });
+    queryClient.invalidateQueries({ queryKey: ['leads', tenantId] });
+    queryClient.invalidateQueries({ queryKey: ['sessions', tenantId] });
+    queryClient.invalidateQueries({ queryKey: ['knowledge', tenantId] });
+  };
 
   const { data: tenant, isLoading: tenantLoading } = useQuery({
     queryKey: ['tenant', tenantId],
