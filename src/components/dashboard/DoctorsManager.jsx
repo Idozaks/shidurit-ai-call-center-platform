@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   Plus, UserPlus, Edit, Trash2, Search, Phone, Mail, 
-  MapPin, Loader2, Stethoscope
+  MapPin, Loader2, Users
 } from "lucide-react";
 
 export default function DoctorsManager({ tenantId }) {
@@ -124,7 +124,7 @@ export default function DoctorsManager({ tenantId }) {
       <CardHeader>
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <CardTitle className="flex items-center gap-2">
-            <Stethoscope className="w-5 h-5 text-indigo-600" />
+            <Users className="w-5 h-5 text-indigo-600" />
             ניהול מומחים
           </CardTitle>
           <div className="flex gap-2">
