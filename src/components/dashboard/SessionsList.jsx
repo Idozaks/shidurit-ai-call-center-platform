@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,20 +11,85 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   MessageSquare, Search, Eye, Phone, Clock, User, 
-  Bot, Loader2, Mic
+  Bot, Loader2, Mic, Sparkles
 } from "lucide-react";
 import { format } from 'date-fns';
+import { toast } from "sonner";
 
 export default function SessionsList({ tenantId, sessions = [] }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedSession, setSelectedSession] = useState(null);
+  const [analyzingId, setAnalyzingId] = useState(null);
+  const queryClient = useQueryClient();
 
   const { data: messages = [], isLoading: messagesLoading } = useQuery({
     queryKey: ['messages', selectedSession?.id],
     queryFn: () => base44.entities.ChatMessage.filter({ session_id: selectedSession.id }, 'created_date'),
     enabled: !!selectedSession
   });
+
+  const { data: leads = [] } = useQuery({
+    queryKey: ['leads', tenantId],
+    queryFn: () => base44.entities.Lead.filter({ tenant_id: tenantId }),
+    enabled: !!tenantId
+  });
+
+  const sessionHasLead = (sessionId) => {
+    const session = sessions.find(s => s.id === sessionId);
+    if (!session) return false;
+    return leads.some(l => 
+      l.customer_phone === session.customer_phone && 
+      l.tenant_id === session.tenant_id
+    );
+  };
+
+  const analyzeSession = async (session) => {
+    setAnalyzingId(session.id);
+    const msgs = await base44.entities.ChatMessage.filter({ session_id: session.id }, 'created_date');
+    if (msgs.length === 0) {
+      toast.error('אין הודעות בשיחה לניתוח');
+      setAnalyzingId(null);
+      return;
+    }
+
+    const transcript = msgs.map(m => `${m.role === 'user' ? 'לקוח' : 'בוט'}: ${m.content}`).join('\n');
+
+    const analysis = await base44.integrations.Core.InvokeLLM({
+      prompt: `נתח את השיחה הבאה בין לקוח לבוט AI של עסק. חלץ מידע רלוונטי ליצירת ליד.\n\nשיחה:\n${transcript}\n\nשם הלקוח: ${session.customer_name || 'לא ידוע'}\nטלפון: ${session.customer_phone || 'לא ידוע'}\nסיבת פנייה: ${session.inquiry_reason || 'לא ידוע'}`,
+      response_json_schema: {
+        type: "object",
+        properties: {
+          summary: { type: "string", description: "סיכום קצר של השיחה" },
+          sentiment: { type: "string", enum: ["positive", "neutral", "negative"] },
+          intent_score: { type: "number", description: "ציון כוונת רכישה 0-100" },
+          urgency_level: { type: "string", enum: ["low", "medium", "high"] },
+          ai_suggested_action: { type: "string", description: "פעולה מומלצת" },
+          priority: { type: "string", enum: ["low", "normal", "high"] },
+          facts: { type: "object", description: "עובדות שחולצו מהשיחה" }
+        }
+      }
+    });
+
+    await base44.entities.Lead.create({
+      tenant_id: session.tenant_id,
+      customer_name: session.customer_name || 'לא ידוע',
+      customer_phone: session.customer_phone || '',
+      inquiry_reason: session.inquiry_reason || '',
+      status: 'new',
+      priority: analysis.priority || 'normal',
+      sentiment: analysis.sentiment || 'neutral',
+      summary: analysis.summary || '',
+      ai_suggested_action: analysis.ai_suggested_action || '',
+      intent_score: analysis.intent_score || 50,
+      urgency_level: analysis.urgency_level || 'low',
+      facts_json: analysis.facts || {}
+    });
+
+    queryClient.invalidateQueries({ queryKey: ['leads'] });
+    toast.success(`ליד חדש נוצר עבור ${session.customer_name}`);
+    setAnalyzingId(null);
+  };
 
   const filteredSessions = sessions.filter(session => {
     const matchesSearch = session.customer_name?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -124,21 +189,46 @@ export default function SessionsList({ tenantId, sessions = [] }) {
                       )}
                     </div>
                   </div>
-                  <Dialog>
-                    <DialogTrigger asChild>
+                  <div className="flex items-center gap-1">
+                    {!sessionHasLead(session.id) && (
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button 
                             variant="ghost" 
-                            size="icon"
-                            onClick={() => setSelectedSession(session)}
+                            size="sm"
+                            className="gap-1 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                            disabled={analyzingId === session.id}
+                            onClick={() => analyzeSession(session)}
                           >
-                            <Eye className="w-4 h-4" />
+                            {analyzingId === session.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Sparkles className="w-4 h-4" />
+                            )}
+                            <span className="text-xs hidden sm:inline">נתח והמר לליד</span>
                           </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>נתח שיחה באמצעות AI והמר לליד</TooltipContent>
+                      </Tooltip>
+                    )}
+                    {sessionHasLead(session.id) && (
+                      <Badge variant="outline" className="text-xs text-green-600 border-green-200 bg-green-50">ליד קיים</Badge>
+                    )}
+                    <Dialog>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <DialogTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => setSelectedSession(session)}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                          </DialogTrigger>
                         </TooltipTrigger>
                         <TooltipContent>הצג שיחה מלאה</TooltipContent>
                       </Tooltip>
-                    </DialogTrigger>
                     <DialogContent className="max-w-2xl max-h-[80vh]" dir="rtl">
                       <DialogHeader>
                         <DialogTitle>שיחה עם {session.customer_name || 'אורח'}</DialogTitle>
@@ -192,7 +282,8 @@ export default function SessionsList({ tenantId, sessions = [] }) {
                         )}
                       </ScrollArea>
                     </DialogContent>
-                  </Dialog>
+                    </Dialog>
+                  </div>
                 </div>
               </div>
             ))}
