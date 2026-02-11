@@ -163,30 +163,30 @@ export default function TenantDashboard() {
           transition={{ delay: 0.2 }}
         >
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="bg-white/70 dark:bg-slate-800/70 p-1 mb-6">
-              <TabsTrigger value="overview" className="gap-2">
+            <TabsList className="bg-white/70 dark:bg-slate-800/70 p-1 mb-6 flex-wrap h-auto gap-1">
+              <TabsTrigger value="overview" className="gap-2 text-xs sm:text-sm flex-shrink-0">
                 <BarChart3 className="w-4 h-4" />
-                סקירה
+                <span className="hidden sm:inline">סקירה</span>
               </TabsTrigger>
-              <TabsTrigger value="leads" className="gap-2">
+              <TabsTrigger value="leads" className="gap-2 text-xs sm:text-sm flex-shrink-0">
                 <Users className="w-4 h-4" />
-                לידים
+                <span className="hidden sm:inline">לידים</span>
               </TabsTrigger>
-              <TabsTrigger value="sessions" className="gap-2">
+              <TabsTrigger value="sessions" className="gap-2 text-xs sm:text-sm flex-shrink-0">
                 <MessageSquare className="w-4 h-4" />
-                שיחות
+                <span className="hidden sm:inline">שיחות</span>
               </TabsTrigger>
-              <TabsTrigger value="knowledge" className="gap-2">
+              <TabsTrigger value="knowledge" className="gap-2 text-xs sm:text-sm flex-shrink-0">
                 <BookOpen className="w-4 h-4" />
-                בסיס ידע
+                <span className="hidden sm:inline">בסיס ידע</span>
               </TabsTrigger>
-              <TabsTrigger value="doctors" className="gap-2">
+              <TabsTrigger value="doctors" className="gap-2 text-xs sm:text-sm flex-shrink-0">
                 <UserPlus className="w-4 h-4" />
-                מומחים
+                <span className="hidden sm:inline">מומחים</span>
               </TabsTrigger>
-              <TabsTrigger value="settings" className="gap-2">
+              <TabsTrigger value="settings" className="gap-2 text-xs sm:text-sm flex-shrink-0">
                 <Settings className="w-4 h-4" />
-                הגדרות
+                <span className="hidden sm:inline">הגדרות</span>
               </TabsTrigger>
             </TabsList>
 
@@ -258,7 +258,7 @@ export default function TenantDashboard() {
             </TabsContent>
 
             <TabsContent value="knowledge">
-              <KnowledgeManager tenantId={tenantId} />
+              <KnowledgeManager tenantId={tenantId} knowledge={knowledge} />
             </TabsContent>
 
             <TabsContent value="doctors">
