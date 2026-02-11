@@ -221,7 +221,7 @@ export default function Home() {
             ))
           )}
         </motion.div>
-        </div>
-      </TooltipProvider>
-    );
-  }
+      </div>
+    </TooltipProvider>
+  );
+}
