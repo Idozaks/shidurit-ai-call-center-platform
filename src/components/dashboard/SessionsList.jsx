@@ -118,7 +118,13 @@ export default function SessionsList({ tenantId, sessions = [], tenant, onRefres
             <MessageSquare className="w-5 h-5 text-indigo-600" />
             שיחות
           </CardTitle>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <GenerateConversationsDialog tenantId={tenantId} tenant={tenant} />
+            <ConvertToLeadsButton tenantId={tenantId} sessions={sessions} existingLeads={leads} />
+            <Button variant="ghost" size="sm" onClick={onRefresh} className="gap-1">
+              <RefreshCw className="w-4 h-4" />
+              רענן
+            </Button>
             <div className="relative flex-1 lg:w-64">
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <Input
