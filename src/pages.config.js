@@ -47,19 +47,19 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import Home from './pages/Home';
 import CreateTenant from './pages/CreateTenant';
-import TenantDashboard from './pages/TenantDashboard';
+import Home from './pages/Home';
 import PublicChat from './pages/PublicChat';
+import TenantDashboard from './pages/TenantDashboard';
 import WorkerLogin from './pages/WorkerLogin';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Home": Home,
     "CreateTenant": CreateTenant,
-    "TenantDashboard": TenantDashboard,
+    "Home": Home,
     "PublicChat": PublicChat,
+    "TenantDashboard": TenantDashboard,
     "WorkerLogin": WorkerLogin,
 }
 

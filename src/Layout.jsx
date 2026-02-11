@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { 
   Building2, LayoutDashboard, MessageSquare, BookOpen, 
   Settings, LogOut, Menu, X, Sparkles, Users, GraduationCap
@@ -53,8 +54,9 @@ export default function Layout({ children, currentPageName }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20" dir="rtl">
-      {/* Mobile Header */}
+    <TooltipProvider>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20" dir="rtl">
+        {/* Mobile Header */}
       <header className="lg:hidden sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center justify-between p-4">
           <Link to={createPageUrl('Home')} className="flex items-center gap-2">
@@ -65,9 +67,14 @@ export default function Layout({ children, currentPageName }) {
               שידורית AI
             </span>
           </Link>
-          <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)}>
+                {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>תפריט</TooltipContent>
+          </Tooltip>
         </div>
       </header>
 
@@ -121,14 +128,19 @@ export default function Layout({ children, currentPageName }) {
                     <p className="text-xs text-slate-500">{currentWorker.email}</p>
                   </div>
                 )}
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start gap-3 text-red-600"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="w-5 h-5" />
-                  התנתק
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      className="w-full justify-start gap-3 text-red-600"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="w-5 h-5" />
+                      התנתק
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>יציאה מהמערכת</TooltipContent>
+                </Tooltip>
               </div>
             </motion.aside>
           </>
@@ -170,14 +182,19 @@ export default function Layout({ children, currentPageName }) {
               <p className="text-xs text-slate-500">{currentWorker.email}</p>
             </div>
           )}
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start gap-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-            onClick={handleLogout}
-          >
-            <LogOut className="w-5 h-5" />
-            התנתק
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start gap-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                onClick={handleLogout}
+              >
+                <LogOut className="w-5 h-5" />
+                התנתק
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>יציאה מהמערכת</TooltipContent>
+          </Tooltip>
         </div>
       </aside>
 
@@ -185,6 +202,7 @@ export default function Layout({ children, currentPageName }) {
       <main className="lg:mr-64">
         {children}
       </main>
-    </div>
-  );
-}
+      </div>
+      </TooltipProvider>
+      );
+      }
