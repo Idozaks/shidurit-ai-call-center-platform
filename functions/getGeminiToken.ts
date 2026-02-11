@@ -26,14 +26,14 @@ Deno.serve(async (req) => {
       }
     );
 
+    const rawText = await response.text();
+    console.log("Response status:", response.status, "body:", rawText);
+
     if (!response.ok) {
-      const errText = await response.text();
-      console.error("Gemini token error:", response.status, errText);
-      return Response.json({ error: "Failed to create ephemeral token", details: errText }, { status: 500 });
+      return Response.json({ error: "Failed to create ephemeral token", details: rawText }, { status: 500 });
     }
 
-    const tokenData = await response.json();
-    console.log("Token created:", JSON.stringify(tokenData));
+    const tokenData = JSON.parse(rawText);
 
     return Response.json({
       token: tokenData.name,
