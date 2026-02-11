@@ -24,6 +24,24 @@ export default function LeadsTable({ tenantId, leads = [] }) {
   const [exporting, setExporting] = useState(false);
   const queryClient = useQueryClient();
 
+  const handleExportToSheets = async () => {
+    setExporting(true);
+    try {
+      const response = await base44.functions.invoke('exportLeadsToSheet', {
+        tenant_id: tenantId,
+        leads: filteredLeads
+      });
+      const { spreadsheetUrl } = response.data;
+      window.open(spreadsheetUrl, '_blank');
+      toast.success('הלידים יוצאו בהצלחה ל-Google Sheets');
+    } catch (err) {
+      console.error('Export error:', err);
+      toast.error('שגיאה בייצוא לידים');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Lead.update(id, data),
     onSuccess: () => {
