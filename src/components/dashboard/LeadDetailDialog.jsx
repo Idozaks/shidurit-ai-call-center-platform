@@ -1,0 +1,263 @@
+import React, { useState } from 'react';
+import { base44 } from '@/api/base44Client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { 
+  Sparkles, Phone, MessageSquare, Archive, CheckCircle, 
+  Loader2, User, Bot, X
+} from "lucide-react";
+import { toast } from "sonner";
+
+export default function LeadDetailDialog({ lead, tenantId, onClose }) {
+  const [analyzing, setAnalyzing] = useState(false);
+  const [followUpMsg, setFollowUpMsg] = useState('');
+  const [generatingMsg, setGeneratingMsg] = useState(false);
+  const queryClient = useQueryClient();
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.Lead.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leads', tenantId] });
+    }
+  });
+
+  // Find session by matching phone
+  const { data: sessions = [] } = useQuery({
+    queryKey: ['lead-sessions', lead?.customer_phone, tenantId],
+    queryFn: () => base44.entities.ChatSession.filter({ tenant_id: tenantId, customer_phone: lead.customer_phone }),
+    enabled: !!lead?.customer_phone && !!tenantId
+  });
+
+  const sessionId = sessions[0]?.id;
+
+  const { data: messages = [], isLoading: msgsLoading } = useQuery({
+    queryKey: ['lead-messages', sessionId],
+    queryFn: () => base44.entities.ChatMessage.filter({ session_id: sessionId }, 'created_date'),
+    enabled: !!sessionId
+  });
+
+  const runAnalysis = async () => {
+    setAnalyzing(true);
+    const transcript = messages.map(m => `${m.role === 'user' ? 'לקוח' : 'בוט'}: ${m.content}`).join('\n');
+    
+    const result = await base44.integrations.Core.InvokeLLM({
+      prompt: `נתח את השיחה הבאה עם הליד וספק סנטימנט, סיכום, ציון כוונה, ופעולה מומלצת.\n\nשם: ${lead.customer_name}\nשיחה:\n${transcript}`,
+      response_json_schema: {
+        type: "object",
+        properties: {
+          sentiment: { type: "string", enum: ["positive", "neutral", "negative"] },
+          summary: { type: "string" },
+          intent_score: { type: "number" },
+          ai_suggested_action: { type: "string" },
+          urgency_level: { type: "string", enum: ["low", "medium", "high"] }
+        }
+      }
+    });
+
+    await base44.entities.Lead.update(lead.id, {
+      sentiment: result.sentiment,
+      summary: result.summary,
+      intent_score: result.intent_score,
+      ai_suggested_action: result.ai_suggested_action,
+      urgency_level: result.urgency_level,
+      last_analysis_at: new Date().toISOString()
+    });
+    queryClient.invalidateQueries({ queryKey: ['leads'] });
+    toast.success('ניתוח AI הושלם');
+    setAnalyzing(false);
+  };
+
+  const generateFollowUp = async () => {
+    setGeneratingMsg(true);
+    const result = await base44.integrations.Core.InvokeLLM({
+      prompt: `צור הודעת מעקב קצרה וחמימה בעברית ללקוח.\nשם: ${lead.customer_name}\nסיבת פנייה: ${lead.inquiry_reason}\nסיכום: ${lead.summary || ''}\nפעולה מומלצת: ${lead.ai_suggested_action || ''}`,
+    });
+    setFollowUpMsg(result);
+    setGeneratingMsg(false);
+  };
+
+  const getSentimentBadge = (sentiment) => {
+    const config = {
+      positive: { label: 'חיובי', className: 'bg-green-100 text-green-700' },
+      neutral: { label: 'ניטרלי', className: 'bg-slate-100 text-slate-700' },
+      negative: { label: 'שלילי', className: 'bg-red-100 text-red-700' }
+    };
+    const c = config[sentiment] || config.neutral;
+    return <Badge className={c.className}>{c.label}</Badge>;
+  };
+
+  if (!lead) return null;
+
+  return (
+    <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto" dir="rtl">
+      <DialogHeader>
+        <div className="flex items-start justify-between">
+          <div />
+          <div className="text-right">
+            <DialogTitle className="text-lg">{lead.customer_name}</DialogTitle>
+            <p className="text-sm text-slate-500 mt-1">{lead.inquiry_reason || 'פנייה כללית'}</p>
+          </div>
+        </div>
+      </DialogHeader>
+
+      {/* Phone */}
+      {lead.customer_phone && (
+        <div className="flex items-center gap-2 justify-end text-sm text-slate-600">
+          {lead.customer_phone}
+          <Phone className="w-4 h-4" />
+        </div>
+      )}
+
+      {/* AI Analysis */}
+      <div className="flex items-center gap-2 justify-end">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="gap-1"
+          disabled={analyzing || messages.length === 0}
+          onClick={runAnalysis}
+        >
+          {analyzing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+          ניתוח AI
+        </Button>
+      </div>
+
+      {/* Sentiment + Summary */}
+      {lead.sentiment && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 justify-end">
+            {getSentimentBadge(lead.sentiment)}
+            <span className="text-sm text-slate-500">סנטימנט</span>
+          </div>
+          {lead.summary && (
+            <div>
+              <p className="text-sm text-slate-500 text-right">סיכום</p>
+              <p className="text-sm bg-slate-50 p-3 rounded-lg text-right">{lead.summary}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      <Separator />
+
+      {/* Action Buttons */}
+      <div className="flex gap-2 justify-center flex-wrap">
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1"
+          onClick={generateFollowUp}
+          disabled={generatingMsg}
+        >
+          {generatingMsg ? <Loader2 className="w-3 h-3 animate-spin" /> : <MessageSquare className="w-3 h-3" />}
+          הודעת מעקב
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1"
+          onClick={() => {
+            updateMutation.mutate({ id: lead.id, data: { status: 'contacted' } });
+            toast.success('סומן כנוצר קשר');
+          }}
+        >
+          <CheckCircle className="w-3 h-3" />
+          סמן כנוצר קשר
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1 text-red-600"
+          onClick={() => {
+            updateMutation.mutate({ id: lead.id, data: { status: 'lost' } });
+            toast.success('הועבר לארכיון');
+          }}
+        >
+          <Archive className="w-3 h-3" />
+          ארכיון
+        </Button>
+      </div>
+
+      {/* Follow-up message */}
+      {followUpMsg && (
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-right">הודעת מעקב מוצעת:</p>
+          <Textarea value={followUpMsg} onChange={(e) => setFollowUpMsg(e.target.value)} rows={4} className="text-right" />
+          <Button size="sm" variant="outline" className="gap-1" onClick={() => { navigator.clipboard.writeText(followUpMsg); toast.success('הועתק!'); }}>
+            העתק
+          </Button>
+        </div>
+      )}
+
+      {/* Status */}
+      <div className="flex items-center gap-2 justify-end">
+        <Select
+          value={lead.status}
+          onValueChange={(value) => updateMutation.mutate({ id: lead.id, data: { status: value } })}
+        >
+          <SelectTrigger className="w-32">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="new">חדש</SelectItem>
+            <SelectItem value="contacted">נוצר קשר</SelectItem>
+            <SelectItem value="converted">הומר</SelectItem>
+            <SelectItem value="lost">אבוד</SelectItem>
+          </SelectContent>
+        </Select>
+        <span className="text-sm text-slate-500">סטטוס</span>
+      </div>
+
+      {/* Notes */}
+      <div>
+        <p className="text-sm text-slate-500 mb-1 text-right">הערות</p>
+        <Textarea
+          value={lead.notes || ''}
+          onChange={(e) => updateMutation.mutate({ id: lead.id, data: { notes: e.target.value } })}
+          placeholder="הוסף הערות..."
+          className="text-right"
+        />
+      </div>
+
+      <Separator />
+
+      {/* Chat Transcript */}
+      <div>
+        <p className="text-sm font-medium flex items-center gap-2 justify-end mb-3">
+          תמלול שיחה
+          <MessageSquare className="w-4 h-4" />
+        </p>
+        {msgsLoading ? (
+          <div className="flex justify-center py-4">
+            <Loader2 className="w-5 h-5 animate-spin" />
+          </div>
+        ) : messages.length === 0 ? (
+          <p className="text-center text-sm text-slate-400 py-4">אין שיחה מקושרת</p>
+        ) : (
+          <ScrollArea className="max-h-[300px]">
+            <div className="space-y-3">
+              {messages.map((msg) => (
+                <div key={msg.id} className={`flex gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                  <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${
+                    msg.role === 'user'
+                      ? 'bg-indigo-50 dark:bg-indigo-900/30 rounded-tr-sm'
+                      : 'bg-slate-50 dark:bg-slate-700/50 rounded-tl-sm'
+                  }`}>
+                    <p className="text-xs text-slate-400 mb-1">{msg.role === 'user' ? 'לקוח' : 'בוט'}</p>
+                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        )}
+      </div>
+    </DialogContent>
+  );
+}
