@@ -10,10 +10,22 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function Layout({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [currentWorker, setCurrentWorker] = React.useState(null);
   const navigate = useNavigate();
 
+  // Check if worker is logged in
+  React.useEffect(() => {
+    const workerData = localStorage.getItem('shidurit_worker');
+    if (workerData) {
+      setCurrentWorker(JSON.parse(workerData));
+    } else if (currentPageName !== 'Login' && currentPageName !== 'PublicChat') {
+      // Redirect to login if not logged in and not on login/public pages
+      navigate(createPageUrl('Login'));
+    }
+  }, [currentPageName, navigate]);
+
   // Pages that should not have the sidebar/header
-  const publicPages = ['PublicChat'];
+  const publicPages = ['PublicChat', 'Login'];
   const isPublicPage = publicPages.includes(currentPageName);
 
   if (isPublicPage) {
@@ -27,8 +39,14 @@ export default function Layout({ children, currentPageName }) {
 
   const handleLogout = async () => {
     try {
-      const { base44 } = await import('@/api/base44Client');
-      await base44.auth.logout();
+      // Update online status if worker exists
+      if (currentWorker) {
+        const { base44 } = await import('@/api/base44Client');
+        await base44.entities.Worker.update(currentWorker.id, { is_online: false });
+      }
+      // Clear session
+      localStorage.removeItem('shidurit_worker');
+      navigate(createPageUrl('Login'));
     } catch (e) {
       console.error('Logout error:', e);
     }
@@ -140,6 +158,12 @@ export default function Layout({ children, currentPageName }) {
           ))}
         </nav>
         <div className="p-4 border-t border-slate-200 dark:border-slate-800">
+          {currentWorker && (
+            <div className="px-4 py-2 mb-2 text-sm">
+              <p className="font-medium text-slate-900 dark:text-slate-100">{currentWorker.full_name}</p>
+              <p className="text-xs text-slate-500">{currentWorker.email}</p>
+            </div>
+          )}
           <Button 
             variant="ghost" 
             className="w-full justify-start gap-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
