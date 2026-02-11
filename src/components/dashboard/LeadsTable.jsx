@@ -87,7 +87,17 @@ export default function LeadsTable({ tenantId, leads = [] }) {
             <User className="w-5 h-5 text-indigo-600" />
             ניהול לידים
           </CardTitle>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportToSheets}
+              disabled={exporting || filteredLeads.length === 0}
+              className="gap-2"
+            >
+              {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4 text-green-600" />}
+              ייצוא ל-Sheets
+            </Button>
             <div className="relative flex-1 lg:w-64">
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <Input
