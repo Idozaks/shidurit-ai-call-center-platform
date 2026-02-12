@@ -36,6 +36,7 @@ export default function Layout({ children, currentPageName }) {
   const navItems = [
     { name: 'Home', label: 'בית', icon: LayoutDashboard },
     { name: 'CreateTenant', label: 'עסק חדש', icon: Building2 },
+    { name: 'DoctorsCatalog', label: 'קטלוג רופאים', icon: Users },
   ];
 
   const handleLogout = async () => {
