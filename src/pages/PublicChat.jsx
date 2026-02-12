@@ -230,7 +230,7 @@ ${history}
       </header>
 
       {/* Chat Container */}
-      <div className="flex-1 max-w-3xl w-full mx-auto px-4 py-6">
+      <div className="flex-1 overflow-y-auto max-w-3xl w-full mx-auto px-4 py-6">
         {showNameInput ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
