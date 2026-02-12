@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
@@ -49,13 +49,15 @@ export default function TenantDashboard() {
   const { data: leads = [] } = useQuery({
     queryKey: ['leads', tenantId],
     queryFn: () => base44.entities.Lead.filter({ tenant_id: tenantId }, '-created_date'),
-    enabled: !!tenantId
+    enabled: !!tenantId,
+    refetchInterval: 15000
   });
 
   const { data: sessions = [] } = useQuery({
     queryKey: ['sessions', tenantId],
     queryFn: () => base44.entities.ChatSession.filter({ tenant_id: tenantId }, '-created_date'),
-    enabled: !!tenantId
+    enabled: !!tenantId,
+    refetchInterval: 15000
   });
 
   const { data: knowledge = [] } = useQuery({
@@ -63,6 +65,23 @@ export default function TenantDashboard() {
     queryFn: () => base44.entities.KnowledgeEntry.filter({ tenant_id: tenantId }),
     enabled: !!tenantId
   });
+
+  // Real-time subscriptions — auto-refresh when leads/sessions/messages change
+  useEffect(() => {
+    const unsubs = [
+      base44.entities.Lead.subscribe(() => {
+        queryClient.invalidateQueries({ queryKey: ['leads', tenantId] });
+      }),
+      base44.entities.ChatSession.subscribe(() => {
+        queryClient.invalidateQueries({ queryKey: ['sessions', tenantId] });
+      }),
+      base44.entities.ChatMessage.subscribe(() => {
+        queryClient.invalidateQueries({ queryKey: ['lead-messages'] });
+        queryClient.invalidateQueries({ queryKey: ['session-messages'] });
+      })
+    ];
+    return () => unsubs.forEach(u => u());
+  }, [tenantId, queryClient]);
 
   if (!tenantId) {
     return (
