@@ -210,34 +210,46 @@ export default function DoctorsCatalog() {
                           </div>
                         )}
 
-                        {/* Contact */}
-                        <div className="flex gap-2 pt-3 border-t border-slate-100">
-                          {doctor.phone && (
+                        {/* Contact & Profile Link */}
+                        <div className="flex flex-col gap-2 pt-3 border-t border-slate-100">
+                          <Link to={createPageUrl('DoctorProfile') + `&id=${doctor.id}`}>
                             <Button 
-                              variant="outline" 
                               size="sm" 
-                              className="flex-1 gap-1.5 text-xs"
-                              asChild
+                              className="w-full gap-1.5 text-xs text-white"
+                              style={{ backgroundColor: tenant?.theme_color || '#6366f1' }}
                             >
-                              <a href={`tel:${doctor.phone}`}>
-                                <Phone className="w-3.5 h-3.5" />
-                                {doctor.phone}
-                              </a>
+                              <ExternalLink className="w-3.5 h-3.5" />
+                              צפה בפרופיל המלא
                             </Button>
-                          )}
-                          {doctor.email && (
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="flex-1 gap-1.5 text-xs"
-                              asChild
-                            >
-                              <a href={`mailto:${doctor.email}`}>
-                                <Mail className="w-3.5 h-3.5" />
-                                אימייל
-                              </a>
-                            </Button>
-                          )}
+                          </Link>
+                          <div className="flex gap-2">
+                            {doctor.phone && (
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="flex-1 gap-1.5 text-xs"
+                                asChild
+                              >
+                                <a href={`tel:${doctor.phone}`}>
+                                  <Phone className="w-3.5 h-3.5" />
+                                  {doctor.phone}
+                                </a>
+                              </Button>
+                            )}
+                            {doctor.email && (
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="flex-1 gap-1.5 text-xs"
+                                asChild
+                              >
+                                <a href={`mailto:${doctor.email}`}>
+                                  <Mail className="w-3.5 h-3.5" />
+                                  אימייל
+                                </a>
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
