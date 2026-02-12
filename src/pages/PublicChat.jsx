@@ -12,6 +12,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from 'react-markdown';
 import VoiceChat from '../components/chat/VoiceChat';
+import SuggestionChips from '../components/chat/SuggestionChips';
 
 export default function PublicChat() {
   const urlParams = new URLSearchParams(window.location.search);
