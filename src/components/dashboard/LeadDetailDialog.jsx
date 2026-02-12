@@ -27,11 +27,25 @@ export default function LeadDetailDialog({ lead, tenantId, onClose }) {
     }
   });
 
-  // Find session by matching phone
+  // Find session by lead_id first, then fall back to phone match
   const { data: sessions = [] } = useQuery({
-    queryKey: ['lead-sessions', lead?.customer_phone, tenantId],
-    queryFn: () => base44.entities.ChatSession.filter({ tenant_id: tenantId, customer_phone: lead.customer_phone }),
-    enabled: !!lead?.customer_phone && !!tenantId
+    queryKey: ['lead-sessions', lead?.id, tenantId],
+    queryFn: async () => {
+      // Try by lead_id first
+      const byLeadId = await base44.entities.ChatSession.filter({ tenant_id: tenantId, lead_id: lead.id });
+      if (byLeadId.length > 0) return byLeadId;
+      // Fall back to customer_name match
+      if (lead.customer_name) {
+        const byName = await base44.entities.ChatSession.filter({ tenant_id: tenantId, customer_name: lead.customer_name });
+        if (byName.length > 0) return byName;
+      }
+      // Fall back to phone match
+      if (lead.customer_phone) {
+        return base44.entities.ChatSession.filter({ tenant_id: tenantId, customer_phone: lead.customer_phone });
+      }
+      return [];
+    },
+    enabled: !!lead?.id && !!tenantId
   });
 
   const sessionId = sessions[0]?.id;
