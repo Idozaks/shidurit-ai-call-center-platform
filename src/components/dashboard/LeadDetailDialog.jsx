@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -53,8 +53,24 @@ export default function LeadDetailDialog({ lead, tenantId, onClose }) {
   const { data: messages = [], isLoading: msgsLoading } = useQuery({
     queryKey: ['lead-messages', sessionId],
     queryFn: () => base44.entities.ChatMessage.filter({ session_id: sessionId }, 'created_date'),
-    enabled: !!sessionId
+    enabled: !!sessionId,
+    refetchInterval: 5000
   });
+
+  // Real-time: refresh messages & lead data as conversation happens
+  useEffect(() => {
+    const unsubs = [
+      base44.entities.ChatMessage.subscribe(() => {
+        if (sessionId) queryClient.invalidateQueries({ queryKey: ['lead-messages', sessionId] });
+      }),
+      base44.entities.Lead.subscribe((event) => {
+        if (event.id === lead?.id) {
+          queryClient.invalidateQueries({ queryKey: ['leads'] });
+        }
+      })
+    ];
+    return () => unsubs.forEach(u => u());
+  }, [sessionId, lead?.id, queryClient]);
 
   const runAnalysis = async () => {
     setAnalyzing(true);
