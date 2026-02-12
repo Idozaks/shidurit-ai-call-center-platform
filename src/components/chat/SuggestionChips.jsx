@@ -118,12 +118,21 @@ Return exactly 10 suggestions.`,
     </motion.button>
   );
 
+  const handleScroll = (e) => {
+    const scrollLeft = e.target.scrollLeft;
+    if (e.target === row1Ref.current && row2Ref.current) {
+      row2Ref.current.scrollLeft = scrollLeft;
+    } else if (e.target === row2Ref.current && row1Ref.current) {
+      row1Ref.current.scrollLeft = scrollLeft;
+    }
+  };
+
   return (
     <div className="space-y-1.5 py-2">
-      <div ref={row1Ref} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <div ref={row1Ref} onScroll={handleScroll} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {row1.map((text, i) => <ChipButton key={`r1-${i}`} text={text} index={i} />)}
       </div>
-      <div ref={row2Ref} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <div ref={row2Ref} onScroll={handleScroll} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {row2.map((text, i) => <ChipButton key={`r2-${i}`} text={text} index={i + midpoint} />)}
       </div>
     </div>
