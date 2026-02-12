@@ -120,12 +120,23 @@ Return exactly 10 suggestions.`,
     );
   }
 
-  // Detect if the AI is asking for personal details (name, phone, time, etc.)
+  // Show "Leave Details" chip: always after 2+ user messages, or if AI is asking for details
   const lastAssistantMessage = [...messages].reverse().find(m => m.role === 'assistant')?.content || '';
-  const detailsKeywords = ['שמך', 'שם מלא', 'מספר טלפון', 'טלפון שלך', 'פרטים', 'פרטי התקשרות', 'תאריך', 'שעה נוח', 'ליצור קשר', 'ספר לי מה שמך', 'אנא ספר', 'שתף אותי', 'אימייל', 'בפרטים', 'להשאיר פרטים', 'לחזור אליך', 'מספר הטלפון', 'פרטי קשר', 'השאר פרטים', 'שלח לי פרטים', 'פרטים נוספים'];
+  const detailsKeywords = [
+    'שמך', 'שם מלא', 'מספר טלפון', 'טלפון שלך', 'פרטים', 'פרטי התקשרות',
+    'תאריך', 'שעה נוח', 'ליצור קשר', 'ספר לי מה שמך', 'אנא ספר', 'שתף אותי',
+    'אימייל', 'בפרטים', 'להשאיר פרטים', 'לחזור אליך', 'מספר הטלפון', 'פרטי קשר',
+    'השאר פרטים', 'שלח לי פרטים', 'פרטים נוספים', 'זקוקה ל', 'זקוק ל',
+    'לקבוע תור', 'קביעת תור', 'תור עם', 'נציג', 'נחזור אליך', 'ניצור קשר',
+    'השאירו פרטים', 'מוזמן להשאיר', 'מוזמנת להשאיר', 'אשמח לקבל', 'צריך את',
+    'צריכה את', 'שם ומספר', 'שלח פרטים', 'למסור פרטים', 'תשאיר', 'תשאירי',
+    'אפשר לעזור', 'לתאם', 'לזמן', 'ליצור איתך קשר'
+  ];
   const isAskingForDetails = detailsKeywords.some(kw => lastAssistantMessage.includes(kw));
+  const userMessageCount = messages.filter(m => m.role === 'user').length;
+  const showDetailsChip = isAskingForDetails || userMessageCount >= 2;
 
-  if (suggestions.length === 0 && !isAskingForDetails) return null;
+  if (suggestions.length === 0 && !showDetailsChip) return null;
 
   const midpoint = Math.ceil(suggestions.length / 2);
   const row1 = suggestions.slice(0, midpoint);
@@ -217,7 +228,7 @@ Return exactly 10 suggestions.`,
         )}
         <div className="flex-1 min-w-0 space-y-1.5">
           <div ref={row1Ref} onScroll={handleScroll} className="flex gap-2 overflow-x-auto pb-1.5 chips-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: `${themeColor}40 transparent` }}>
-            {isAskingForDetails && <DetailsChip />}
+            {showDetailsChip && <DetailsChip />}
             {row1.map((text, i) => <ChipButton key={`r1-${i}`} text={text} index={i} />)}
           </div>
           {!collapsed && row2.length > 0 && (
