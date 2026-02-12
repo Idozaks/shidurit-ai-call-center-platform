@@ -120,11 +120,9 @@ ${history}
     }
   };
 
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (!inputValue.trim() || isTyping) return;
-
-    const userMessage = inputValue.trim();
+  const sendChat = async (text) => {
+    if (!text.trim() || isTyping) return;
+    const userMessage = text.trim();
     setInputValue('');
     
     // Add user message
