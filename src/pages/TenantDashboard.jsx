@@ -185,8 +185,8 @@ export default function TenantDashboard() {
           transition={{ delay: 0.2 }}
         >
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <div className="overflow-x-auto mb-6 -mx-2 px-2 scrollbar-hide">
-                <TabsList className="bg-gradient-to-r from-amber-500 to-orange-500 p-1.5 flex-nowrap h-auto gap-1 w-max">
+            <div className="mb-6">
+                <TabsList className="bg-gradient-to-r from-amber-500 to-orange-500 p-1.5 flex-wrap h-auto gap-1 w-full">
                   {[
                     { value: 'overview', icon: BarChart3, label: 'סקירה' },
                     { value: 'leads', icon: Users, label: 'לידים' },
