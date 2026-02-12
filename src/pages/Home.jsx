@@ -35,15 +35,20 @@ export default function Home() {
     ? allTenants
     : allTenants.filter(t => t.id === currentWorker?.tenant_id);
 
-  const { data: leads = [] } = useQuery({
+  const tenantIds = tenants.map(t => t.id);
+
+  const { data: allLeads = [] } = useQuery({
     queryKey: ['leads'],
     queryFn: () => base44.entities.Lead.list('-created_date', 100)
   });
 
-  const { data: sessions = [] } = useQuery({
+  const { data: allSessions = [] } = useQuery({
     queryKey: ['sessions'],
     queryFn: () => base44.entities.ChatSession.list('-created_date', 100)
   });
+
+  const leads = isSuperAdmin ? allLeads : allLeads.filter(l => tenantIds.includes(l.tenant_id));
+  const sessions = isSuperAdmin ? allSessions : allSessions.filter(s => tenantIds.includes(s.tenant_id));
 
   const filteredTenants = tenants.filter(t => 
     t.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
