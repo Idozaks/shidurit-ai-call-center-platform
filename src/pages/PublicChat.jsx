@@ -194,7 +194,7 @@ ${history}
 
   return (
     <div 
-      className="min-h-screen flex flex-col"
+      className="h-[100dvh] flex flex-col overflow-hidden"
       dir="rtl"
       style={{ 
         background: `linear-gradient(135deg, ${themeColor}10 0%, white 50%, ${themeColor}05 100%)` 
