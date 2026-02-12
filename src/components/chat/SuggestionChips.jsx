@@ -118,7 +118,7 @@ Return exactly 10 suggestions.`,
 
   // Detect if the AI is asking for personal details (name, phone, time, etc.)
   const lastAssistantMessage = [...messages].reverse().find(m => m.role === 'assistant')?.content || '';
-  const detailsKeywords = ['שמך', 'שם מלא', 'מספר טלפון', 'טלפון שלך', 'פרטים', 'פרטי התקשרות', 'תאריך', 'שעה נוח', 'ליצור קשר', 'ספר לי מה שמך', 'אנא ספר'];
+  const detailsKeywords = ['שמך', 'שם מלא', 'מספר טלפון', 'טלפון שלך', 'פרטים', 'פרטי התקשרות', 'תאריך', 'שעה נוח', 'ליצור קשר', 'ספר לי מה שמך', 'אנא ספר', 'שתף אותי', 'אימייל', 'בפרטים', 'להשאיר פרטים', 'לחזור אליך', 'מספר הטלפון', 'פרטי קשר', 'השאר פרטים', 'שלח לי פרטים', 'פרטים נוספים'];
   const isAskingForDetails = detailsKeywords.some(kw => lastAssistantMessage.includes(kw));
 
   if (suggestions.length === 0 && !isAskingForDetails) return null;
