@@ -9,8 +9,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Search, Phone, Mail, MapPin, Clock, Stethoscope, 
-  Loader2, CheckCircle2, XCircle, Filter
+  Loader2, CheckCircle2, XCircle, Filter, ExternalLink
 } from "lucide-react";
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function DoctorsCatalog() {
