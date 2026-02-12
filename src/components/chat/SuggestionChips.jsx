@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function SuggestionChips({ tenantId, messages, onSelect, themeColor, disabled }) {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const row1Ref = useRef(null);
   const row2Ref = useRef(null);
 
@@ -128,12 +129,25 @@ Return exactly 10 suggestions.`,
   };
 
   return (
-    <div className="space-y-1.5 py-2">
-      <div ref={row1Ref} onScroll={handleScroll} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-        {row1.map((text, i) => <ChipButton key={`r1-${i}`} text={text} index={i} />)}
-      </div>
-      <div ref={row2Ref} onScroll={handleScroll} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-        {row2.map((text, i) => <ChipButton key={`r2-${i}`} text={text} index={i + midpoint} />)}
+    <div className="py-2">
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="flex-shrink-0 p-1 rounded-full hover:bg-slate-100 transition-colors"
+          style={{ color: themeColor }}
+        >
+          {collapsed ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+        </button>
+        <div className="flex-1 min-w-0 space-y-1.5">
+          <div ref={row1Ref} onScroll={handleScroll} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {row1.map((text, i) => <ChipButton key={`r1-${i}`} text={text} index={i} />)}
+          </div>
+          {!collapsed && (
+            <div ref={row2Ref} onScroll={handleScroll} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {row2.map((text, i) => <ChipButton key={`r2-${i}`} text={text} index={i + midpoint} />)}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
