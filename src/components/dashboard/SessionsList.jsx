@@ -26,6 +26,7 @@ export default function SessionsList({ tenantId, sessions = [], tenant, onRefres
   const [selectedSession, setSelectedSession] = useState(null);
   const [analyzingId, setAnalyzingId] = useState(null);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { data: messages = [], isLoading: messagesLoading } = useQuery({
     queryKey: ['messages', selectedSession?.id],
