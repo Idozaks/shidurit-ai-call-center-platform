@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { format } from 'date-fns';
 import { toast } from "sonner";
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import GenerateConversationsDialog from './GenerateConversationsDialog';
 import ConvertToLeadsButton from './ConvertToLeadsButton';
 
