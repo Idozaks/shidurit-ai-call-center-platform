@@ -50,7 +50,7 @@ export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], s
     enabled: !!lead?.id && !!tenantId
   });
 
-  const sessionId = sessions[0]?.id;
+  const sessionId = leadSessions[0]?.id;
 
   const { data: messages = [], isLoading: msgsLoading } = useQuery({
     queryKey: ['lead-messages', sessionId],
