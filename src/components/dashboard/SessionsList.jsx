@@ -25,6 +25,7 @@ export default function SessionsList({ tenantId, sessions = [], tenant, onRefres
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedSession, setSelectedSession] = useState(null);
   const [analyzingId, setAnalyzingId] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -124,8 +125,18 @@ export default function SessionsList({ tenantId, sessions = [], tenant, onRefres
           <div className="flex gap-2 flex-wrap">
             <GenerateConversationsDialog tenantId={tenantId} tenant={tenant} />
             <ConvertToLeadsButton tenantId={tenantId} sessions={sessions} existingLeads={leads} />
-            <Button variant="ghost" size="sm" onClick={onRefresh} className="gap-1">
-              <RefreshCw className="w-4 h-4" />
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              disabled={isRefreshing}
+              onClick={async () => {
+                setIsRefreshing(true);
+                await onRefresh?.();
+                setTimeout(() => setIsRefreshing(false), 800);
+              }} 
+              className="gap-1"
+            >
+              <RefreshCw className={`w-4 h-4 transition-transform ${isRefreshing ? 'animate-spin' : ''}`} />
               רענן
             </Button>
             <div className="relative flex-1 lg:w-64">

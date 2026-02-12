@@ -22,6 +22,7 @@ export default function LeadsTable({ tenantId, leads = [], onRefresh }) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedLead, setSelectedLead] = useState(null);
   const [exporting, setExporting] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const queryClient = useQueryClient();
 
   const handleExportToSheets = async () => {
@@ -88,8 +89,18 @@ export default function LeadsTable({ tenantId, leads = [], onRefresh }) {
             ניהול לידים
           </CardTitle>
           <div className="flex gap-2 flex-wrap">
-            <Button variant="ghost" size="sm" onClick={onRefresh} className="gap-1">
-              <RefreshCw className="w-4 h-4" />
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              disabled={isRefreshing}
+              onClick={async () => {
+                setIsRefreshing(true);
+                await onRefresh?.();
+                setTimeout(() => setIsRefreshing(false), 800);
+              }} 
+              className="gap-1"
+            >
+              <RefreshCw className={`w-4 h-4 transition-transform ${isRefreshing ? 'animate-spin' : ''}`} />
               רענן
             </Button>
             <Button

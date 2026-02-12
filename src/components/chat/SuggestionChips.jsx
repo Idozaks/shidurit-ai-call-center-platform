@@ -179,13 +179,13 @@ Return exactly 10 suggestions.`,
   return (
     <div className="py-2">
       <div className="flex items-center gap-1">
-        {suggestions.length > 0 && (
+        {suggestions.length > 0 && row2.length > 0 && (
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="flex-shrink-0 p-1 rounded-full hover:bg-slate-100 transition-colors"
+            className="flex-shrink-0 p-1.5 rounded-full hover:bg-slate-100 transition-colors z-10"
             style={{ color: themeColor }}
           >
-            {collapsed ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            {collapsed ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
         )}
         <div className="flex-1 min-w-0 space-y-1.5">
