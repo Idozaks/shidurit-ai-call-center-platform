@@ -16,6 +16,7 @@ import { motion } from "framer-motion";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: tenants = [], isLoading } = useQuery({
@@ -70,13 +71,18 @@ export default function Home() {
                   <Button 
                     variant="outline" 
                     size="icon"
-                    onClick={() => {
-                      queryClient.invalidateQueries({ queryKey: ['tenants'] });
-                      queryClient.invalidateQueries({ queryKey: ['leads'] });
-                      queryClient.invalidateQueries({ queryKey: ['sessions'] });
+                    disabled={isRefreshing}
+                    onClick={async () => {
+                      setIsRefreshing(true);
+                      await Promise.all([
+                        queryClient.invalidateQueries({ queryKey: ['tenants'] }),
+                        queryClient.invalidateQueries({ queryKey: ['leads'] }),
+                        queryClient.invalidateQueries({ queryKey: ['sessions'] }),
+                      ]);
+                      setTimeout(() => setIsRefreshing(false), 800);
                     }}
                   >
-                    <RefreshCw className="w-4 h-4" />
+                    <RefreshCw className={`w-4 h-4 transition-transform ${isRefreshing ? 'animate-spin' : ''}`} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>רענן נתונים</TooltipContent>
