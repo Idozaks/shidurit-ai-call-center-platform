@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 
-export default function SuggestionChips({ tenantId, messages, onSelect, themeColor, disabled }) {
+export default function SuggestionChips({ tenantId, messages, onSelect, themeColor, disabled, onOpenDetailsModal }) {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -90,7 +90,12 @@ Return exactly 10 suggestions.`,
     );
   }
 
-  if (suggestions.length === 0) return null;
+  // Detect if the AI is asking for personal details (name, phone, time, etc.)
+  const lastAssistantMessage = [...messages].reverse().find(m => m.role === 'assistant')?.content || '';
+  const detailsKeywords = ['שמך', 'שם מלא', 'מספר טלפון', 'טלפון שלך', 'פרטים', 'פרטי התקשרות', 'תאריך', 'שעה נוח', 'ליצור קשר', 'ספר לי מה שמך', 'אנא ספר'];
+  const isAskingForDetails = detailsKeywords.some(kw => lastAssistantMessage.includes(kw));
+
+  if (suggestions.length === 0 && !isAskingForDetails) return null;
 
   const midpoint = Math.ceil(suggestions.length / 2);
   const row1 = suggestions.slice(0, midpoint);
@@ -128,21 +133,41 @@ Return exactly 10 suggestions.`,
     }
   };
 
+  const DetailsChip = () => (
+    <motion.button
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      onClick={() => onOpenDetailsModal?.()}
+      disabled={disabled}
+      className="text-sm px-4 py-1.5 rounded-full border-2 transition-colors whitespace-nowrap disabled:opacity-50 flex-shrink-0 font-medium"
+      style={{
+        borderColor: themeColor,
+        color: 'white',
+        backgroundColor: themeColor,
+      }}
+    >
+      📋 השאר פרטים
+    </motion.button>
+  );
+
   return (
     <div className="py-2">
       <div className="flex items-center gap-1">
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="flex-shrink-0 p-1 rounded-full hover:bg-slate-100 transition-colors"
-          style={{ color: themeColor }}
-        >
-          {collapsed ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-        </button>
+        {suggestions.length > 0 && (
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="flex-shrink-0 p-1 rounded-full hover:bg-slate-100 transition-colors"
+            style={{ color: themeColor }}
+          >
+            {collapsed ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+        )}
         <div className="flex-1 min-w-0 space-y-1.5">
           <div ref={row1Ref} onScroll={handleScroll} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {isAskingForDetails && <DetailsChip />}
             {row1.map((text, i) => <ChipButton key={`r1-${i}`} text={text} index={i} />)}
           </div>
-          {!collapsed && (
+          {!collapsed && row2.length > 0 && (
             <div ref={row2Ref} onScroll={handleScroll} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               {row2.map((text, i) => <ChipButton key={`r2-${i}`} text={text} index={i + midpoint} />)}
             </div>

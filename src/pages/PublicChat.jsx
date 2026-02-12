@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from 'react-markdown';
 import VoiceChat from '../components/chat/VoiceChat';
 import SuggestionChips from '../components/chat/SuggestionChips';
+import DetailsInputModal from '../components/chat/DetailsInputModal';
 
 export default function PublicChat() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -27,6 +28,7 @@ export default function PublicChat() {
   const [showNameInput, setShowNameInput] = useState(true);
   const leadIdRef = useRef(null);
   const [chatMode, setChatMode] = useState('voice'); // 'text' or 'voice'
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const messagesEndRef = useRef(null);
 
   const { data: tenant, isLoading: tenantLoading } = useQuery({
@@ -532,6 +534,14 @@ ${history}
         )}
       </div>
 
+      {/* Details Modal */}
+      <DetailsInputModal
+        open={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        onSubmit={(text) => sendChat(text)}
+        themeColor={themeColor}
+      />
+
       {/* Input */}
       {!showNameInput && chatMode === 'text' && (
         <div className="flex-shrink-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-t px-4 pt-2 pb-4">
@@ -542,6 +552,7 @@ ${history}
               onSelect={(text) => sendChat(text)}
               themeColor={themeColor}
               disabled={isTyping}
+              onOpenDetailsModal={() => setShowDetailsModal(true)}
             />
           </div>
           <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto flex gap-2">
