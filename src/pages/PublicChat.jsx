@@ -25,6 +25,7 @@ export default function PublicChat() {
   const [leadId, setLeadId] = useState(null);
   const [customerName, setCustomerName] = useState('');
   const [showNameInput, setShowNameInput] = useState(true);
+  const leadIdRef = useRef(null);
   const [chatMode, setChatMode] = useState('voice'); // 'text' or 'voice'
   const messagesEndRef = useRef(null);
 
@@ -39,14 +40,8 @@ export default function PublicChat() {
 
   const createSessionMutation = useMutation({
     mutationFn: async ({ name }) => {
-      const lead = await base44.entities.Lead.create({
-        tenant_id: tenant.id,
-        customer_name: name,
-        status: 'new'
-      });
       const session = await base44.entities.ChatSession.create({
         tenant_id: tenant.id,
-        lead_id: lead.id,
         customer_name: name,
         status: 'active',
         mode: chatMode === 'voice' ? 'voice' : 'text'
@@ -55,9 +50,7 @@ export default function PublicChat() {
     },
     onSuccess: (session) => {
       setSessionId(session.id);
-      setLeadId(session.lead_id);
       setShowNameInput(false);
-      // Add welcome message
       if (tenant?.welcome_message) {
         setMessages([{
           id: 'welcome',
@@ -100,36 +93,40 @@ export default function PublicChat() {
       return aiResponse;
     },
     onSuccess: () => {
-      // Run lead analysis in background after each message exchange
-      if (leadId) {
-        analyzeLead();
-      }
+      // Run lead intelligence in background after each message exchange
+      analyzeAndManageLead();
     }
   });
 
-  const analyzeLead = async () => {
+  const analyzeAndManageLead = async () => {
     const allMessages = messages.map(m => 
       `${m.role === 'user' ? 'לקוח' : 'נציג'}: ${m.content}`
     ).join('\n');
 
-    const analysis = await base44.integrations.Core.InvokeLLM({
-      prompt: `Analyze this customer service conversation and extract lead intelligence.
+    const currentLeadId = leadIdRef.current;
 
+    const analysis = await base44.integrations.Core.InvokeLLM({
+      prompt: `Analyze this customer service conversation in real-time.
+
+Customer name: ${customerName}
 Conversation:
 ${allMessages}
 
-Analyze and return:
-1. intent_score (0-100): How likely is this person to convert/buy/schedule? 0=just browsing, 100=ready to buy/schedule now
-2. sentiment: "positive", "neutral", or "negative" - the customer's overall mood
-3. inquiry_reason: A short Hebrew summary of what they're asking about (e.g. "קביעת תור לגינקולוג", "מחירון שירותים")
-4. urgency_level: "low", "medium", or "high" - how urgent is their need
-5. priority: "low", "normal", or "high" - overall lead priority based on intent + urgency
-6. summary: A brief Hebrew summary of the conversation so far (1-2 sentences)
-7. ai_suggested_action: A short Hebrew suggestion for next action (e.g. "להציע קביעת תור", "לשלוח מחירון")
-8. competitor_detected: true/false - did the customer mention a competitor`,
+Determine:
+1. is_lead: Should this person be tracked as a lead? true if they showed any real interest (asked about services, pricing, scheduling, specific questions about the business). false if they only said hello or asked something completely unrelated.
+2. intent_score (0-100): Purchase/conversion intent. 0=no intent, 30=curious, 50=interested, 70=considering, 90+=ready to act
+3. sentiment: "positive", "neutral", or "negative"
+4. inquiry_reason: Short Hebrew description of what they want (e.g. "קביעת תור לגינקולוג", "בירור מחירים")
+5. urgency_level: "low", "medium", or "high"
+6. priority: "low", "normal", or "high" based on intent + urgency combined
+7. summary: Brief Hebrew summary of conversation (1-2 sentences)
+8. ai_suggested_action: Short Hebrew next-step suggestion
+9. competitor_detected: boolean
+10. status: "new" if just started showing interest, "contacted" if actively engaged in conversation`,
       response_json_schema: {
         type: "object",
         properties: {
+          is_lead: { type: "boolean" },
           intent_score: { type: "number" },
           sentiment: { type: "string", enum: ["positive", "neutral", "negative"] },
           inquiry_reason: { type: "string" },
@@ -137,13 +134,16 @@ Analyze and return:
           priority: { type: "string", enum: ["low", "normal", "high"] },
           summary: { type: "string" },
           ai_suggested_action: { type: "string" },
-          competitor_detected: { type: "boolean" }
+          competitor_detected: { type: "boolean" },
+          status: { type: "string", enum: ["new", "contacted"] }
         },
-        required: ["intent_score", "sentiment", "inquiry_reason", "urgency_level", "priority", "summary", "ai_suggested_action", "competitor_detected"]
+        required: ["is_lead", "intent_score", "sentiment", "inquiry_reason", "urgency_level", "priority", "summary", "ai_suggested_action", "competitor_detected", "status"]
       }
     });
 
-    await base44.entities.Lead.update(leadId, {
+    if (!analysis.is_lead) return;
+
+    const leadData = {
       intent_score: analysis.intent_score,
       sentiment: analysis.sentiment,
       inquiry_reason: analysis.inquiry_reason,
@@ -152,8 +152,27 @@ Analyze and return:
       summary: analysis.summary,
       ai_suggested_action: analysis.ai_suggested_action,
       competitor_detected: analysis.competitor_detected,
+      status: analysis.status,
       last_analysis_at: new Date().toISOString()
-    });
+    };
+
+    if (currentLeadId) {
+      // Lead exists — update it with fresh intelligence
+      await base44.entities.Lead.update(currentLeadId, leadData);
+    } else {
+      // Create lead for the first time
+      const newLead = await base44.entities.Lead.create({
+        tenant_id: tenant.id,
+        customer_name: customerName,
+        ...leadData
+      });
+      leadIdRef.current = newLead.id;
+      setLeadId(newLead.id);
+      // Link session to lead
+      if (sessionId) {
+        await base44.entities.ChatSession.update(sessionId, { lead_id: newLead.id });
+      }
+    }
   };
 
   const buildPrompt = (userMessage) => {
