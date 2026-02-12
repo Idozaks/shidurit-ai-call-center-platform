@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { 
   Plus, Building2, MessageSquare, Users, TrendingUp, 
-  Search, Settings, ExternalLink, BarChart3, Sparkles
+  Search, Settings, ExternalLink, BarChart3, Sparkles, RefreshCw
 } from "lucide-react";
 import { motion } from "framer-motion";
 
