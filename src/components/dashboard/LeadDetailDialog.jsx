@@ -30,7 +30,7 @@ export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], s
   });
 
   // Find session by lead_id first, then fall back to phone match
-  const { data: sessions = [] } = useQuery({
+  const { data: leadSessions = [] } = useQuery({
     queryKey: ['lead-sessions', lead?.id, tenantId],
     queryFn: async () => {
       // Try by lead_id first
