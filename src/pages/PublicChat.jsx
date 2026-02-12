@@ -450,7 +450,6 @@ ${history}
               <Send className="w-5 h-5" />
             </Button>
           </form>
-          </div>
         </div>
       )}
     </div>
