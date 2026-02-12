@@ -10,14 +10,16 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { 
   Sparkles, Phone, MessageSquare, Archive, CheckCircle, 
-  Loader2, User, Bot, X
+  Loader2, User, Bot, X, Zap, Swords, ShieldCheck, TrendingDown, Copy
 } from "lucide-react";
 import { toast } from "sonner";
 
-export default function LeadDetailDialog({ lead, tenantId, onClose }) {
+export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], sessions = [], onClose }) {
   const [analyzing, setAnalyzing] = useState(false);
   const [followUpMsg, setFollowUpMsg] = useState('');
   const [generatingMsg, setGeneratingMsg] = useState(false);
+  const [runningToolId, setRunningToolId] = useState(null);
+  const [toolResult, setToolResult] = useState(null);
   const queryClient = useQueryClient();
 
   const updateMutation = useMutation({
@@ -103,6 +105,62 @@ export default function LeadDetailDialog({ lead, tenantId, onClose }) {
     setAnalyzing(false);
   };
 
+  const INLINE_TOOLS = [
+    { id: 'lead_scorer', name: 'ניקוד ליד', icon: Sparkles, color: 'text-amber-500' },
+    { id: 'smart_followup', name: 'הודעת מעקב', icon: MessageSquare, color: 'text-green-500' },
+    { id: 'competitor_clash', name: 'ניתוח מתחרים', icon: Swords, color: 'text-purple-500' },
+    { id: 'revenue_leak', name: 'דליפות הכנסה', icon: TrendingDown, color: 'text-red-500' },
+  ];
+
+  const runInlineTool = async (toolId) => {
+    setRunningToolId(toolId);
+    setToolResult(null);
+
+    const prompts = {
+      lead_scorer: `נתח את הליד הבא ותן ציון כוונת רכישה (0-100), רמת דחיפות, וסנטימנט.\n\nשם: ${lead?.customer_name}\nסיבת פנייה: ${lead?.inquiry_reason}\nסיכום: ${lead?.summary || 'אין'}\nעובדות: ${JSON.stringify(lead?.facts_json || {})}`,
+      smart_followup: `צור הודעת וואטסאפ מעקב מותאמת אישית ללקוח.\n\nשם: ${lead?.customer_name}\nסיבת פנייה: ${lead?.inquiry_reason}\nסיכום שיחה: ${lead?.summary || 'אין'}\nסטטוס: ${lead?.status}\nעסק: ${tenant?.company_name}`,
+      competitor_clash: `נתח את השיחה עם הליד וזהה אזכורי מתחרים. צור נקודות מכירה ייחודיות לעסק.\n\nשם לקוח: ${lead?.customer_name}\nסיכום: ${lead?.summary || 'אין'}\nעובדות: ${JSON.stringify(lead?.facts_json || {})}\nעסק: ${tenant?.company_name}`,
+      revenue_leak: `נתח את השיחות הבאות וזהה הזדמנויות שפוספסו ודליפות הכנסה.\n\nשיחות סגורות: ${sessions.filter(s => s.status === 'closed').length}\nלידים שאבדו: ${leads.filter(l => l.status === 'lost').length}\nסה"כ לידים: ${leads.length}\nלידים חמים: ${leads.filter(l => (l.intent_score || 0) >= 70).length}`
+    };
+
+    const result = await base44.integrations.Core.InvokeLLM({
+      prompt: prompts[toolId],
+      response_json_schema: {
+        type: "object",
+        properties: {
+          title: { type: "string" },
+          content: { type: "string" },
+          action_items: { type: "array", items: { type: "string" } }
+        }
+      }
+    });
+
+    if (toolId === 'lead_scorer' && lead) {
+      const scoreResult = await base44.integrations.Core.InvokeLLM({
+        prompt: prompts[toolId],
+        response_json_schema: {
+          type: "object",
+          properties: {
+            intent_score: { type: "number" },
+            urgency_level: { type: "string", enum: ["low", "medium", "high"] },
+            sentiment: { type: "string", enum: ["positive", "neutral", "negative"] },
+            summary: { type: "string" }
+          }
+        }
+      });
+      await base44.entities.Lead.update(lead.id, {
+        intent_score: scoreResult.intent_score,
+        urgency_level: scoreResult.urgency_level,
+        sentiment: scoreResult.sentiment
+      });
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
+    }
+
+    setToolResult(result);
+    setRunningToolId(null);
+    toast.success('הכלי הופעל בהצלחה');
+  };
+
   const generateFollowUp = async () => {
     setGeneratingMsg(true);
     const result = await base44.integrations.Core.InvokeLLM({
@@ -173,6 +231,56 @@ export default function LeadDetailDialog({ lead, tenantId, onClose }) {
           )}
         </div>
       )}
+
+      {/* AI Toolbox Inline */}
+      <div className="space-y-2">
+        <p className="text-sm text-slate-500 text-right">כלי AI</p>
+        <div className="flex flex-wrap gap-1.5 justify-end">
+          {INLINE_TOOLS.map((tool) => (
+            <Button
+              key={tool.id}
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-xs h-7 px-2.5"
+              disabled={!!runningToolId}
+              onClick={() => runInlineTool(tool.id)}
+            >
+              {runningToolId === tool.id ? (
+                <Loader2 className="w-3 h-3 animate-spin" />
+              ) : (
+                <tool.icon className={`w-3 h-3 ${tool.color}`} />
+              )}
+              {tool.name}
+            </Button>
+          ))}
+        </div>
+
+        {/* Tool Result */}
+        {toolResult && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <Button variant="ghost" size="sm" className="h-6 text-xs gap-1" onClick={() => { navigator.clipboard.writeText(toolResult.content); toast.success('הועתק!'); }}>
+                <Copy className="w-3 h-3" /> העתק
+              </Button>
+              <p className="text-sm font-bold text-amber-800">{toolResult.title}</p>
+            </div>
+            <p className="text-xs text-amber-900 whitespace-pre-wrap">{toolResult.content}</p>
+            {toolResult.action_items?.length > 0 && (
+              <ul className="space-y-0.5">
+                {toolResult.action_items.map((item, i) => (
+                  <li key={i} className="text-xs text-amber-800 flex items-start gap-1">
+                    <span className="text-amber-500 mt-0.5">•</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <Button variant="ghost" size="sm" className="h-6 text-xs text-amber-600" onClick={() => setToolResult(null)}>
+              סגור תוצאה
+            </Button>
+          </div>
+        )}
+      </div>
 
       <Separator />
 
