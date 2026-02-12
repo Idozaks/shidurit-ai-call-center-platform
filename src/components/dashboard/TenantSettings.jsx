@@ -29,7 +29,8 @@ export default function TenantSettings({ tenant }) {
     system_prompt: '',
     usage_limit: 100,
     is_active: true,
-    closer_mode_enabled: false
+    closer_mode_enabled: false,
+    gemini_api_key: ''
   });
 
   useEffect(() => {
@@ -44,7 +45,8 @@ export default function TenantSettings({ tenant }) {
         system_prompt: tenant.system_prompt || '',
         usage_limit: tenant.usage_limit || 100,
         is_active: tenant.is_active !== false,
-        closer_mode_enabled: tenant.closer_mode_enabled || false
+        closer_mode_enabled: tenant.closer_mode_enabled || false,
+        gemini_api_key: tenant.gemini_api_key || ''
       });
     }
   }, [tenant]);
