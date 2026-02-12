@@ -64,17 +64,35 @@ export default function Home() {
                 פלטפורמת מוקד שירות אוטונומי מונע בינה מלאכותית
               </p>
             </div>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link to={createPageUrl('CreateTenant')}>
-                  <Button className="bg-gradient-to-l from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-lg shadow-indigo-500/25">
-                    <Plus className="w-4 h-4 ml-2" />
-                    הוסף עסק חדש
+            <div className="flex gap-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={() => {
+                      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+                      queryClient.invalidateQueries({ queryKey: ['leads'] });
+                      queryClient.invalidateQueries({ queryKey: ['sessions'] });
+                    }}
+                  >
+                    <RefreshCw className="w-4 h-4" />
                   </Button>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>יצירת עסק חדש במערכת</TooltipContent>
-            </Tooltip>
+                </TooltipTrigger>
+                <TooltipContent>רענן נתונים</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link to={createPageUrl('CreateTenant')}>
+                    <Button className="bg-gradient-to-l from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-lg shadow-indigo-500/25">
+                      <Plus className="w-4 h-4 ml-2" />
+                      הוסף עסק חדש
+                    </Button>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>יצירת עסק חדש במערכת</TooltipContent>
+              </Tooltip>
+            </div>
           </div>
         </motion.div>
 
