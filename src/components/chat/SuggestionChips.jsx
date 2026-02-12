@@ -40,27 +40,31 @@ export default function SuggestionChips({ tenantId, messages, onSelect, themeCol
         prompt: isFirstInteraction 
           ? `You are generating suggestion chips for a customer chat interface in Hebrew.
 
-The business "${knowledgeSummary.split('\n')[0]}" has knowledge about these topics:
-${knowledgeSummary}
+Business name: "${knowledgeSummary.split('\n')[0]}"
 
 This is the FIRST interaction - the customer just opened the chat.
 
+Generate EXACTLY 10 short suggestion chips (2-4 words each) in Hebrew.
+These should be the most BASIC and GENERIC questions ANY customer would ask ANY business. 
+Do NOT use business-specific terminology or jargon. Keep it extremely simple.
+
+Use suggestions like these (pick 10, adapt the wording to sound natural):
+- מה אתם מציעים?
+- כמה זה עולה?
+- מתי אתם פתוחים?
+- איפה אתם נמצאים?
+- אפשר לקבוע תור?
+- יש מבצעים?
+- ספרו לי עליכם
+- איך יוצרים קשר?
+- מה התהליך?
+- יש הדגמה?
+
 Rules:
-1. Generate EXACTLY 10 suggestions.
-2. Suggestions should be SIMPLE, COMMON questions any typical customer would ask.
-3. Each suggestion should be 2-5 words in Hebrew.
-4. Focus on the most basic, everyday things customers care about:
-   - שעות פעילות / שעות פתיחה
-   - מחירון / עלויות
-   - כתובת / איך מגיעים
-   - פרטי התקשרות
-   - לקבוע תור / פגישה
-   - שירותים עיקריים (1-2 of the MOST popular/common services)
-   - מבצעים / הנחות
-5. Do NOT suggest niche, specific, or esoteric topics. Keep it broad and accessible.
-6. Think like a regular customer who just found this business and wants basic info.
-7. Make them sound natural and conversational.
-8. Order from most common to less common.
+1. MAXIMUM 4 words per suggestion.
+2. Use everyday Hebrew, no technical terms.
+3. Think like someone who knows NOTHING about the business and just wants basics.
+4. Do NOT mention specific product names, features, or services by name.
 
 Return exactly 10 suggestions.`
           : `You are generating suggestion chips for a customer chat interface in Hebrew.
