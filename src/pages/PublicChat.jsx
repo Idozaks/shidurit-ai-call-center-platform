@@ -219,6 +219,7 @@ ${history}
 לקוח: ${userMessage}
 
 כללים חשובים:
+- CRITICAL: You MUST respond ONLY in Hebrew. Do NOT use any other language (no English, no Chinese, no Arabic, no other language). Every single word in your response must be in Hebrew.
 - ענה בעברית בצורה ידידותית ומקצועית. היה תמציתי וענייני.
 - ${isFirstMessage ? 'זו ההודעה הראשונה של הלקוח - הצג את עצמך בשמך פעם אחת בלבד.' : 'זו שיחה מתמשכת - אל תציג את עצמך שוב, אל תגיד שלום שוב, אל תחזור על שמך. פשוט המשך את השיחה ישירות וענה לשאלה.'}
 - אל תחזור על מידע שכבר אמרת בהיסטוריית השיחה.`;
