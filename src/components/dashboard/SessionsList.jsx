@@ -201,7 +201,7 @@ export default function SessionsList({ tenantId, sessions = [], tenant, onRefres
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                     {!sessionHasLead(session.id) && (
                       <Tooltip>
                         <TooltipTrigger asChild>
