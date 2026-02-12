@@ -163,7 +163,8 @@ export default function SessionsList({ tenantId, sessions = [], tenant, onRefres
             {filteredSessions.map((session) => (
               <div 
                 key={session.id}
-                className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                onClick={() => navigate(createPageUrl('ConversationView') + `?sessionId=${session.id}&tenantId=${tenantId}`)}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
