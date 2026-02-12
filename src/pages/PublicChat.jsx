@@ -105,24 +105,53 @@ export default function PublicChat() {
 
     const currentLeadId = leadIdRef.current;
 
-    const analysis = await base44.integrations.Core.InvokeLLM({
-      prompt: `Analyze this customer service conversation in real-time.
+    const businessType = tenant?.system_prompt || '';
+    const businessName = tenant?.company_name || 'העסק';
 
+    const analysis = await base44.integrations.Core.InvokeLLM({
+      prompt: `You are a lead detection engine. Analyze this customer service conversation and decide if the person qualifies as a lead.
+
+Business name: ${businessName}
+Business context/category: ${businessType}
 Customer name: ${customerName}
+
 Conversation:
 ${allMessages}
 
-Determine:
-1. is_lead: Should this person be tracked as a lead? true if they showed any real interest (asked about services, pricing, scheduling, specific questions about the business). false if they only said hello or asked something completely unrelated.
-2. intent_score (0-100): Purchase/conversion intent. 0=no intent, 30=curious, 50=interested, 70=considering, 90+=ready to act
+=== LEAD DETECTION CRITERIA ===
+A person becomes a lead when ANY of these conditions are met:
+- intent_score reaches 40 or above
+- They shared ANY personal details (name beyond greeting, phone, email, address, even small details)
+- They asked about pricing, costs, or fees
+- They asked about specific services, products, or treatments the business offers
+- They showed interest in scheduling, booking, or making an appointment
+- They expressed desire to contact or speak with the business owner/staff
+- They asked about availability, opening hours with intent to visit
+- They compared options or mentioned competitors (signals active shopping)
+
+A person is NOT a lead if they:
+- Only said hello/greeting without substance
+- Asked something completely unrelated to the business
+- Are clearly a bot or spam
+
+IMPORTANT: Adapt your judgment to the business category. For example:
+- Medical/clinic: asking about symptoms, treatments, doctors = lead
+- Restaurant: asking about menu, reservations, catering = lead  
+- Legal: asking about case types, consultation = lead
+- E-commerce: asking about products, shipping, returns = lead
+- Services: asking about availability, pricing, process = lead
+
+=== ANALYSIS FIELDS ===
+1. is_lead: boolean based on criteria above
+2. intent_score (0-100): 0=no intent, 20=slightly curious, 40=interested (LEAD THRESHOLD), 60=seriously considering, 80=ready to act, 95+=urgent need
 3. sentiment: "positive", "neutral", or "negative"
-4. inquiry_reason: Short Hebrew description of what they want (e.g. "קביעת תור לגינקולוג", "בירור מחירים")
+4. inquiry_reason: Short Hebrew description of what they want
 5. urgency_level: "low", "medium", or "high"
 6. priority: "low", "normal", or "high" based on intent + urgency combined
 7. summary: Brief Hebrew summary of conversation (1-2 sentences)
-8. ai_suggested_action: Short Hebrew next-step suggestion
+8. ai_suggested_action: Short Hebrew next-step suggestion for the business owner
 9. competitor_detected: boolean
-10. status: "new" if just started showing interest, "contacted" if actively engaged in conversation`,
+10. status: "new" if just started showing interest, "contacted" if actively engaged`,
       response_json_schema: {
         type: "object",
         properties: {
