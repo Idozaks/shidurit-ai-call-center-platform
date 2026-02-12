@@ -52,6 +52,7 @@ import Home from './pages/Home';
 import PublicChat from './pages/PublicChat';
 import TenantDashboard from './pages/TenantDashboard';
 import WorkerLogin from './pages/WorkerLogin';
+import ConversationView from './pages/ConversationView';
 import __Layout from './Layout.jsx';
 
 
@@ -61,6 +62,7 @@ export const PAGES = {
     "PublicChat": PublicChat,
     "TenantDashboard": TenantDashboard,
     "WorkerLogin": WorkerLogin,
+    "ConversationView": ConversationView,
 }
 
 export const pagesConfig = {
