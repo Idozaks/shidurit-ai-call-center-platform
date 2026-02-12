@@ -312,27 +312,7 @@ export default function TenantDashboard() {
             </TabsContent>
 
             <TabsContent value="api">
-              <Card className="border-0 shadow-lg bg-white/70 dark:bg-slate-800/70">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Key className="w-5 h-5 text-indigo-600" />
-                    מפתח API
-                  </CardTitle>
-                  <CardDescription>מפתח לגישה ישירה לבוט דרך API חיצוני</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg font-mono text-sm break-all direction-ltr text-left">
-                    sk-{tenantId?.slice(0, 8)}-{tenant?.slug}-{tenantId?.slice(-8)}
-                  </div>
-                  <p className="text-sm text-slate-500">השתמש במפתח זה בכותרת Authorization כ-Bearer token.</p>
-                  <div className="bg-slate-900 text-green-400 p-4 rounded-lg font-mono text-xs text-left direction-ltr overflow-x-auto">
-                    <pre>{`curl -X POST https://api.shidurit.ai/v1/chat \\
-  -H "Authorization: Bearer sk-${tenantId?.slice(0, 8)}-${tenant?.slug}-${tenantId?.slice(-8)}" \\
-  -H "Content-Type: application/json" \\
-  -d '{"message": "שלום", "customer_name": "ישראל"}'`}</pre>
-                  </div>
-                </CardContent>
-              </Card>
+              <GeminiKeySection tenant={tenant} tenantId={tenantId} />
             </TabsContent>
 
             <TabsContent value="info">
