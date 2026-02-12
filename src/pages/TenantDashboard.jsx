@@ -185,49 +185,27 @@ export default function TenantDashboard() {
           transition={{ delay: 0.2 }}
         >
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="bg-gradient-to-r from-amber-500 to-orange-500 p-1.5 mb-6 flex-wrap h-auto gap-1 mx-auto w-fit">
-              <TabsTrigger value="overview" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
-                <BarChart3 className="w-4 h-4" />
-                <span className="text-[10px] sm:text-sm leading-tight">סקירה</span>
-              </TabsTrigger>
-              <TabsTrigger value="leads" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
-                <Users className="w-4 h-4" />
-                <span className="text-[10px] sm:text-sm leading-tight">לידים</span>
-              </TabsTrigger>
-              <TabsTrigger value="sessions" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
-                <MessageSquare className="w-4 h-4" />
-                <span className="text-[10px] sm:text-sm leading-tight">שיחות</span>
-              </TabsTrigger>
-              
-              <TabsTrigger value="toolbox" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
-                <Wrench className="w-4 h-4" />
-                <span className="text-[10px] sm:text-sm leading-tight">ארגז כלים</span>
-              </TabsTrigger>
-              <TabsTrigger value="performance" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
-                <BarChart3 className="w-4 h-4" />
-                <span className="text-[10px] sm:text-sm leading-tight">ביצועים</span>
-              </TabsTrigger>
-              <TabsTrigger value="settings" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
-                <Settings className="w-4 h-4" />
-                <span className="text-[10px] sm:text-sm leading-tight">הגדרות בוט</span>
-              </TabsTrigger>
-              <TabsTrigger value="api" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
-                <Key className="w-4 h-4" />
-                <span className="text-[10px] sm:text-sm leading-tight">API</span>
-              </TabsTrigger>
-              <TabsTrigger value="doctors" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
-                <UserCheck className="w-4 h-4" />
-                <span className="text-[10px] sm:text-sm leading-tight">רופאים / אנשי קשר</span>
-              </TabsTrigger>
-              <TabsTrigger value="info" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
-                <FileText className="w-4 h-4" />
-                <span className="text-[10px] sm:text-sm leading-tight">מידע</span>
-              </TabsTrigger>
-              <TabsTrigger value="profile" className="gap-2 text-xs sm:text-sm flex-shrink-0 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:scale-105 hover:bg-white/20">
-                <Users className="w-4 h-4" />
-                <span className="text-[10px] sm:text-sm leading-tight">פרופיל</span>
-              </TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto mb-6 -mx-2 px-2 scrollbar-hide">
+                <TabsList className="bg-gradient-to-r from-amber-500 to-orange-500 p-1.5 flex-nowrap h-auto gap-1 w-max">
+                  {[
+                    { value: 'overview', icon: BarChart3, label: 'סקירה' },
+                    { value: 'leads', icon: Users, label: 'לידים' },
+                    { value: 'sessions', icon: MessageSquare, label: 'שיחות' },
+                    { value: 'toolbox', icon: Wrench, label: 'כלים' },
+                    { value: 'performance', icon: BarChart3, label: 'ביצועים' },
+                    { value: 'settings', icon: Settings, label: 'הגדרות' },
+                    { value: 'api', icon: Key, label: 'API' },
+                    { value: 'doctors', icon: UserCheck, label: 'אנשי קשר' },
+                    { value: 'info', icon: FileText, label: 'מידע' },
+                    { value: 'profile', icon: Users, label: 'פרופיל' },
+                  ].map(tab => (
+                    <TabsTrigger key={tab.value} value={tab.value} className="gap-1.5 text-xs flex-shrink-0 px-3 py-1.5 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:bg-white/20">
+                      <tab.icon className="w-3.5 h-3.5" />
+                      {tab.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </div>
 
             <TabsContent value="overview">
               <div className="grid lg:grid-cols-2 gap-6">
