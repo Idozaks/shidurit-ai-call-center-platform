@@ -22,6 +22,7 @@ export default function PublicChat() {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [sessionId, setSessionId] = useState(null);
+  const [leadId, setLeadId] = useState(null);
   const [customerName, setCustomerName] = useState('');
   const [showNameInput, setShowNameInput] = useState(true);
   const [chatMode, setChatMode] = useState('voice'); // 'text' or 'voice'
@@ -54,6 +55,7 @@ export default function PublicChat() {
     },
     onSuccess: (session) => {
       setSessionId(session.id);
+      setLeadId(session.lead_id);
       setShowNameInput(false);
       // Add welcome message
       if (tenant?.welcome_message) {
@@ -96,8 +98,63 @@ export default function PublicChat() {
       }
 
       return aiResponse;
+    },
+    onSuccess: () => {
+      // Run lead analysis in background after each message exchange
+      if (leadId) {
+        analyzeLead();
+      }
     }
   });
+
+  const analyzeLead = async () => {
+    const allMessages = messages.map(m => 
+      `${m.role === 'user' ? 'לקוח' : 'נציג'}: ${m.content}`
+    ).join('\n');
+
+    const analysis = await base44.integrations.Core.InvokeLLM({
+      prompt: `Analyze this customer service conversation and extract lead intelligence.
+
+Conversation:
+${allMessages}
+
+Analyze and return:
+1. intent_score (0-100): How likely is this person to convert/buy/schedule? 0=just browsing, 100=ready to buy/schedule now
+2. sentiment: "positive", "neutral", or "negative" - the customer's overall mood
+3. inquiry_reason: A short Hebrew summary of what they're asking about (e.g. "קביעת תור לגינקולוג", "מחירון שירותים")
+4. urgency_level: "low", "medium", or "high" - how urgent is their need
+5. priority: "low", "normal", or "high" - overall lead priority based on intent + urgency
+6. summary: A brief Hebrew summary of the conversation so far (1-2 sentences)
+7. ai_suggested_action: A short Hebrew suggestion for next action (e.g. "להציע קביעת תור", "לשלוח מחירון")
+8. competitor_detected: true/false - did the customer mention a competitor`,
+      response_json_schema: {
+        type: "object",
+        properties: {
+          intent_score: { type: "number" },
+          sentiment: { type: "string", enum: ["positive", "neutral", "negative"] },
+          inquiry_reason: { type: "string" },
+          urgency_level: { type: "string", enum: ["low", "medium", "high"] },
+          priority: { type: "string", enum: ["low", "normal", "high"] },
+          summary: { type: "string" },
+          ai_suggested_action: { type: "string" },
+          competitor_detected: { type: "boolean" }
+        },
+        required: ["intent_score", "sentiment", "inquiry_reason", "urgency_level", "priority", "summary", "ai_suggested_action", "competitor_detected"]
+      }
+    });
+
+    await base44.entities.Lead.update(leadId, {
+      intent_score: analysis.intent_score,
+      sentiment: analysis.sentiment,
+      inquiry_reason: analysis.inquiry_reason,
+      urgency_level: analysis.urgency_level,
+      priority: analysis.priority,
+      summary: analysis.summary,
+      ai_suggested_action: analysis.ai_suggested_action,
+      competitor_detected: analysis.competitor_detected,
+      last_analysis_at: new Date().toISOString()
+    });
+  };
 
   const buildPrompt = (userMessage) => {
     const history = messages.map(m => `${m.role === 'user' ? 'לקוח' : tenant?.ai_persona_name || 'נועה'}: ${m.content}`).join('\n');
