@@ -34,14 +34,42 @@ export default function SuggestionChips({ tenantId, messages, onSelect, themeCol
 
       const lastAssistantMsg = [...messages].reverse().find(m => m.role === 'assistant')?.content || '';
 
+      const isFirstInteraction = messages.filter(m => m.role === 'user').length === 0;
+
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are generating suggestion chips for a customer chat interface in Hebrew.
+        prompt: isFirstInteraction 
+          ? `You are generating suggestion chips for a customer chat interface in Hebrew.
+
+The business "${knowledgeSummary.split('\n')[0]}" has knowledge about these topics:
+${knowledgeSummary}
+
+This is the FIRST interaction - the customer just opened the chat.
+
+Rules:
+1. Generate EXACTLY 10 suggestions.
+2. Suggestions should be SIMPLE, COMMON questions any typical customer would ask.
+3. Each suggestion should be 2-5 words in Hebrew.
+4. Focus on the most basic, everyday things customers care about:
+   - שעות פעילות / שעות פתיחה
+   - מחירון / עלויות
+   - כתובת / איך מגיעים
+   - פרטי התקשרות
+   - לקבוע תור / פגישה
+   - שירותים עיקריים (1-2 of the MOST popular/common services)
+   - מבצעים / הנחות
+5. Do NOT suggest niche, specific, or esoteric topics. Keep it broad and accessible.
+6. Think like a regular customer who just found this business and wants basic info.
+7. Make them sound natural and conversational.
+8. Order from most common to less common.
+
+Return exactly 10 suggestions.`
+          : `You are generating suggestion chips for a customer chat interface in Hebrew.
 
 The business has knowledge about these topics:
 ${knowledgeSummary}
 
 Full conversation so far:
-${fullConversation || 'No messages yet - this is the start of the conversation.'}
+${fullConversation}
 
 Last assistant message: "${lastAssistantMsg}"
 
@@ -50,14 +78,12 @@ Rules:
 2. ONLY suggest things the business has knowledge about.
 3. Each suggestion should be 2-6 words in Hebrew.
 4. Make them sound natural, like a real customer would say or ask.
-5. If the conversation just started, suggest broad topics covering different areas of the business knowledge.
-6. If the conversation is ongoing:
-   - The first 3-4 should be direct follow-ups to what was just discussed (proactive, flowing naturally from the last assistant message).
-   - The next 3-4 should explore related but different topics from the knowledge base.
-   - The last 2-3 should be general actions like asking for pricing, contact info, scheduling, etc.
-7. Never repeat something the customer already asked.
-8. Make each suggestion distinct - no duplicates or near-duplicates.
-9. Order them by relevance to the current conversation flow.
+5. The first 3-4 should be direct follow-ups to what was just discussed (proactive, flowing naturally from the last assistant message).
+6. The next 3-4 should explore related but different topics from the knowledge base.
+7. The last 2-3 should be general actions like asking for pricing, contact info, scheduling, etc.
+8. Never repeat something the customer already asked.
+9. Make each suggestion distinct - no duplicates or near-duplicates.
+10. Order them by relevance to the current conversation flow.
 
 Return exactly 10 suggestions.`,
         response_json_schema: {
