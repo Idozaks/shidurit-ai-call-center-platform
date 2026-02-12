@@ -155,6 +155,11 @@ ${history}
     }
   };
 
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+    sendChat(inputValue);
+  };
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -425,7 +430,7 @@ ${history}
             <SuggestionChips
               tenantId={tenant?.id}
               messages={messages}
-              onSelect={(text) => setInputValue(text)}
+              onSelect={(text) => sendChat(text)}
               themeColor={themeColor}
               disabled={isTyping}
             />
