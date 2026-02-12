@@ -178,6 +178,29 @@ Return exactly 10 suggestions.`,
 
   return (
     <div className="py-2">
+      <style>{`
+        .chips-scrollbar::-webkit-scrollbar {
+          height: 4px;
+        }
+        .chips-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .chips-scrollbar::-webkit-scrollbar-thumb {
+          background: ${themeColor}40;
+          border-radius: 4px;
+        }
+        .chips-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: ${themeColor}70;
+        }
+        @media (max-width: 768px) {
+          .chips-scrollbar::-webkit-scrollbar {
+            height: 0;
+          }
+          .chips-scrollbar {
+            scrollbar-width: none !important;
+          }
+        }
+      `}</style>
       <div className="flex items-center gap-1">
         {suggestions.length > 0 && row2.length > 0 && (
           <button
@@ -189,12 +212,12 @@ Return exactly 10 suggestions.`,
           </button>
         )}
         <div className="flex-1 min-w-0 space-y-1.5">
-          <div ref={row1Ref} onScroll={handleScroll} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div ref={row1Ref} onScroll={handleScroll} className="flex gap-2 overflow-x-auto pb-1.5 chips-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: `${themeColor}40 transparent` }}>
             {isAskingForDetails && <DetailsChip />}
             {row1.map((text, i) => <ChipButton key={`r1-${i}`} text={text} index={i} />)}
           </div>
           {!collapsed && row2.length > 0 && (
-            <div ref={row2Ref} onScroll={handleScroll} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div ref={row2Ref} onScroll={handleScroll} className="flex gap-2 overflow-x-auto pb-1.5 chips-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: `${themeColor}40 transparent` }}>
               {row2.map((text, i) => <ChipButton key={`r2-${i}`} text={text} index={i + midpoint} />)}
             </div>
           )}
