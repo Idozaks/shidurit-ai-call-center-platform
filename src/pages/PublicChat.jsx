@@ -101,6 +101,7 @@ export default function PublicChat() {
 
   const buildPrompt = (userMessage) => {
     const history = messages.map(m => `${m.role === 'user' ? 'לקוח' : tenant?.ai_persona_name || 'נועה'}: ${m.content}`).join('\n');
+    const isFirstMessage = messages.filter(m => m.role === 'user').length === 0;
     
     return `אתה ${tenant?.ai_persona_name || 'נועה'}, נציג/ת שירות לקוחות של ${tenant?.company_name || 'העסק'}.
 ${tenant?.system_prompt || ''}
@@ -110,7 +111,10 @@ ${history}
 
 לקוח: ${userMessage}
 
-ענה בעברית בצורה ידידותית ומקצועית. היה תמציתי וענייני.`;
+כללים חשובים:
+- ענה בעברית בצורה ידידותית ומקצועית. היה תמציתי וענייני.
+- ${isFirstMessage ? 'זו ההודעה הראשונה של הלקוח - הצג את עצמך בשמך פעם אחת בלבד.' : 'זו שיחה מתמשכת - אל תציג את עצמך שוב, אל תגיד שלום שוב, אל תחזור על שמך. פשוט המשך את השיחה ישירות וענה לשאלה.'}
+- אל תחזור על מידע שכבר אמרת בהיסטוריית השיחה.`;
   };
 
   const handleStartChat = (e) => {
