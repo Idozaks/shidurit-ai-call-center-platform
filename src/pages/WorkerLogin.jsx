@@ -69,7 +69,8 @@ export default function WorkerLogin() {
         email: worker.email,
         full_name: worker.full_name,
         role: worker.role,
-        tenant_id: worker.tenant_id
+        tenant_id: worker.tenant_id,
+        is_super_admin: worker.is_super_admin || false
       }));
 
       // Update online status

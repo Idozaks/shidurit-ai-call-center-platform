@@ -19,10 +19,21 @@ export default function Home() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data: tenants = [], isLoading } = useQuery({
+  const currentWorker = React.useMemo(() => {
+    const data = localStorage.getItem('shidurit_worker');
+    return data ? JSON.parse(data) : null;
+  }, []);
+
+  const isSuperAdmin = currentWorker?.is_super_admin === true;
+
+  const { data: allTenants = [], isLoading } = useQuery({
     queryKey: ['tenants'],
     queryFn: () => base44.entities.Tenant.list('-created_date')
   });
+
+  const tenants = isSuperAdmin
+    ? allTenants
+    : allTenants.filter(t => t.id === currentWorker?.tenant_id);
 
   const { data: leads = [] } = useQuery({
     queryKey: ['leads'],
