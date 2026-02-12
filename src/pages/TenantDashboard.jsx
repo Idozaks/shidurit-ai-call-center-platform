@@ -287,7 +287,7 @@ export default function TenantDashboard() {
             </TabsContent>
 
             <TabsContent value="leads">
-              <LeadsTable tenantId={tenantId} leads={leads} onRefresh={refreshAll} />
+              <LeadsTable tenantId={tenantId} tenant={tenant} leads={leads} sessions={sessions} onRefresh={refreshAll} />
             </TabsContent>
 
             <TabsContent value="sessions">
