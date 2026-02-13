@@ -212,8 +212,8 @@ export default function TenantDashboard() {
                 <TabsList className="bg-gradient-to-r from-amber-500 to-orange-500 p-1.5 flex-wrap h-auto gap-1 w-full">
                   {[
                     { value: 'overview', icon: BarChart3, label: 'סקירה' },
-                    { value: 'leads', icon: Users, label: 'לידים' },
-                    { value: 'sessions', icon: MessageSquare, label: 'שיחות' },
+                    { value: 'leads', icon: Users, label: 'לידים', count: leads.length },
+                    { value: 'sessions', icon: MessageSquare, label: 'שיחות', count: sessions.length },
                     { value: 'toolbox', icon: Wrench, label: 'כלים' },
                     { value: 'performance', icon: BarChart3, label: 'ביצועים' },
                     { value: 'settings', icon: Settings, label: 'הגדרות' },
@@ -225,6 +225,11 @@ export default function TenantDashboard() {
                     <TabsTrigger key={tab.value} value={tab.value} className="gap-1.5 text-xs flex-shrink-0 px-3 py-1.5 text-white/80 data-[state=active]:text-orange-700 data-[state=active]:bg-white transition-all duration-200 hover:bg-white/20">
                       <tab.icon className="w-3.5 h-3.5" />
                       {tab.label}
+                      {tab.count !== undefined && (
+                        <span className="mr-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-white/25 data-[state=active]:bg-orange-100 text-[10px] font-bold px-1">
+                          {tab.count}
+                        </span>
+                      )}
                     </TabsTrigger>
                   ))}
                 </TabsList>
