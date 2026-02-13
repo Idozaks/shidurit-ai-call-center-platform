@@ -66,23 +66,8 @@ export default function ConversationView() {
 
   const isWorkerActive = session?.status === 'agent_active';
 
-  const handleTakeControl = async () => {
-    await base44.entities.ChatSession.update(sessionId, { 
-      status: 'agent_active',
-      assigned_worker_id: currentWorker?.id || ''
-    });
-    queryClient.invalidateQueries({ queryKey: ['session-detail', sessionId] });
-    toast.success('השתלטת על השיחה — הבוט מושבת');
-  };
-
-  const handleReleaseToBot = async () => {
-    await base44.entities.ChatSession.update(sessionId, { 
-      status: 'active',
-      assigned_worker_id: ''
-    });
-    queryClient.invalidateQueries({ queryKey: ['session-detail', sessionId] });
-    toast.success('השיחה חזרה לבוט');
-  };
+  const handleTakeControl = () => handleChangeStatus('agent_active');
+  const handleReleaseToBot = () => handleChangeStatus('active');
 
   const handleChangeStatus = async (newStatus) => {
     const updateData = { status: newStatus };
