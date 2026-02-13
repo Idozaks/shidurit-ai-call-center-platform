@@ -467,7 +467,7 @@ ${leadsInfo}
 
       {/* Lead selection dialog */}
       <Dialog open={!!selectedTool && selectedTool.action === 'select_lead'} onOpenChange={(open) => { if (!open) { setSelectedTool(null); setToolResult(null); } }}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto" dir="rtl">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto" dir="rtl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {selectedTool && <selectedTool.icon className={`w-5 h-5 ${selectedTool?.color}`} />}
@@ -512,7 +512,7 @@ ${leadsInfo}
 
       {/* Deep analysis result dialog */}
       <Dialog open={!!selectedTool && selectedTool.action === 'run' && !!toolResult} onOpenChange={(open) => { if (!open) { setSelectedTool(null); setToolResult(null); } }}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto" dir="rtl">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto" dir="rtl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {selectedTool && <selectedTool.icon className={`w-5 h-5 ${selectedTool?.color}`} />}
@@ -530,7 +530,7 @@ ${leadsInfo}
 
       {/* Multi-lead selection dialog (hallucination, lead_scorer, competitor_clash) */}
       <Dialog open={!!selectedTool && selectedTool.action === 'multi_lead'} onOpenChange={(open) => { if (!open) { setSelectedTool(null); setToolResult(null); setMultiLeadMode(null); setSelectedLeadIds([]); } }}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto" dir="rtl">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto" dir="rtl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {selectedTool && <selectedTool.icon className={`w-5 h-5 ${selectedTool?.color}`} />}
