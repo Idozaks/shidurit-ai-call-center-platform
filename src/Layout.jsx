@@ -2,12 +2,9 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
-
 import { 
-  Building2, LayoutDashboard, MessageSquare, BookOpen, 
-  Settings, LogOut, Menu, X, Sparkles, Users, GraduationCap
+  Building2, LayoutDashboard, LogOut, Menu, X, Sparkles, Users
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 export default function Layout({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -17,16 +14,15 @@ export default function Layout({ children, currentPageName }) {
   const publicPages = ['PublicChat', 'WorkerLogin', 'DoctorProfile', 'ProcedurePage'];
   const isPublicPage = publicPages.includes(currentPageName);
 
-  // Check if worker is logged in (only for non-public pages)
-    React.useEffect(() => {
-      if (isPublicPage) return;
-      const workerData = localStorage.getItem('shidurit_worker');
-      if (workerData) {
-        setCurrentWorker(JSON.parse(workerData));
-      } else {
-        navigate(createPageUrl('WorkerLogin'));
-      }
-    }, [currentPageName, isPublicPage]);
+  React.useEffect(() => {
+    if (isPublicPage) return;
+    const workerData = localStorage.getItem('shidurit_worker');
+    if (workerData) {
+      setCurrentWorker(JSON.parse(workerData));
+    } else {
+      navigate(createPageUrl('WorkerLogin'));
+    }
+  }, [currentPageName, isPublicPage]);
 
   if (isPublicPage) {
     return <>{children}</>;
@@ -36,27 +32,21 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Home', label: 'בית', icon: LayoutDashboard },
     { name: 'CreateTenant', label: 'עסק חדש', icon: Building2 },
     { name: 'DoctorsCatalog', label: 'קטלוג רופאים', icon: Users },
-
   ];
 
-  const handleLogout = async () => {
-    // Clear session first to ensure logout always works
+  const handleLogout = () => {
     localStorage.removeItem('shidurit_worker');
-    // Try to update online status, but don't block logout
-    try {
-      if (currentWorker) {
-        const { base44 } = await import('@/api/base44Client');
-        await base44.entities.Worker.update(currentWorker.id, { is_online: false });
-      }
-    } catch (e) {
-      console.error('Logout status update error:', e);
+    if (currentWorker) {
+      import('@/api/base44Client').then(({ base44 }) => {
+        base44.entities.Worker.update(currentWorker.id, { is_online: false }).catch(() => {});
+      }).catch(() => {});
     }
-    navigate(createPageUrl('WorkerLogin'));
+    window.location.href = createPageUrl('WorkerLogin');
   };
 
   return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20" dir="rtl">
-        {/* Mobile Header */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20" dir="rtl">
+      {/* Mobile Header */}
       <header className="lg:hidden sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center justify-between p-4">
           <Link to={createPageUrl('Home')} className="flex items-center gap-2">
@@ -75,19 +65,22 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden">
+        <div className="fixed inset-0 z-[60] lg:hidden">
           <div 
             className="absolute inset-0 bg-black/50"
             onClick={() => setSidebarOpen(false)}
           />
-          <div className="absolute top-0 right-0 bottom-0 w-64 bg-white dark:bg-slate-900 shadow-xl flex flex-col">
-            <div className="p-4 border-b border-slate-200 dark:border-slate-800">
+          <div className="absolute top-0 right-0 bottom-0 w-64 bg-white dark:bg-slate-900 shadow-xl flex flex-col z-[70]">
+            <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center">
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
                 <span className="font-bold text-lg">שידורית AI</span>
               </div>
+              <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(false)}>
+                <X className="w-5 h-5" />
+              </Button>
             </div>
             <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
               {navItems.map((item) => (
@@ -105,27 +98,23 @@ export default function Layout({ children, currentPageName }) {
                   <span>{item.label}</span>
                 </Link>
               ))}
-
-              <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
-                {currentWorker && (
-                  <div className="px-3 py-2 mb-2 text-sm">
-                    <p className="font-medium text-slate-900 dark:text-slate-100">{currentWorker.full_name}</p>
-                    <p className="text-xs text-slate-500">{currentWorker.email}</p>
-                  </div>
-                )}
-                <a
-                  href="#logout"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleLogout();
-                  }}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 active:bg-red-100 transition-colors"
-                >
-                  <LogOut className="w-5 h-5" />
-                  <span>התנתק</span>
-                </a>
-              </div>
             </nav>
+            <div className="p-4 border-t border-slate-200 dark:border-slate-800">
+              {currentWorker && (
+                <div className="px-3 py-2 mb-2 text-sm">
+                  <p className="font-medium text-slate-900 dark:text-slate-100">{currentWorker.full_name}</p>
+                  <p className="text-xs text-slate-500">{currentWorker.email}</p>
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-red-600 hover:bg-red-50 active:bg-red-100 transition-colors text-sm font-medium"
+              >
+                <LogOut className="w-5 h-5" />
+                התנתק
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -180,6 +169,6 @@ export default function Layout({ children, currentPageName }) {
       <main className="lg:mr-64">
         {children}
       </main>
-      </div>
-      );
-      }
+    </div>
+  );
+}
