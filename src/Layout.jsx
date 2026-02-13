@@ -37,7 +37,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Home', label: 'בית', icon: LayoutDashboard },
     { name: 'CreateTenant', label: 'עסק חדש', icon: Building2 },
     { name: 'DoctorsCatalog', label: 'קטלוג רופאים', icon: Users },
-    { name: 'ShiduritSystemPrompt', label: 'System Prompt', icon: BookOpen },
+
   ];
 
   const handleLogout = async () => {
