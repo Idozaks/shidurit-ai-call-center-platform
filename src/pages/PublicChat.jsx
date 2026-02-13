@@ -49,13 +49,13 @@ export default function PublicChat() {
 
   const createSessionMutation = useMutation({
     mutationFn: async ({ name }) => {
-      const session = await base44.entities.ChatSession.create({
+      const res = await publicApi({
+        action: 'createSession',
         tenant_id: tenant.id,
         customer_name: name,
-        status: 'active',
         mode: chatMode === 'voice' ? 'voice' : 'text'
       });
-      return session;
+      return res.session;
     },
     onSuccess: (session) => {
       setSessionId(session.id);
