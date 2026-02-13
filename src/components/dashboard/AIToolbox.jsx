@@ -78,6 +78,17 @@ const TOOLS = [
     color: 'text-red-500',
     bgColor: 'bg-red-50',
     action: 'run'
+  },
+  {
+    id: 'knowledge_gaps',
+    name: 'פערי ידע',
+    nameEn: 'Knowledge Gaps',
+    description: 'זיהוי שאלות שהבוט לא ידע לענות עליהן — חוסרים בבסיס הידע',
+    icon: HelpCircle,
+    speed: 'עמוק',
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-50',
+    action: 'run'
   }
 ];
 
