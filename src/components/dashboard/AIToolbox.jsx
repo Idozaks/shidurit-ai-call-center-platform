@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { 
   Sparkles, Zap, MessageSquare, Swords, ShieldCheck, 
   TrendingDown, BarChart3, Loader2, ArrowLeft, HelpCircle, 
-  Users, Target
+  Users, Target, AlertTriangle
 } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from 'react-markdown';
@@ -112,6 +112,17 @@ const TOOLS = [
     speed: 'עמוק',
     color: 'text-emerald-500',
     bgColor: 'bg-emerald-50',
+    action: 'run'
+  },
+  {
+    id: 'hallucination_detector',
+    name: 'גלאי הזיות',
+    nameEn: 'Hallucination Detector',
+    description: 'סריקת שיחות הבוט וזיהוי מידע שהומצא — שלא מופיע בבסיס הידע או בהנחיות העסק',
+    icon: AlertTriangle,
+    speed: 'עמוק',
+    color: 'text-rose-500',
+    bgColor: 'bg-rose-50',
     action: 'run'
   }
 ];
