@@ -47,6 +47,9 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
   const [customCategory, setCustomCategory] = useState('');
   const [uploading, setUploading] = useState(false);
   const [bulkUploading, setBulkUploading] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState([]); // {file_url, file_name, status: 'uploaded'|'analyzing'|'analyzed', title, content, category}
+  const [analyzing, setAnalyzing] = useState(false);
+  const [savingBulk, setSavingBulk] = useState(false);
   const queryClient = useQueryClient();
 
   const entries = knowledge;
