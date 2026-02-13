@@ -265,7 +265,7 @@ export default function TenantDashboard() {
                               </Badge>
                             </button>
                             {selectedOverviewLead?.id === lead.id && (
-                              <LeadDetailDialog lead={selectedOverviewLead} tenantId={tenantId} tenant={tenant} leads={leads} sessions={sessions} onClose={() => setSelectedOverviewLead(null)} />
+                              <LeadDetailDialog lead={selectedOverviewLead} tenantId={tenantId} tenant={tenant} leads={leads} sessions={sessions} knowledge={knowledge} onClose={() => setSelectedOverviewLead(null)} />
                             )}
                           </Dialog>
                         ))}
