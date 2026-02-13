@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
 import { 
   Building2, LayoutDashboard, MessageSquare, BookOpen, 
   Settings, LogOut, Menu, X, Sparkles, Users, GraduationCap
