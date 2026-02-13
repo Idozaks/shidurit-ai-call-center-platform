@@ -40,6 +40,8 @@ export default function CompassChat({ tenantId, leads = [], sessions = [] }) {
   const [isLoading, setIsLoading] = useState(false);
   const [pulseActive, setPulseActive] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [dynamicChips, setDynamicChips] = useState([]);
+  const [chipsLoading, setChipsLoading] = useState(false);
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -57,6 +59,53 @@ export default function CompassChat({ tenantId, leads = [], sessions = [] }) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isLoading]);
+
+  // Clear dynamic chips when switching chats or starting new
+  useEffect(() => {
+    setDynamicChips([]);
+  }, [activeChatId]);
+
+  const generateDynamicChips = useCallback(async (conversationMessages) => {
+    if (!conversationMessages.length) return;
+    setChipsLoading(true);
+    try {
+      const lastAssistant = [...conversationMessages].reverse().find(m => m.role === 'assistant')?.content || '';
+      const recentHistory = conversationMessages.slice(-4).map(m =>
+        `${m.role === 'user' ? 'בעל העסק' : 'המצפן'}: ${m.content?.slice(0, 200)}`
+      ).join('\n');
+
+      const statsSnippet = `לידים: ${leads.length}, חדשים: ${leads.filter(l=>l.status==='new').length}, אבודים: ${leads.filter(l=>l.status==='lost').length}, המרות: ${leads.filter(l=>l.status==='converted').length}`;
+
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `You generate follow-up suggestion chips for a business intelligence chat called "מצפן הידע" (Knowledge Compass).
+
+Context - last exchange:
+${recentHistory}
+
+Business stats: ${statsSnippet}
+
+Generate EXACTLY 4 short follow-up questions (3-6 words each) in Hebrew that a business owner would naturally want to ask NEXT based on what was just discussed.
+Rules:
+- Make them specific and actionable, not generic
+- They should drill deeper or pivot to related business insights
+- Each should feel like a natural "what about...?" follow-up
+- Use business Hebrew, concise
+
+Return exactly 4 suggestions.`,
+        response_json_schema: {
+          type: "object",
+          properties: { suggestions: { type: "array", items: { type: "string" } } },
+          required: ["suggestions"]
+        }
+      });
+      setDynamicChips(result?.suggestions?.slice(0, 4) || []);
+    } catch (err) {
+      console.error('Error generating compass chips:', err);
+      setDynamicChips([]);
+    } finally {
+      setChipsLoading(false);
+    }
+  }, [leads]);
 
   const createNewChat = useCallback(() => {
     const newChat = {
