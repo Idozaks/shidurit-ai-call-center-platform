@@ -10,14 +10,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { 
   Sparkles, Phone, MessageSquare, Archive, CheckCircle, 
-  Loader2, User, Bot, X, Zap, Swords, ShieldCheck, TrendingDown, Copy, HelpCircle, ChevronDown, ChevronUp
+  Loader2, User, Bot, X, Zap, Swords, ShieldCheck, TrendingDown, Copy, HelpCircle, ChevronDown, ChevronUp, AlertTriangle
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from 'react-markdown';
 import LeadMetricsCards from './LeadMetricsCards';
 
-export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], sessions = [], onClose }) {
+export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], sessions = [], knowledge = [], onClose }) {
   const [analyzing, setAnalyzing] = useState(false);
   const [followUpMsg, setFollowUpMsg] = useState('');
   const [generatingMsg, setGeneratingMsg] = useState(false);
@@ -135,6 +135,7 @@ ${transcript}
     { id: 'competitor_clash', name: 'ניתוח מתחרים', icon: Swords, color: 'text-purple-500' },
     { id: 'revenue_leak', name: 'דליפות ונטישה', icon: TrendingDown, color: 'text-red-500' },
     { id: 'knowledge_gaps', name: 'פערי ידע', icon: HelpCircle, color: 'text-orange-500' },
+    { id: 'hallucination_detector', name: 'גלאי הזיות', icon: AlertTriangle, color: 'text-rose-500' },
   ];
 
   const runInlineTool = async (toolId) => {
@@ -148,6 +149,48 @@ ${transcript}
       revenue_leak: `נתח את הליד הבא וזהה הזדמנויות שפוספסו, דליפות הכנסה פוטנציאליות, וסיכוני נטישה. תן ניתוח מפורט עם המלצות.\n\nשם: ${lead?.customer_name}\nסיבת פנייה: ${lead?.inquiry_reason}\nסיכום שיחה: ${lead?.summary || 'אין'}\nסטטוס: ${lead?.status}\nסנטימנט: ${lead?.sentiment || 'לא ידוע'}\nציון כוונה: ${lead?.intent_score || 'לא ידוע'}\nעובדות: ${JSON.stringify(lead?.facts_json || {})}\nעסק: ${tenant?.company_name}\n\nנתוני רקע כלליים:\nשיחות סגורות: ${sessions.filter(s => s.status === 'closed').length}\nלידים שאבדו: ${leads.filter(l => l.status === 'lost').length}\nסה"כ לידים: ${leads.length}\nלידים חמים: ${leads.filter(l => (l.intent_score || 0) >= 70).length}`,
       knowledge_gaps: `נתח את השיחה עם הליד וזהה שאלות שהבוט לא ידע לענות עליהן — מידע חסר, תשובות כלליות מדי, או הפניות מיותרות לנציג.\n\nשם: ${lead?.customer_name}\nסיבת פנייה: ${lead?.inquiry_reason}\nסיכום: ${lead?.summary || 'אין'}\nעובדות: ${JSON.stringify(lead?.facts_json || {})}\nעסק: ${tenant?.company_name}\n\nזהה פערי ידע ספציפיים והמלץ איזה תוכן צריך להוסיף לבסיס הידע.`
     };
+
+    // Special handling for hallucination detector
+    if (toolId === 'hallucination_detector') {
+      const botMessages = messages.filter(m => m.role === 'assistant');
+      const knowledgeText = (knowledge || []).map(e => `[${e.category || 'general'}] ${e.title}: ${e.content}`).join('\n');
+
+      const hallucinationPrompt = `אתה מנתח בקרת איכות מומחה. סרוק את תשובות הבוט AI של העסק "${tenant?.company_name}" בשיחה עם הלקוח "${lead?.customer_name}" וזהה מידע שהומצא (הזיות).
+
+=== מקורות מידע מורשים ===
+
+הנחיות מערכת:
+${tenant?.system_prompt || 'אין'}
+
+בסיס ידע:
+${knowledgeText || 'ריק'}
+
+=== תשובות הבוט לבדיקה ===
+${botMessages.map(m => m.content).join('\n\n---\n\n')}
+
+=== הוראות ===
+בדוק: שמות חבילות/מוצרים שלא קיימים, מחירים שגויים, שעות/מיקומים לא מדויקים, שמות צוות שלא קיימים, הבטחות לא מבוססות.
+
+לכל הזיה: ציטוט מהבוט, מה נכון לפי המקורות, רמת חומרה (קריטי/בינוני/נמוך).
+אם אין הזיות — ציין בבירור. כתוב בעברית.`;
+
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: hallucinationPrompt,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            content: { type: "string" },
+            action_items: { type: "array", items: { type: "string" } }
+          }
+        }
+      });
+
+      setToolResult(result);
+      setRunningToolId(null);
+      toast.success('גלאי הזיות הופעל בהצלחה');
+      return;
+    }
 
     const result = await base44.integrations.Core.InvokeLLM({
       prompt: prompts[toolId],

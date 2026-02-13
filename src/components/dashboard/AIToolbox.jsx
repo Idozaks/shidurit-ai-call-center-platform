@@ -118,12 +118,12 @@ const TOOLS = [
     id: 'hallucination_detector',
     name: 'גלאי הזיות',
     nameEn: 'Hallucination Detector',
-    description: 'סריקת שיחות הבוט וזיהוי מידע שהומצא — שלא מופיע בבסיס הידע או בהנחיות העסק',
+    description: 'בחירת ליד וסריקת שיחת הבוט לזיהוי מידע שהומצא — שלא מופיע בבסיס הידע או בהנחיות העסק',
     icon: AlertTriangle,
     speed: 'עמוק',
     color: 'text-rose-500',
     bgColor: 'bg-rose-50',
-    action: 'run'
+    action: 'select_lead'
   }
 ];
 
@@ -152,16 +152,22 @@ export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [],
       conversion_forecast: `נתח את כל הלידים של העסק "${tenant?.company_name}" ונבא מי הכי סביר שיומר ללקוח משלם.\n\nסטטיסטיקות:\n- סה"כ לידים: ${leads.length}\n- הומרו: ${leads.filter(l => l.status === 'converted').length}\n- חדשים: ${leads.filter(l => l.status === 'new').length}\n- נוצר קשר: ${leads.filter(l => l.status === 'contacted').length}\n- אבודים: ${leads.filter(l => l.status === 'lost').length}\n\nלידים פעילים (לא הומרו ולא אבודים):\n${leads.filter(l => l.status !== 'converted' && l.status !== 'lost').slice(0, 15).map(l => `- ${l.customer_name}: intent: ${l.intent_score || '?'} | דחיפות: ${l.urgency_level || '?'} | סנטימנט: ${l.sentiment || '?'} | סיבה: ${l.inquiry_reason || 'לא צוין'} | סטטוס: ${l.status}`).join('\n')}\n\nדרג את הלידים מהסביר ביותר לפחות סביר להמרה, ולכל אחד הסבר למה ומה הפעולה המומלצת.`
     };
 
-    // Special handling for hallucination detector — needs to fetch messages
+    // Special handling for hallucination detector — needs to fetch messages for the specific lead
     if (tool.id === 'hallucination_detector') {
-      setRunningTool(tool.id);
-      setToolResult(null);
-      setSelectedTool(tool);
+      // Find sessions for this lead
+      const leadObj = leadId ? leads.find(l => l.id === leadId) : null;
+      let leadSessionsList = [];
+      if (leadObj) {
+        leadSessionsList = sessions.filter(s => 
+          s.lead_id === leadObj.id || 
+          s.customer_name === leadObj.customer_name || 
+          (leadObj.customer_phone && s.customer_phone === leadObj.customer_phone)
+        );
+      }
+      if (leadSessionsList.length === 0) leadSessionsList = sessions.slice(0, 5);
 
-      // Fetch bot messages from recent sessions
-      const recentSessions = sessions.slice(0, 15);
       let allBotMessages = [];
-      for (const session of recentSessions) {
+      for (const session of leadSessionsList.slice(0, 10)) {
         const msgsRes = await base44.entities.ChatMessage.filter({ session_id: session.id }, 'created_date');
         allBotMessages.push(...msgsRes.filter(m => m.role === 'assistant').map(m => ({
           session_id: session.id,
@@ -172,7 +178,7 @@ export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [],
 
       const knowledgeText = knowledge.map(e => `[${e.category || 'general'}] ${e.title}: ${e.content}`).join('\n');
 
-      const hallucinationPrompt = `אתה מנתח בקרת איכות מומחה. המשימה שלך: לסרוק את כל תשובות הבוט AI של העסק "${tenant?.company_name}" ולזהות מידע שהומצא (הזיות / hallucinations).
+      const hallucinationPrompt = `אתה מנתח בקרת איכות מומחה. המשימה שלך: לסרוק את תשובות הבוט AI של העסק "${tenant?.company_name}" בשיחה עם הלקוח "${leadObj?.customer_name || 'לא ידוע'}" ולזהות מידע שהומצא (הזיות / hallucinations).
 
 === מקורות מידע מורשים (הבסיס היחיד שהבוט יכול להשתמש בו) ===
 
@@ -183,7 +189,7 @@ ${tenant?.system_prompt || 'אין'}
 ${knowledgeText || 'ריק'}
 
 === תשובות הבוט לבדיקה ===
-${allBotMessages.slice(0, 40).map((m, i) => `[שיחה עם ${m.customer}]:\n${m.content}`).join('\n\n---\n\n')}
+${allBotMessages.slice(0, 40).map((m) => `[שיחה עם ${m.customer}]:\n${m.content}`).join('\n\n---\n\n')}
 
 === הוראות ניתוח ===
 עבור כל תשובה של הבוט, בדוק:
