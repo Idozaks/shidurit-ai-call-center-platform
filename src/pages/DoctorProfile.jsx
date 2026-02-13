@@ -14,6 +14,20 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
+async function publicApi(action, data) {
+  try {
+    const res = await base44.functions.invoke('publicChat', { action, ...data });
+    return res.data;
+  } catch {
+    const res = await fetch(`/api/publicChat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, ...data })
+    });
+    return res.json();
+  }
+}
+
 export default function DoctorProfile() {
   const urlParams = new URLSearchParams(window.location.search);
   const doctorId = urlParams.get('id');
@@ -21,18 +35,21 @@ export default function DoctorProfile() {
   const { data: doctor, isLoading } = useQuery({
     queryKey: ['doctor', doctorId],
     queryFn: async () => {
-      const doctors = await base44.entities.Doctor.filter({ id: doctorId });
-      return doctors[0] || null;
+      const res = await publicApi('getDoctor', { doctor_id: doctorId });
+      return res.doctor || null;
     },
     enabled: !!doctorId
   });
 
-  const { data: tenants = [] } = useQuery({
-    queryKey: ['tenants'],
-    queryFn: () => base44.entities.Tenant.list()
+  const { data: tenant } = useQuery({
+    queryKey: ['doctor-tenant', doctor?.tenant_id],
+    queryFn: async () => {
+      const res = await publicApi('getTenantById', { tenant_id: doctor.tenant_id });
+      return res.tenant || null;
+    },
+    enabled: !!doctor?.tenant_id
   });
 
-  const tenant = tenants.find(t => t.id === doctor?.tenant_id);
   const themeColor = tenant?.theme_color || '#6366f1';
 
   if (isLoading) {
