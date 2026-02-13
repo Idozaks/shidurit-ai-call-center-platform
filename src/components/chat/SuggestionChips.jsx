@@ -42,7 +42,8 @@ export default function SuggestionChips({ tenantId, messages, onSelect, themeCol
 
       const isFirstInteraction = messages.filter(m => m.role === 'user').length === 0;
 
-      const result = await base44.integrations.Core.InvokeLLM({
+      const llmRes = await publicApi({
+        action: 'invokeLLM',
         prompt: isFirstInteraction 
           ? `You are generating suggestion chips for a customer chat interface in Hebrew.
 
@@ -108,6 +109,7 @@ Return exactly 10 suggestions.`,
           required: ["suggestions"]
         }
       });
+      const result = llmRes.result;
 
       setSuggestions(result.suggestions?.slice(0, 12) || []);
     } catch (err) {
