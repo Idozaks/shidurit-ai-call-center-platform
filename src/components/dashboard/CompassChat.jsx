@@ -210,6 +210,7 @@ ${question}
       const result = await base44.integrations.Core.InvokeLLM({ prompt });
       const finalMessages = [...newMessages, { role: 'assistant', content: result }];
       updateChatMessages(chatId, finalMessages);
+      generateDynamicChips(finalMessages);
     } catch (err) {
       const finalMessages = [...newMessages, { role: 'assistant', content: '❌ שגיאה בניתוח. נסה שוב.' }];
       updateChatMessages(chatId, finalMessages);
