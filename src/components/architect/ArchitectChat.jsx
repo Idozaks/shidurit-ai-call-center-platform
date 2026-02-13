@@ -188,6 +188,9 @@ export default function ArchitectChat({ mode = 'create', tenant = null, knowledg
     setUploadingFiles(false);
   };
 
+  // Track all uploaded file URLs across the conversation
+  const [allUploadedFiles, setAllUploadedFiles] = useState([]);
+
   const handleSend = async () => {
     if (!input.trim() && attachedFiles.length === 0) return;
 
@@ -197,6 +200,11 @@ export default function ArchitectChat({ mode = 'create', tenant = null, knowledg
       fileUrls: attachedFiles.map(f => f.url),
       fileNames: attachedFiles.map(f => f.name)
     };
+
+    // Track all uploaded files for source_files in the config
+    if (attachedFiles.length > 0) {
+      setAllUploadedFiles(prev => [...prev, ...attachedFiles.map(f => ({ url: f.url, name: f.name }))]);
+    }
 
     const newMessages = [...messages, userMsg];
     setMessages(newMessages);
@@ -211,10 +219,10 @@ export default function ArchitectChat({ mode = 'create', tenant = null, knowledg
     // Only send the last 10 messages to keep the prompt shorter and faster
     const recentMessages = newMessages.slice(-10);
     const conversationHistory = recentMessages
-      .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}${m.fileUrls?.length ? `\n[Attached files: ${m.fileNames?.join(', ')}]` : ''}`)
+      .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}${m.fileUrls?.length ? `\n[Attached files: ${m.fileNames?.join(', ')}] [File URLs: ${m.fileUrls?.join(', ')}]` : ''}`)
       .join('\n\n');
 
-    const prompt = `${systemPrompt}\n\n--- Conversation History (last ${recentMessages.length} messages) ---\n${conversationHistory}\n\n--- End ---\nRespond as the Architect. Keep your response concise.`;
+    const prompt = `${systemPrompt}\n\n--- Conversation History (last ${recentMessages.length} messages) ---\n${conversationHistory}\n\n--- End ---\nRespond as the Architect. Be thorough in your analysis.`;
 
     const fileUrls = userMsg.fileUrls?.length > 0 ? userMsg.fileUrls : undefined;
 
@@ -239,6 +247,10 @@ export default function ArchitectChat({ mode = 'create', tenant = null, knowledg
 
     const config = extractConfig(response);
     if (config) {
+      // Inject tracked uploaded files as source_files if not already present
+      if (!config.source_files || config.source_files.length === 0) {
+        config.source_files = allUploadedFiles;
+      }
       setLastConfig(config);
       if (onBuildReady) onBuildReady(config);
     }
