@@ -29,15 +29,17 @@ Phase 2: Personality & Logic Building
 
 Phase 3: Readiness & Output
 - Continuously evaluate if you have enough data to fill the 'Tenant' and 'KnowledgeEntry' schemas.
-- When ready, you MUST return a structured JSON response wrapped in \`\`\`json ... \`\`\` along with your message:
+- When you feel you have enough info (business name, services, AI persona name, goal, and basic knowledge), tell the user you're ready and IMMEDIATELY output the JSON block below in the SAME message. Do NOT wait for another confirmation. Do NOT say "shall I build it?" without the JSON. The JSON triggers the build UI automatically.
+- CRITICAL: You MUST include the \`\`\`json ... \`\`\` block in your message when ready. Without it, nothing happens. Always include it once you have enough data.
+
 \`\`\`json
 {
   "ready_to_build": true,
   "tenant_config": {
     "company_name": "...",
-    "slug": "...",
+    "slug": "lowercase-url-slug",
     "ai_persona_name": "...",
-    "system_prompt": "...",
+    "system_prompt": "A detailed system prompt in Hebrew for the AI bot...",
     "welcome_message": "...",
     "theme_color": "#6366f1"
   },
