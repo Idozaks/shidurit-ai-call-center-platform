@@ -15,6 +15,12 @@ import VoiceChat from '../components/chat/VoiceChat';
 import SuggestionChips from '../components/chat/SuggestionChips';
 import DetailsInputModal from '../components/chat/DetailsInputModal';
 
+// Helper to call the public backend function (no auth needed)
+const publicApi = async (payload) => {
+  const res = await base44.functions.invoke('publicChat', payload);
+  return res.data;
+};
+
 export default function PublicChat() {
   const urlParams = new URLSearchParams(window.location.search);
   const slug = urlParams.get('slug');
