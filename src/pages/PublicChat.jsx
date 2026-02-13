@@ -15,10 +15,15 @@ import VoiceChat from '../components/chat/VoiceChat';
 import SuggestionChips from '../components/chat/SuggestionChips';
 import DetailsInputModal from '../components/chat/DetailsInputModal';
 
-// Helper to call the public backend function (no auth needed)
+// Helper to call the public backend function via direct HTTP (no auth needed)
 const publicApi = async (payload) => {
-  const res = await base44.functions.invoke('publicChat', payload);
-  return res.data;
+  const res = await fetch(`/api/publicChat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  return res.json();
 };
 
 export default function PublicChat() {
