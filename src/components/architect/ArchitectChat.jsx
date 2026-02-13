@@ -159,19 +159,29 @@ export default function ArchitectChat({ mode = 'create', tenant = null, knowledg
       ? UPDATE_SYSTEM_PROMPT(tenant, knowledge)
       : SYSTEM_PROMPT;
 
-    const conversationHistory = newMessages
+    // Only send the last 10 messages to keep the prompt shorter and faster
+    const recentMessages = newMessages.slice(-10);
+    const conversationHistory = recentMessages
       .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}${m.fileUrls?.length ? `\n[Attached files: ${m.fileNames?.join(', ')}]` : ''}`)
       .join('\n\n');
 
-    const prompt = `${systemPrompt}\n\n--- Conversation History ---\n${conversationHistory}\n\n--- End ---\nRespond as the Architect:`;
+    const prompt = `${systemPrompt}\n\n--- Conversation History (last ${recentMessages.length} messages) ---\n${conversationHistory}\n\n--- End ---\nRespond as the Architect. Keep your response concise.`;
 
     const fileUrls = userMsg.fileUrls?.length > 0 ? userMsg.fileUrls : undefined;
 
-    const response = await base44.integrations.Core.InvokeLLM({
-      prompt,
-      file_urls: fileUrls,
-      add_context_from_internet: false
-    });
+    let response;
+    try {
+      response = await base44.integrations.Core.InvokeLLM({
+        prompt,
+        file_urls: fileUrls,
+        add_context_from_internet: false
+      });
+    } catch (err) {
+      const errorMsg = { role: 'assistant', content: 'סליחה, הייתה בעיה טכנית. נסה שוב בבקשה.' };
+      setMessages(prev => [...prev, errorMsg]);
+      setIsLoading(false);
+      return;
+    }
 
     const assistantMsg = { role: 'assistant', content: response };
     const updatedMessages = [...newMessages, assistantMsg];
