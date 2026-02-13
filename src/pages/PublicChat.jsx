@@ -51,6 +51,7 @@ export default function PublicChat() {
   const [detailsSubmitted, setDetailsSubmitted] = useState(false);
   const messagesEndRef = useRef(null);
   const [sessionStatus, setSessionStatus] = useState('active');
+  const [collectedDetails, setCollectedDetails] = useState({});
 
   const { data: tenant, isLoading: tenantLoading } = useQuery({
     queryKey: ['publicTenant', slug],
