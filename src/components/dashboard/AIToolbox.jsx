@@ -367,6 +367,8 @@ ${allBotMessages.slice(0, 40).map((m) => `[שיחה עם ${m.customer}]:\n${m.co
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : tool.action === 'select_lead' ? (
                     <>בחר ליד והפעל <ArrowLeft className="w-4 h-4" /></>
+                  ) : tool.action === 'hallucination' ? (
+                    <>סרוק הזיות <ArrowLeft className="w-4 h-4" /></>
                   ) : (
                     'הפעל ניתוח'
                   )}
