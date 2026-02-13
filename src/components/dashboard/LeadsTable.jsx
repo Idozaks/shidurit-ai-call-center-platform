@@ -173,14 +173,14 @@ export default function LeadsTable({ tenantId, tenant, leads = [], sessions = []
                 <SelectValue placeholder="מיון" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="created_date_desc">תאריך - חדש לישן</SelectItem>
-                <SelectItem value="created_date_asc">תאריך - ישן לחדש</SelectItem>
-                <SelectItem value="customer_name_asc">שם - א-ת</SelectItem>
-                <SelectItem value="customer_name_desc">שם - ת-א</SelectItem>
-                <SelectItem value="intent_score_desc">ציון כוונה - גבוה</SelectItem>
-                <SelectItem value="intent_score_asc">ציון כוונה - נמוך</SelectItem>
-                <SelectItem value="status_asc">סטטוס - חדש קודם</SelectItem>
-                <SelectItem value="status_desc">סטטוס - אבוד קודם</SelectItem>
+                <SelectItem value="created_date::desc">תאריך - חדש לישן</SelectItem>
+                <SelectItem value="created_date::asc">תאריך - ישן לחדש</SelectItem>
+                <SelectItem value="customer_name::asc">שם - א-ת</SelectItem>
+                <SelectItem value="customer_name::desc">שם - ת-א</SelectItem>
+                <SelectItem value="intent_score::desc">ציון כוונה - גבוה</SelectItem>
+                <SelectItem value="intent_score::asc">ציון כוונה - נמוך</SelectItem>
+                <SelectItem value="status::asc">סטטוס - חדש קודם</SelectItem>
+                <SelectItem value="status::desc">סטטוס - אבוד קודם</SelectItem>
               </SelectContent>
             </Select>
           </div>
