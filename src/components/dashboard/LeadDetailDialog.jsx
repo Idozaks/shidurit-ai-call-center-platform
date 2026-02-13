@@ -55,7 +55,7 @@ export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], s
 
   const { data: messages = [], isLoading: msgsLoading } = useQuery({
     queryKey: ['lead-messages', sessionId],
-    queryFn: () => base44.entities.ChatMessage.filter({ session_id: sessionId }, 'created_date'),
+    queryFn: () => base44.entities.ChatMessage.filter({ session_id: sessionId }, '-created_date'),
     enabled: !!sessionId,
     refetchInterval: 5000
   });
