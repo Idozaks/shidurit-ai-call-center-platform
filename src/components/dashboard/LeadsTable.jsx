@@ -103,10 +103,19 @@ export default function LeadsTable({ tenantId, tenant, leads = [], sessions = []
     );
   };
 
-  const getSentimentColor = (sentiment) => {
-    if (sentiment === 'positive') return 'text-green-600';
-    if (sentiment === 'negative') return 'text-red-600';
-    return 'text-slate-600';
+  const getSentimentBadge = (sentiment) => {
+    if (!sentiment) return <span className="text-xs text-slate-300">—</span>;
+    const config = {
+      positive: { label: 'חיובי', emoji: '😊', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+      negative: { label: 'שלילי', emoji: '😞', bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' },
+      neutral: { label: 'ניטרלי', emoji: '😐', bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-200' }
+    };
+    const c = config[sentiment] || config.neutral;
+    return (
+      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${c.bg} ${c.text} ${c.border}`}>
+        {c.emoji} {c.label}
+      </span>
+    );
   };
 
   return (
@@ -243,6 +252,7 @@ export default function LeadsTable({ tenantId, tenant, leads = [], sessions = []
                     <TableHead>פרטי קשר</TableHead>
                     <TableHead>סיבת פנייה</TableHead>
                     <TableHead>סטטוס</TableHead>
+                    <TableHead>סנטימנט</TableHead>
                     <TableHead>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -280,6 +290,7 @@ export default function LeadsTable({ tenantId, tenant, leads = [], sessions = []
                             {lead.inquiry_reason || '-'}
                           </TableCell>
                           <TableCell>{getStatusBadge(lead.status)}</TableCell>
+                          <TableCell>{getSentimentBadge(lead.sentiment)}</TableCell>
                           <TableCell>
                             {lead.intent_score !== undefined && (
                               <div className="flex items-center gap-2">
