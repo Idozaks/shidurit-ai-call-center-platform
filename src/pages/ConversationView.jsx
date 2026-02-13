@@ -83,6 +83,12 @@ export default function ConversationView() {
     toast.success('השיחה חזרה לבוט');
   };
 
+  const handleCloseSession = async () => {
+    await base44.entities.ChatSession.update(sessionId, { status: 'closed' });
+    queryClient.invalidateQueries({ queryKey: ['session-detail', sessionId] });
+    toast.success('השיחה נסגרה');
+  };
+
   const handleSendWorkerMessage = async (e) => {
     e.preventDefault();
     if (!workerInput.trim() || isSending) return;
