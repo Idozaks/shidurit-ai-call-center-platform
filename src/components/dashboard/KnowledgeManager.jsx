@@ -247,6 +247,37 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
                       required
                     />
                   </div>
+                  {/* File attachment */}
+                  <div className="space-y-2">
+                    <Label>קובץ מצורף</Label>
+                    {formData.file_url ? (
+                      <div className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 border">
+                        <File className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+                        <a href={formData.file_url} target="_blank" rel="noopener noreferrer" className="text-sm text-indigo-600 hover:underline truncate flex-1">
+                          {formData.file_name || 'קובץ'}
+                        </a>
+                        <Button type="button" variant="ghost" size="icon" className="h-6 w-6" onClick={() => setFormData(prev => ({ ...prev, file_url: '', file_name: '' }))}>
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div>
+                        <input
+                          type="file"
+                          id="single-file-upload"
+                          className="hidden"
+                          onChange={(e) => {
+                            if (e.target.files?.[0]) handleFileUpload(e.target.files[0]);
+                            e.target.value = '';
+                          }}
+                        />
+                        <Button type="button" variant="outline" className="w-full gap-2" disabled={uploading} onClick={() => document.getElementById('single-file-upload').click()}>
+                          {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Paperclip className="w-4 h-4" />}
+                          {uploading ? 'מעלה...' : 'צרף קובץ'}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                   <div className="flex items-center justify-between">
                     <Label>פעיל</Label>
                     <Switch
