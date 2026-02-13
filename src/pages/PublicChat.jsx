@@ -103,11 +103,7 @@ export default function PublicChat() {
   const sendMessageMutation = useMutation({
     mutationFn: async ({ content }) => {
       // Save user message
-      await base44.entities.ChatMessage.create({
-        session_id: sessionId,
-        role: 'user',
-        content
-      });
+      await publicApi({ action: 'sendMessage', session_id: sessionId, role: 'user', content });
 
       // If a worker has taken control, don't generate AI response
       if (sessionStatus === 'agent_active') {
@@ -115,23 +111,15 @@ export default function PublicChat() {
       }
 
       // Get AI response
-      const aiResponse = await base44.integrations.Core.InvokeLLM({
-        prompt: buildPrompt(content),
-        response_json_schema: null
-      });
+      const llmRes = await publicApi({ action: 'invokeLLM', prompt: buildPrompt(content), response_json_schema: null });
+      const aiResponse = llmRes.result;
 
       // Save AI response
-      await base44.entities.ChatMessage.create({
-        session_id: sessionId,
-        role: 'assistant',
-        content: aiResponse
-      });
+      await publicApi({ action: 'sendMessage', session_id: sessionId, role: 'assistant', content: aiResponse });
 
       // Update usage
       if (tenant) {
-        await base44.entities.Tenant.update(tenant.id, {
-          usage_count: (tenant.usage_count || 0) + 1
-        });
+        await publicApi({ action: 'updateTenantUsage', tenant_id: tenant.id, usage_count: (tenant.usage_count || 0) + 1 });
       }
 
       return aiResponse;
