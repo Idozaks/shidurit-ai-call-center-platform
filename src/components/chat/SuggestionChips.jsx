@@ -231,7 +231,7 @@ Return exactly 10 suggestions.`,
             className="flex-shrink-0 p-1.5 mt-0.5 rounded-full hover:bg-slate-100 transition-colors z-10"
             style={{ color: themeColor }}
           >
-            {collapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+            {collapsed ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
         )}
         <div ref={containerRef} className="flex-1 min-w-0 overflow-x-auto pb-1.5 chips-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: `${themeColor}40 transparent` }}>
