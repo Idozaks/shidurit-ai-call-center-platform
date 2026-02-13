@@ -215,7 +215,9 @@ export default function SessionsList({ tenantId, sessions = [], tenant, onRefres
                         )}
                       </div>
                       <div className="flex items-center gap-3 text-sm text-slate-500 mt-1">
-                        {getStatusBadge(session.status)}
+                        <span onClick={(e) => e.stopPropagation()}>
+                          {getStatusBadge(session.status, session.id)}
+                        </span>
                         {session.customer_phone && (
                           <span className="flex items-center gap-1">
                             <Phone className="w-3 h-3" />
