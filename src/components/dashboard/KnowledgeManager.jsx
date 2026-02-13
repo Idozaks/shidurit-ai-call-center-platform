@@ -40,9 +40,13 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
     title: '',
     content: '',
     category: 'general',
-    is_active: true
+    is_active: true,
+    file_url: '',
+    file_name: ''
   });
   const [customCategory, setCustomCategory] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [bulkUploading, setBulkUploading] = useState(false);
   const queryClient = useQueryClient();
 
   const entries = knowledge;
