@@ -395,18 +395,30 @@ ${question}
         )}
       </div>
 
-      {/* Quick chips after messages started */}
+      {/* Dynamic suggestion chips after messages */}
       {messages.length > 0 && !isLoading && (
-        <div className="px-4 sm:px-6 pb-2 flex flex-wrap gap-1.5">
-          {QUICK_CHIPS.slice(0, 3).map((chip, i) => (
-            <button
-              key={i}
-              onClick={() => handleSend(chip.label)}
-              className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-slate-400 hover:bg-indigo-500/20 hover:text-white transition-all"
-            >
-              {chip.icon} {chip.label}
-            </button>
-          ))}
+        <div className="px-4 sm:px-6 pb-2">
+          {chipsLoading ? (
+            <div className="flex items-center gap-2 py-1">
+              <Loader2 className="w-3 h-3 animate-spin text-indigo-400" />
+              <span className="text-[10px] text-slate-500">מייצר הצעות...</span>
+            </div>
+          ) : dynamicChips.length > 0 ? (
+            <div className="flex flex-wrap gap-1.5">
+              {dynamicChips.map((chip, i) => (
+                <motion.button
+                  key={`dyn-${i}`}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.07 }}
+                  onClick={() => handleSend(chip)}
+                  className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-slate-400 hover:bg-indigo-500/20 hover:border-indigo-500/30 hover:text-white transition-all"
+                >
+                  {chip}
+                </motion.button>
+              ))}
+            </div>
+          ) : null}
         </div>
       )}
 
