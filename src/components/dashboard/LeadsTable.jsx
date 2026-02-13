@@ -17,7 +17,7 @@ import { format } from 'date-fns';
 import LeadDetailDialog from './LeadDetailDialog';
 import { toast } from "sonner";
 
-export default function LeadsTable({ tenantId, tenant, leads = [], sessions = [], onRefresh }) {
+export default function LeadsTable({ tenantId, tenant, leads = [], sessions = [], knowledge = [], onRefresh }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedLead, setSelectedLead] = useState(null);
@@ -228,7 +228,7 @@ export default function LeadsTable({ tenantId, tenant, leads = [], sessions = []
                     </button>
                   </DialogTrigger>
                   {selectedLead && selectedLead.id === lead.id && (
-                    <LeadDetailDialog lead={selectedLead} tenantId={tenantId} tenant={tenant} leads={leads} sessions={sessions} onClose={() => setSelectedLead(null)} />
+                    <LeadDetailDialog lead={selectedLead} tenantId={tenantId} tenant={tenant} leads={leads} sessions={sessions} knowledge={knowledge} onClose={() => setSelectedLead(null)} />
                   )}
                 </Dialog>
               ))}
@@ -302,7 +302,7 @@ export default function LeadsTable({ tenantId, tenant, leads = [], sessions = []
                         </TableRow>
                       </DialogTrigger>
                       {selectedLead && selectedLead.id === lead.id && (
-                        <LeadDetailDialog lead={selectedLead} tenantId={tenantId} tenant={tenant} leads={leads} sessions={sessions} onClose={() => setSelectedLead(null)} />
+                        <LeadDetailDialog lead={selectedLead} tenantId={tenantId} tenant={tenant} leads={leads} sessions={sessions} knowledge={knowledge} onClose={() => setSelectedLead(null)} />
                       )}
                     </Dialog>
                   ))}
