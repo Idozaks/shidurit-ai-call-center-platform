@@ -31,6 +31,7 @@ export default function TenantDashboard() {
   const urlParams = new URLSearchParams(window.location.search);
   const tenantId = urlParams.get('id');
   const [activeTab, setActiveTab] = useState('overview');
+  const [selectedOverviewLead, setSelectedOverviewLead] = useState(null);
 
   const refreshAll = () => {
     queryClient.invalidateQueries({ queryKey: ['tenant', tenantId] });
