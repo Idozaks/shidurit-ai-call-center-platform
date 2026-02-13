@@ -44,11 +44,12 @@ export default function TenantDashboard() {
     queryClient.invalidateQueries({ queryKey: ['knowledge', tenantId] });
   };
 
-  const { data: tenant, isLoading: tenantLoading } = useQuery({
+  const { data: tenant, isLoading: tenantLoading, error: tenantError } = useQuery({
     queryKey: ['tenant', tenantId],
     queryFn: async () => {
-      const tenants = await base44.entities.Tenant.filter({ id: tenantId });
-      return tenants[0];
+      const all = await base44.entities.Tenant.list();
+      const found = all.find(t => t.id === tenantId);
+      return found || null;
     },
     enabled: !!tenantId
   });
@@ -102,6 +103,17 @@ export default function TenantDashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center" dir="rtl">
         <div className="animate-spin w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (!tenant && !tenantLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4" dir="rtl">
+        <p className="text-lg text-slate-600">העסק לא נמצא</p>
+        <Button variant="outline" onClick={() => navigate(createPageUrl('Home'))}>
+          חזרה לדף הבית
+        </Button>
       </div>
     );
   }
