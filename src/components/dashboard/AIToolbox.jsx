@@ -129,7 +129,7 @@ export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [],
     const lead = leadId ? leads.find(l => l.id === leadId) : null;
 
     const prompts = {
-      lead_scorer: `נתח את הליד הבא ותן ציון כוונת רכישה (0-100), רמת דחיפות, וסנטימנט.\n\nשם: ${lead?.customer_name}\nסיבת פנייה: ${lead?.inquiry_reason}\nסיכום: ${lead?.summary || 'אין'}\nעובדות: ${JSON.stringify(lead?.facts_json || {})}`,
+      lead_scorer: `נתח את הליד הבא ותן ציון כוונת רכישה (0-100), רמת דחיפות, סנטימנט, תיאור קצר של השיחה (2-3 משפטים), והערה מסכמת.\n\nשם: ${lead?.customer_name}\nסיבת פנייה: ${lead?.inquiry_reason}\nסיכום: ${lead?.summary || 'אין'}\nעובדות: ${JSON.stringify(lead?.facts_json || {})}`,
       smart_followup: `צור הודעת וואטסאפ מעקב מותאמת אישית ללקוח.\n\nשם: ${lead?.customer_name}\nסיבת פנייה: ${lead?.inquiry_reason}\nסיכום שיחה: ${lead?.summary || 'אין'}\nסטטוס: ${lead?.status}\nעסק: ${tenant?.company_name}`,
       closer_mode: '',
       competitor_clash: `נתח את השיחה עם הליד וזהה אזכורי מתחרים. צור נקודות מכירה ייחודיות לעסק.\n\nשם לקוח: ${lead?.customer_name}\nסיכום: ${lead?.summary || 'אין'}\nעובדות: ${JSON.stringify(lead?.facts_json || {})}\nעסק: ${tenant?.company_name}`,
@@ -169,6 +169,7 @@ export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [],
             intent_score: { type: "number" },
             urgency_level: { type: "string", enum: ["low", "medium", "high"] },
             sentiment: { type: "string", enum: ["positive", "neutral", "negative"] },
+            conversation_description: { type: "string" },
             summary: { type: "string" }
           }
         }
@@ -179,6 +180,8 @@ export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [],
         sentiment: scoreResult.sentiment
       });
       queryClient.invalidateQueries({ queryKey: ['leads'] });
+      // Enrich the general result with score details
+      result.scoreDetails = scoreResult;
     }
 
     setToolResult(result);
@@ -316,6 +319,30 @@ export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [],
           ) : (
             <div className="space-y-4">
               <h3 className="font-bold">{toolResult.title}</h3>
+
+              {/* Score details for lead_scorer */}
+              {toolResult.scoreDetails && (
+                <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Badge className={toolResult.scoreDetails.sentiment === 'positive' ? 'bg-green-100 text-green-700' : toolResult.scoreDetails.sentiment === 'negative' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700'}>
+                      {toolResult.scoreDetails.sentiment === 'positive' ? 'חיובי' : toolResult.scoreDetails.sentiment === 'negative' ? 'שלילי' : 'ניטרלי'}
+                    </Badge>
+                    <div className="flex items-center gap-3">
+                      <Badge className={toolResult.scoreDetails.urgency_level === 'high' ? 'bg-red-100 text-red-700' : toolResult.scoreDetails.urgency_level === 'medium' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}>
+                        דחיפות: {toolResult.scoreDetails.urgency_level === 'high' ? 'גבוהה' : toolResult.scoreDetails.urgency_level === 'medium' ? 'בינונית' : 'נמוכה'}
+                      </Badge>
+                      <div className="text-center">
+                        <span className="text-2xl font-bold text-indigo-600">{toolResult.scoreDetails.intent_score}</span>
+                        <span className="text-xs text-slate-500">/100</span>
+                      </div>
+                    </div>
+                  </div>
+                  {toolResult.scoreDetails.conversation_description && (
+                    <p className="text-sm text-slate-600">{toolResult.scoreDetails.conversation_description}</p>
+                  )}
+                </div>
+              )}
+
               <p className="text-sm whitespace-pre-wrap bg-slate-50 p-4 rounded-lg">{toolResult.content}</p>
               {toolResult.action_items?.length > 0 && (
                 <div>
