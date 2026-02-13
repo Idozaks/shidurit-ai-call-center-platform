@@ -148,6 +148,64 @@ export default function PublicChat() {
     }
   });
 
+  const extractAndStoreDetails = async () => {
+    const allMessages = messages.map(m => 
+      `${m.role === 'user' ? 'לקוח' : 'נציג'}: ${m.content}`
+    ).join('\n');
+
+    const llmRes = await publicApi({
+      action: 'invokeLLM',
+      prompt: `Extract customer contact details from this conversation. Only extract details the CUSTOMER explicitly shared (not the bot asking for them).
+
+Conversation:
+${allMessages}
+
+Customer name given at start: ${customerName}
+
+Currently stored details: ${JSON.stringify(collectedDetails)}
+
+Extract any NEW details found. If a field was already collected and hasn't changed, keep the old value. Return null for fields not yet provided.`,
+      response_json_schema: {
+        type: "object",
+        properties: {
+          full_name: { type: "string", description: "Customer's full name if shared" },
+          phone: { type: "string", description: "Phone number if shared" },
+          email: { type: "string", description: "Email if shared" },
+          preferred_time: { type: "string", description: "Preferred meeting/call time if mentioned" },
+          notes: { type: "string", description: "Any other personal details shared" }
+        }
+      }
+    });
+
+    const extracted = llmRes.result;
+    // Merge: keep old values, override with new non-null values
+    const merged = { ...collectedDetails };
+    for (const [key, val] of Object.entries(extracted)) {
+      if (val && val !== 'null' && val.trim() !== '') {
+        merged[key] = val;
+      }
+    }
+
+    // Only update if something new was found
+    if (JSON.stringify(merged) !== JSON.stringify(collectedDetails)) {
+      setCollectedDetails(merged);
+      // Persist to session
+      if (sessionId) {
+        await publicApi({ action: 'updateSession', session_id: sessionId, data: { collected_details: merged, customer_phone: merged.phone || undefined } });
+      }
+      // Also update lead if exists
+      const currentLeadId = leadIdRef.current;
+      if (currentLeadId) {
+        const leadUpdate = {};
+        if (merged.phone) leadUpdate.customer_phone = merged.phone;
+        if (merged.email) leadUpdate.customer_email = merged.email;
+        if (Object.keys(leadUpdate).length > 0) {
+          await publicApi({ action: 'updateLead', lead_id: currentLeadId, data: leadUpdate });
+        }
+      }
+    }
+  };
+
   const analyzeAndManageLead = async () => {
     const allMessages = messages.map(m => 
       `${m.role === 'user' ? 'לקוח' : 'נציג'}: ${m.content}`
