@@ -167,31 +167,17 @@ export default function ConversationView() {
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            {session?.status === 'active' && (
-              <div className="flex items-center gap-1.5 text-green-600">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-xs font-medium">בוט פעיל</span>
-              </div>
-            )}
-            {isWorkerActive && (
-              <div className="flex items-center gap-1.5 text-blue-600">
+        </div>
+      </div>
+      {/* Take control bar */}
+      {currentWorker && (
+        <div className="max-w-4xl mx-auto px-4 py-2 flex items-center justify-between gap-2 bg-blue-50 border-b border-blue-200">
+          {isWorkerActive ? (
+            <>
+              <div className="flex items-center gap-1.5 text-blue-700 text-sm font-medium">
                 <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                <span className="text-xs font-medium">נציג פעיל</span>
+                אתה שולט בשיחה — הבוט מושבת
               </div>
-            )}
-            {currentWorker && !isWorkerActive && (
-              <Button
-                size="sm"
-                variant="outline"
-                className="gap-1.5 text-blue-600 border-blue-200 hover:bg-blue-50"
-                onClick={handleTakeControl}
-              >
-                <Hand className="w-4 h-4" />
-                השתלט על השיחה
-              </Button>
-            )}
-            {isWorkerActive && (
               <Button
                 size="sm"
                 variant="outline"
@@ -201,9 +187,25 @@ export default function ConversationView() {
                 <RotateCcw className="w-4 h-4" />
                 החזר לבוט
               </Button>
-            )}
-          </div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-1.5 text-slate-600 text-sm">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                הבוט מנהל את השיחה
+              </div>
+              <Button
+                size="sm"
+                className="gap-1.5 bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={handleTakeControl}
+              >
+                <Hand className="w-4 h-4" />
+                השתלט על השיחה
+              </Button>
+            </>
+          )}
         </div>
+      )}
       </div>
 
       {/* Messages */}
