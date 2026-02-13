@@ -163,10 +163,10 @@ export default function LeadsTable({ tenantId, tenant, leads = [], sessions = []
                 <SelectItem value="lost">אבוד</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={`${sortField}_${sortDirection}`} onValueChange={(val) => {
-              const [field, dir] = val.split('_');
-              setSortField(field);
-              setSortDirection(dir);
+            <Select value={`${sortField}::${sortDirection}`} onValueChange={(val) => {
+              const lastSep = val.lastIndexOf('::');
+              setSortField(val.substring(0, lastSep));
+              setSortDirection(val.substring(lastSep + 2));
             }}>
               <SelectTrigger className="w-40 gap-1">
                 <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
