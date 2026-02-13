@@ -14,11 +14,24 @@ import VoiceChat from '../components/chat/VoiceChat';
 import SuggestionChips from '../components/chat/SuggestionChips';
 import DetailsInputModal from '../components/chat/DetailsInputModal';
 
-// Helper to call the public backend function
+// Helper to call the public backend function (supports both auth and non-auth)
 const publicApi = async (payload) => {
-  const { base44 } = await import('@/api/base44Client');
-  const response = await base44.functions.invoke('publicChat', payload);
-  return response.data;
+  try {
+    // Try SDK first (works when user is authenticated)
+    const { base44 } = await import('@/api/base44Client');
+    const response = await base44.functions.invoke('publicChat', payload);
+    return response.data;
+  } catch (sdkErr) {
+    console.warn('SDK invoke failed, trying direct fetch:', sdkErr.message);
+    // Fallback: direct HTTP call for unauthenticated users
+    const res = await fetch(`/functions/publicChat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    return res.json();
+  }
 };
 
 export default function PublicChat() {
