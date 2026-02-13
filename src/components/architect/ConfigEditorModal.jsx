@@ -45,7 +45,7 @@ export default function ConfigEditorModal({ open, onOpenChange, config, onConfir
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[85vh] p-0 flex flex-col" dir="rtl">
+      <DialogContent className="max-w-lg max-h-[85vh] p-0 overflow-hidden flex flex-col" dir="rtl">
         <DialogHeader className="p-6 pb-2">
           <DialogTitle className="text-xl flex items-center gap-2">
             ✏️ עריכת הגדרות הבוט
@@ -55,7 +55,7 @@ export default function ConfigEditorModal({ open, onOpenChange, config, onConfir
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 px-6">
+        <div className="flex-1 overflow-y-auto px-6">
           <div className="space-y-4 pb-4">
             <div className="space-y-2">
               <Label>שם העסק</Label>
@@ -156,7 +156,7 @@ export default function ConfigEditorModal({ open, onOpenChange, config, onConfir
               ))}
             </div>
           </div>
-        </ScrollArea>
+        </div>
 
         <div className="p-4 border-t flex gap-2">
           <Button

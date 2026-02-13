@@ -112,6 +112,7 @@ export default function ArchitectChat({ mode = 'create', tenant = null, knowledg
   const [isLoading, setIsLoading] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState([]);
+  const [lastConfig, setLastConfig] = useState(null);
   const scrollRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -189,8 +190,9 @@ export default function ArchitectChat({ mode = 'create', tenant = null, knowledg
     setIsLoading(false);
 
     const config = extractConfig(response);
-    if (config && onBuildReady) {
-      onBuildReady(config);
+    if (config) {
+      setLastConfig(config);
+      if (onBuildReady) onBuildReady(config);
     }
   };
 
@@ -244,6 +246,22 @@ export default function ArchitectChat({ mode = 'create', tenant = null, knowledg
                 <ReactMarkdown className="text-sm prose prose-sm prose-slate max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
                   {msg.content?.replace(/```json[\s\S]*?```/g, '').trim()}
                 </ReactMarkdown>
+              )}
+              {msg.role === 'assistant' && extractConfig(msg.content || '') && (
+                <Button
+                  size="sm"
+                  className="mt-2 gap-1.5 bg-gradient-to-l from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white text-xs"
+                  onClick={() => {
+                    const cfg = extractConfig(msg.content);
+                    if (cfg && onBuildReady) {
+                      setLastConfig(cfg);
+                      onBuildReady(cfg);
+                    }
+                  }}
+                >
+                  <Sparkles className="w-3 h-3" />
+                  סקור והקם את הבוט
+                </Button>
               )}
             </div>
           </div>
