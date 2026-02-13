@@ -127,7 +127,7 @@ const TOOLS = [
   }
 ];
 
-export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [], onNavigateToPerformance }) {
+export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [], knowledge = [], onNavigateToPerformance }) {
   const [runningTool, setRunningTool] = useState(null);
   const [selectedTool, setSelectedTool] = useState(null);
   const [selectedLeadId, setSelectedLeadId] = useState('');
@@ -151,6 +151,74 @@ export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [],
       customer_segments: `נתח את כל הלידים של העסק "${tenant?.company_name}" וחלק אותם לקבוצות (סגמנטים) משמעותיות.\n\nסה"כ לידים: ${leads.length}\n\nפירוט לידים:\n${leads.slice(0, 20).map(l => `- ${l.customer_name}: סיבת פנייה: ${l.inquiry_reason || 'לא צוין'} | סנטימנט: ${l.sentiment || '?'} | intent: ${l.intent_score || '?'} | דחיפות: ${l.urgency_level || '?'} | סטטוס: ${l.status} | מתחרה: ${l.competitor_detected ? 'כן' : 'לא'}`).join('\n')}\n\nחלק ל-3-5 סגמנטים ברורים (לפי תחום עניין, התנהגות, דחיפות). לכל סגמנט ציין: שם, מאפיינים, גודל משוער, והמלצת פעולה מותאמת.`,
       conversion_forecast: `נתח את כל הלידים של העסק "${tenant?.company_name}" ונבא מי הכי סביר שיומר ללקוח משלם.\n\nסטטיסטיקות:\n- סה"כ לידים: ${leads.length}\n- הומרו: ${leads.filter(l => l.status === 'converted').length}\n- חדשים: ${leads.filter(l => l.status === 'new').length}\n- נוצר קשר: ${leads.filter(l => l.status === 'contacted').length}\n- אבודים: ${leads.filter(l => l.status === 'lost').length}\n\nלידים פעילים (לא הומרו ולא אבודים):\n${leads.filter(l => l.status !== 'converted' && l.status !== 'lost').slice(0, 15).map(l => `- ${l.customer_name}: intent: ${l.intent_score || '?'} | דחיפות: ${l.urgency_level || '?'} | סנטימנט: ${l.sentiment || '?'} | סיבה: ${l.inquiry_reason || 'לא צוין'} | סטטוס: ${l.status}`).join('\n')}\n\nדרג את הלידים מהסביר ביותר לפחות סביר להמרה, ולכל אחד הסבר למה ומה הפעולה המומלצת.`
     };
+
+    // Special handling for hallucination detector — needs to fetch messages
+    if (tool.id === 'hallucination_detector') {
+      setRunningTool(tool.id);
+      setToolResult(null);
+      setSelectedTool(tool);
+
+      // Fetch bot messages from recent sessions
+      const recentSessions = sessions.slice(0, 15);
+      let allBotMessages = [];
+      for (const session of recentSessions) {
+        const msgsRes = await base44.entities.ChatMessage.filter({ session_id: session.id }, 'created_date');
+        allBotMessages.push(...msgsRes.filter(m => m.role === 'assistant').map(m => ({
+          session_id: session.id,
+          customer: session.customer_name || 'לא ידוע',
+          content: m.content
+        })));
+      }
+
+      const knowledgeText = knowledge.map(e => `[${e.category || 'general'}] ${e.title}: ${e.content}`).join('\n');
+
+      const hallucinationPrompt = `אתה מנתח בקרת איכות מומחה. המשימה שלך: לסרוק את כל תשובות הבוט AI של העסק "${tenant?.company_name}" ולזהות מידע שהומצא (הזיות / hallucinations).
+
+=== מקורות מידע מורשים (הבסיס היחיד שהבוט יכול להשתמש בו) ===
+
+הנחיות מערכת (System Prompt):
+${tenant?.system_prompt || 'אין'}
+
+בסיס ידע:
+${knowledgeText || 'ריק'}
+
+=== תשובות הבוט לבדיקה ===
+${allBotMessages.slice(0, 40).map((m, i) => `[שיחה עם ${m.customer}]:\n${m.content}`).join('\n\n---\n\n')}
+
+=== הוראות ניתוח ===
+עבור כל תשובה של הבוט, בדוק:
+1. האם יש שמות חבילות/מוצרים/שירותים שלא מופיעים במקורות?
+2. האם יש מחירים שלא מופיעים במקורות?
+3. האם יש שעות פעילות, מיקומים, או פרטי קשר שונים מהמקורות?
+4. האם יש שמות עובדים/רופאים/אנשי צוות שלא מופיעים במקורות?
+5. האם יש הבטחות, מבצעים, תכונות שלא קיימות במקורות?
+6. האם הבוט המציא תוכן של חבילות (לדוגמה: הוסיף BBQ, אזור פרטי, תחרויות שלא קיימים)?
+
+לכל הזיה שמצאת, ציין:
+- מה הבוט אמר (ציטוט)
+- מה המידע הנכון לפי המקורות (או שאין מידע כזה)
+- רמת חומרה: קריטי (מחירים/חבילות שגויים), בינוני (פרטים לא מדויקים), נמוך (ניסוח מוגזם)
+
+אם לא מצאת הזיות — ציין את זה בבירור.
+
+כתוב בעברית.`;
+
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: hallucinationPrompt,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            content: { type: "string" },
+            action_items: { type: "array", items: { type: "string" } }
+          }
+        }
+      });
+
+      setToolResult(result);
+      setRunningTool(null);
+      return;
+    }
 
     if (tool.id === 'closer_mode') {
       await base44.entities.Tenant.update(tenantId, { closer_mode_enabled: !tenant?.closer_mode_enabled });
