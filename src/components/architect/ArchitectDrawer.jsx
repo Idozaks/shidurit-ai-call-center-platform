@@ -53,6 +53,21 @@ export default function ArchitectDrawer({ open, onOpenChange, tenant, knowledge,
       }
     }
 
+    // Save original uploaded source files as knowledge entries for reference
+    if (config.source_files?.length > 0) {
+      for (const sf of config.source_files) {
+        await base44.entities.KnowledgeEntry.create({
+          tenant_id: tenantId,
+          title: `📎 קובץ מקור: ${sf.name}`,
+          content: `קובץ מקור שהועלה דרך האדריכל. ניתן להוריד את הקובץ דרך הקישור המצורף.`,
+          category: 'general',
+          file_url: sf.url,
+          file_name: sf.name,
+          is_active: true
+        });
+      }
+    }
+
     queryClient.invalidateQueries({ queryKey: ['tenant', tenantId] });
     queryClient.invalidateQueries({ queryKey: ['knowledge', tenantId] });
     setIsCreating(false);
