@@ -215,7 +215,7 @@ export default function DoctorsCatalog() {
 
                         {/* Contact & Profile Link */}
                         <div className="flex flex-col gap-2 pt-3 border-t border-slate-100">
-                          <Link to={createPageUrl('DoctorProfile') + `&id=${doctor.id}`}>
+                          <Link to={createPageUrl(`DoctorProfile?id=${doctor.id}`)}>
                             <Button 
                               size="sm" 
                               className="w-full gap-1.5 text-xs text-white"
