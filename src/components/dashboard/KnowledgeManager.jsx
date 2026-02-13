@@ -194,6 +194,23 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
               setIsDialogOpen(open);
               if (!open) resetForm();
             }}>
+              <div className="relative">
+                <input
+                  type="file"
+                  id="bulk-file-upload"
+                  className="hidden"
+                  multiple
+                  accept=".pdf,.csv,.xlsx,.json,.png,.jpg,.jpeg"
+                  onChange={(e) => {
+                    if (e.target.files?.length) handleBulkFileUpload(Array.from(e.target.files));
+                    e.target.value = '';
+                  }}
+                />
+                <Button variant="outline" className="gap-2" disabled={bulkUploading} onClick={() => document.getElementById('bulk-file-upload').click()}>
+                  {bulkUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                  {bulkUploading ? 'מעלה קבצים...' : 'העלאת קבצים'}
+                </Button>
+              </div>
               <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700" onClick={() => setIsDialogOpen(true)}>
                 <Plus className="w-4 h-4" />
                 הוסף פריט
