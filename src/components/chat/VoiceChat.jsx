@@ -87,13 +87,29 @@ export default function VoiceChat({ tenant, themeColor, onTranscript }) {
     setupCompleteRef.current = false;
     
     try {
-      const { base44 } = await import('@/api/base44Client');
-      const response = await base44.functions.invoke('getGeminiToken', {
-        system_prompt: tenant?.system_prompt || '',
-        persona_name: tenant?.ai_persona_name || 'נועה',
-        company_name: tenant?.company_name || '',
-      });
-      const { apiKey, model } = response.data;
+      let tokenData;
+      try {
+        const { base44 } = await import('@/api/base44Client');
+        const response = await base44.functions.invoke('getGeminiToken', {
+          system_prompt: tenant?.system_prompt || '',
+          persona_name: tenant?.ai_persona_name || 'נועה',
+          company_name: tenant?.company_name || '',
+        });
+        tokenData = response.data;
+      } catch (sdkErr) {
+        const response = await fetch(`/functions/getGeminiToken`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_prompt: tenant?.system_prompt || '',
+            persona_name: tenant?.ai_persona_name || 'נועה',
+            company_name: tenant?.company_name || '',
+          })
+        });
+        if (!response.ok) throw new Error('Failed to get token');
+        tokenData = await response.json();
+      }
+      const { apiKey, model } = tokenData;
 
       const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${apiKey}`;
       const ws = new WebSocket(wsUrl);
