@@ -80,7 +80,7 @@ export default function DoctorProfile() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30" dir="rtl">
       {/* Hero Banner */}
       <div 
-        className="relative h-48 md:h-64"
+        className="relative h-36 md:h-48"
         style={{ background: `linear-gradient(135deg, ${themeColor}, ${themeColor}cc)` }}
       >
         <div className="absolute inset-0 bg-black/10" />
@@ -97,7 +97,7 @@ export default function DoctorProfile() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 md:px-8 -mt-20 relative z-10 pb-12">
+      <div className="max-w-4xl mx-auto px-4 md:px-8 -mt-16 relative z-10 pb-12">
         {/* Profile Card */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden">
