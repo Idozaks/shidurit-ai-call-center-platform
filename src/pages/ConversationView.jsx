@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   ArrowRight, User, Bot, Loader2, Phone, Clock, 
-  Mic, Sparkles, MessageSquare, UserCheck, Send, Hand, RotateCcw
+  Mic, Sparkles, MessageSquare, UserCheck, Send, Hand, RotateCcw, XCircle
 } from "lucide-react";
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
