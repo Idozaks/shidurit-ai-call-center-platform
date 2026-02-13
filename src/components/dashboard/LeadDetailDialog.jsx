@@ -121,7 +121,8 @@ export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], s
       lead_scorer: `נתח את הליד הבא ותן ציון כוונת רכישה (0-100), רמת דחיפות, וסנטימנט.\n\nשם: ${lead?.customer_name}\nסיבת פנייה: ${lead?.inquiry_reason}\nסיכום: ${lead?.summary || 'אין'}\nעובדות: ${JSON.stringify(lead?.facts_json || {})}`,
       smart_followup: `צור הודעת וואטסאפ מעקב מותאמת אישית ללקוח.\n\nשם: ${lead?.customer_name}\nסיבת פנייה: ${lead?.inquiry_reason}\nסיכום שיחה: ${lead?.summary || 'אין'}\nסטטוס: ${lead?.status}\nעסק: ${tenant?.company_name}`,
       competitor_clash: `נתח את השיחה עם הליד וזהה אזכורי מתחרים. צור נקודות מכירה ייחודיות לעסק.\n\nשם לקוח: ${lead?.customer_name}\nסיכום: ${lead?.summary || 'אין'}\nעובדות: ${JSON.stringify(lead?.facts_json || {})}\nעסק: ${tenant?.company_name}`,
-      revenue_leak: `נתח את השיחות הבאות וזהה הזדמנויות שפוספסו ודליפות הכנסה.\n\nשיחות סגורות: ${sessions.filter(s => s.status === 'closed').length}\nלידים שאבדו: ${leads.filter(l => l.status === 'lost').length}\nסה"כ לידים: ${leads.length}\nלידים חמים: ${leads.filter(l => (l.intent_score || 0) >= 70).length}`
+      revenue_leak: `נתח את השיחות הבאות וזהה הזדמנויות שפוספסו ודליפות הכנסה.\n\nשיחות סגורות: ${sessions.filter(s => s.status === 'closed').length}\nלידים שאבדו: ${leads.filter(l => l.status === 'lost').length}\nסה"כ לידים: ${leads.length}\nלידים חמים: ${leads.filter(l => (l.intent_score || 0) >= 70).length}`,
+      knowledge_gaps: `נתח את השיחה עם הליד וזהה שאלות שהבוט לא ידע לענות עליהן — מידע חסר, תשובות כלליות מדי, או הפניות מיותרות לנציג.\n\nשם: ${lead?.customer_name}\nסיבת פנייה: ${lead?.inquiry_reason}\nסיכום: ${lead?.summary || 'אין'}\nעובדות: ${JSON.stringify(lead?.facts_json || {})}\nעסק: ${tenant?.company_name}\n\nזהה פערי ידע ספציפיים והמלץ איזה תוכן צריך להוסיף לבסיס הידע.`
     };
 
     const result = await base44.integrations.Core.InvokeLLM({
