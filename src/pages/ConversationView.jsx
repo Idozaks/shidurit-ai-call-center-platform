@@ -180,7 +180,7 @@ export default function ConversationView() {
                 <span className="text-xs font-medium">נציג פעיל</span>
               </div>
             )}
-            {currentWorker && session?.status !== 'closed' && !isWorkerActive && (
+            {currentWorker && !isWorkerActive && (
               <Button
                 size="sm"
                 variant="outline"
