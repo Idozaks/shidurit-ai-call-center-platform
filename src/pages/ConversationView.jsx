@@ -6,13 +6,15 @@ import { createPageUrl } from '@/utils';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   ArrowRight, User, Bot, Loader2, Phone, Clock, 
-  Mic, Sparkles, MessageSquare, UserCheck
+  Mic, Sparkles, MessageSquare, UserCheck, Send, Hand, RotateCcw
 } from "lucide-react";
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from "sonner";
 
 export default function ConversationView() {
   const navigate = useNavigate();
@@ -21,6 +23,14 @@ export default function ConversationView() {
   const sessionId = urlParams.get('sessionId');
   const tenantId = urlParams.get('tenantId');
   const messagesEndRef = useRef(null);
+  const [workerInput, setWorkerInput] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [currentWorker, setCurrentWorker] = useState(null);
+
+  useEffect(() => {
+    const workerData = localStorage.getItem('shidurit_worker');
+    if (workerData) setCurrentWorker(JSON.parse(workerData));
+  }, []);
 
   const { data: session, isLoading: sessionLoading } = useQuery({
     queryKey: ['session-detail', sessionId],
@@ -52,6 +62,40 @@ export default function ConversationView() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  const isWorkerActive = session?.status === 'agent_active';
+
+  const handleTakeControl = async () => {
+    await base44.entities.ChatSession.update(sessionId, { 
+      status: 'agent_active',
+      assigned_worker_id: currentWorker?.id || ''
+    });
+    queryClient.invalidateQueries({ queryKey: ['session-detail', sessionId] });
+    toast.success('השתלטת על השיחה — הבוט מושבת');
+  };
+
+  const handleReleaseToBot = async () => {
+    await base44.entities.ChatSession.update(sessionId, { 
+      status: 'active',
+      assigned_worker_id: ''
+    });
+    queryClient.invalidateQueries({ queryKey: ['session-detail', sessionId] });
+    toast.success('השיחה חזרה לבוט');
+  };
+
+  const handleSendWorkerMessage = async (e) => {
+    e.preventDefault();
+    if (!workerInput.trim() || isSending) return;
+    setIsSending(true);
+    await base44.entities.ChatMessage.create({
+      session_id: sessionId,
+      role: 'worker',
+      content: workerInput.trim()
+    });
+    setWorkerInput('');
+    queryClient.invalidateQueries({ queryKey: ['conversation-messages', sessionId] });
+    setIsSending(false);
+  };
 
   if (!sessionId) {
     return (
@@ -123,12 +167,42 @@ export default function ConversationView() {
               </div>
             </div>
           </div>
-          {session?.status === 'active' && (
-            <div className="flex items-center gap-1.5 text-green-600">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-xs font-medium">שיחה חיה</span>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {session?.status === 'active' && (
+              <div className="flex items-center gap-1.5 text-green-600">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-xs font-medium">בוט פעיל</span>
+              </div>
+            )}
+            {isWorkerActive && (
+              <div className="flex items-center gap-1.5 text-blue-600">
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                <span className="text-xs font-medium">נציג פעיל</span>
+              </div>
+            )}
+            {currentWorker && session?.status !== 'closed' && !isWorkerActive && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-1.5 text-blue-600 border-blue-200 hover:bg-blue-50"
+                onClick={handleTakeControl}
+              >
+                <Hand className="w-4 h-4" />
+                השתלט על השיחה
+              </Button>
+            )}
+            {isWorkerActive && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-1.5 text-green-600 border-green-200 hover:bg-green-50"
+                onClick={handleReleaseToBot}
+              >
+                <RotateCcw className="w-4 h-4" />
+                החזר לבוט
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -191,6 +265,30 @@ export default function ConversationView() {
           </div>
         )}
       </div>
+
+      {/* Worker input bar */}
+      {isWorkerActive && currentWorker && (
+        <div className="sticky bottom-0 bg-white/90 backdrop-blur-lg border-t border-slate-200 px-4 py-3">
+          <form onSubmit={handleSendWorkerMessage} className="max-w-4xl mx-auto flex gap-2">
+            <Input
+              value={workerInput}
+              onChange={(e) => setWorkerInput(e.target.value)}
+              placeholder="הקלד הודעה כנציג..."
+              className="flex-1 h-11"
+              disabled={isSending}
+              autoFocus
+            />
+            <Button 
+              type="submit" 
+              size="icon" 
+              className="h-11 w-11 bg-blue-600 hover:bg-blue-700"
+              disabled={!workerInput.trim() || isSending}
+            >
+              {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            </Button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
