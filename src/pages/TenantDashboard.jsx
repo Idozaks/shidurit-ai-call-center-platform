@@ -12,7 +12,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { 
   ArrowRight, Settings, Users, MessageSquare, BookOpen, 
   ExternalLink, BarChart3, UserPlus, FileText, Sparkles,
-  Phone, Mail, Clock, TrendingUp, AlertCircle, Wrench, Key, UserCheck, RefreshCw
+  Phone, Mail, Clock, TrendingUp, AlertCircle, Wrench, Key, UserCheck, RefreshCw, Compass
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -25,6 +25,7 @@ import AIToolbox from '@/components/dashboard/AIToolbox.jsx';
 import PerformanceDashboard from '@/components/dashboard/PerformanceDashboard.jsx';
 import GeminiKeySection from '@/components/dashboard/GeminiKeySection.jsx';
 import LeadDetailDialog from '@/components/dashboard/LeadDetailDialog.jsx';
+import CompassChat from '@/components/dashboard/CompassChat.jsx';
 
 export default function TenantDashboard() {
   const navigate = useNavigate();
@@ -219,6 +220,7 @@ export default function TenantDashboard() {
                     { value: 'settings', icon: Settings, label: 'הגדרות' },
                     { value: 'api', icon: Key, label: 'API' },
                     { value: 'doctors', icon: UserCheck, label: 'אנשי קשר' },
+                    { value: 'compass', icon: Compass, label: 'מצפן הידע' },
                     { value: 'info', icon: FileText, label: 'מידע' },
                     { value: 'profile', icon: Users, label: 'פרופיל' },
                   ].map(tab => (
@@ -330,6 +332,10 @@ export default function TenantDashboard() {
 
             <TabsContent value="api">
               <GeminiKeySection tenant={tenant} tenantId={tenantId} />
+            </TabsContent>
+
+            <TabsContent value="compass">
+              <CompassChat tenantId={tenantId} leads={leads} sessions={sessions} />
             </TabsContent>
 
             <TabsContent value="info">
