@@ -84,10 +84,17 @@ export default function ConversationView() {
     toast.success('השיחה חזרה לבוט');
   };
 
-  const handleCloseSession = async () => {
-    await base44.entities.ChatSession.update(sessionId, { status: 'closed' });
+  const handleChangeStatus = async (newStatus) => {
+    const updateData = { status: newStatus };
+    if (newStatus === 'agent_active') {
+      updateData.assigned_worker_id = currentWorker?.id || '';
+    } else if (newStatus === 'active') {
+      updateData.assigned_worker_id = '';
+    }
+    await base44.entities.ChatSession.update(sessionId, updateData);
     queryClient.invalidateQueries({ queryKey: ['session-detail', sessionId] });
-    toast.success('השיחה נסגרה');
+    const labels = { active: 'פעיל (בוט)', waiting_for_agent: 'ממתין לנציג', agent_active: 'נציג פעיל', closed: 'סגור' };
+    toast.success(`הסטטוס שונה ל: ${labels[newStatus]}`);
   };
 
   const handleSendWorkerMessage = async (e) => {
