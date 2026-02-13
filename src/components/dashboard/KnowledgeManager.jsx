@@ -28,7 +28,8 @@ const CATEGORIES = [
   { value: 'about', label: 'אודות' },
   { value: 'team', label: 'צוות' },
   { value: 'policies', label: 'מדיניות' },
-  { value: 'locations', label: 'מיקומים' }
+  { value: 'locations', label: 'מיקומים' },
+  { value: 'other', label: 'אחר' }
 ];
 
 export default function KnowledgeManager({ tenantId, knowledge = [] }) {
@@ -41,6 +42,7 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
     category: 'general',
     is_active: true
   });
+  const [customCategory, setCustomCategory] = useState('');
   const queryClient = useQueryClient();
 
   const entries = knowledge;
@@ -71,27 +73,34 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
 
   const resetForm = () => {
     setFormData({ title: '', content: '', category: 'general', is_active: true });
+    setCustomCategory('');
     setEditingEntry(null);
     setIsDialogOpen(false);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const submitData = {
+      ...formData,
+      category: formData.category === 'other' ? (customCategory.trim() || 'other') : formData.category
+    };
     if (editingEntry) {
-      updateMutation.mutate({ id: editingEntry.id, data: formData });
+      updateMutation.mutate({ id: editingEntry.id, data: submitData });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(submitData);
     }
   };
 
   const handleEdit = (entry) => {
     setEditingEntry(entry);
+    const isPrebuilt = CATEGORIES.some(c => c.value === entry.category && c.value !== 'other');
     setFormData({
       title: entry.title,
       content: entry.content,
-      category: entry.category || 'general',
+      category: isPrebuilt ? (entry.category || 'general') : 'other',
       is_active: entry.is_active !== false
     });
+    setCustomCategory(isPrebuilt ? '' : (entry.category || ''));
     setIsDialogOpen(true);
   };
 
@@ -150,7 +159,10 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
                     <Label>קטגוריה</Label>
                     <Select
                       value={formData.category}
-                      onValueChange={(value) => setFormData({ ...formData, category: value })}
+                      onValueChange={(value) => {
+                        setFormData({ ...formData, category: value });
+                        if (value !== 'other') setCustomCategory('');
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -161,6 +173,14 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
                         ))}
                       </SelectContent>
                     </Select>
+                    {formData.category === 'other' && (
+                      <Input
+                        placeholder="הקלד שם קטגוריה..."
+                        value={customCategory}
+                        onChange={(e) => setCustomCategory(e.target.value)}
+                        required
+                      />
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label>תוכן</Label>
