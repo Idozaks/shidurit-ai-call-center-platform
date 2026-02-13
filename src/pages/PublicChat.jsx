@@ -54,8 +54,6 @@ export default function PublicChat() {
   const [sessionStatus, setSessionStatus] = useState('active');
   const [collectedDetails, setCollectedDetails] = useState({});
 
-  const { data: doctors = [] } = useTenantDoctors(tenant?.id);
-
   const { data: tenant, isLoading: tenantLoading } = useQuery({
     queryKey: ['publicTenant', slug],
     queryFn: async () => {
@@ -64,6 +62,8 @@ export default function PublicChat() {
     },
     enabled: !!slug
   });
+
+  const { data: doctors = [] } = useTenantDoctors(tenant?.id);
 
   const createSessionMutation = useMutation({
     mutationFn: async ({ name }) => {
