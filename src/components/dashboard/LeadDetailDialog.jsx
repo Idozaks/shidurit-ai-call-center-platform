@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { 
   Sparkles, Phone, MessageSquare, Archive, CheckCircle, 
-  Loader2, User, Bot, X, Zap, Swords, ShieldCheck, TrendingDown, Copy, HelpCircle
+  Loader2, User, Bot, X, Zap, Swords, ShieldCheck, TrendingDown, Copy, HelpCircle, ChevronDown, ChevronUp
 } from "lucide-react";
 import { toast } from "sonner";
 import LeadMetricsCards from './LeadMetricsCards';
