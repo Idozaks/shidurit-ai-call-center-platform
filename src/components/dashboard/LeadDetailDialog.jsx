@@ -13,6 +13,7 @@ import {
   Loader2, User, Bot, X, Zap, Swords, ShieldCheck, TrendingDown, Copy, HelpCircle
 } from "lucide-react";
 import { toast } from "sonner";
+import LeadMetricsCards from './LeadMetricsCards';
 
 export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], sessions = [], onClose }) {
   const [analyzing, setAnalyzing] = useState(false);
