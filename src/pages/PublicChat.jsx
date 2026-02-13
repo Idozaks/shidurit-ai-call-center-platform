@@ -611,6 +611,7 @@ ${history}
               themeColor={themeColor}
               disabled={isTyping}
               onOpenDetailsModal={() => setShowDetailsModal(true)}
+              detailsSubmitted={detailsSubmitted}
             />
           </div>
           <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto flex gap-2">
