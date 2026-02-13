@@ -223,7 +223,7 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
                   id="bulk-file-upload"
                   className="hidden"
                   multiple
-                  accept=".pdf,.csv,.xlsx,.json,.png,.jpg,.jpeg"
+                  accept=".pdf,.doc,.docx,.csv,.xlsx,.json,.png,.jpg,.jpeg,.txt,.rtf"
                   onChange={(e) => {
                     if (e.target.files?.length) handleBulkFileUpload(Array.from(e.target.files));
                     e.target.value = '';
