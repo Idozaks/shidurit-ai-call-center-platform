@@ -95,15 +95,15 @@ Last assistant message: "${lastAssistantMsg}"
 
 Rules:
 1. Generate EXACTLY 10 suggestions.
-2. ONLY suggest things the business has knowledge about.
-3. Each suggestion should be 2-6 words in Hebrew.
-4. Make them sound natural, like a real customer would say or ask.
-5. The first 3-4 should be direct follow-ups to what was just discussed (proactive, flowing naturally from the last assistant message).
-6. The next 3-4 should explore related but different topics from the knowledge base.
-7. The last 2-3 should be general actions like asking for pricing, contact info, scheduling, etc.
-8. Never repeat something the customer already asked.
-9. Make each suggestion distinct - no duplicates or near-duplicates.
-10. Order them by relevance to the current conversation flow.
+2. Suggestions should sound like things a REAL CUSTOMER would naturally say — statements and requests, NOT interview questions.
+3. GOOD examples: "אני רוצה לקבוע תור", "כמה עולה טיפול?", "אני מתעניין בטיפול לייזר", "איזה רופא מומלץ?", "מתי יש תור פנוי?"
+4. BAD examples: "מהם זמני ההמתנה?", "למה כדאי לבחור בכם?", "איזה טיפולים נוספים יש?", "שעות פתיחה של המרכז?" — these sound robotic and unnatural.
+5. The first 4-5 should be ACTIONABLE follow-ups directly related to what was just discussed. If the bot talked about specific services/treatments, suggest booking them or asking about their price.
+6. The next 3-4 should explore other relevant topics the customer might care about.
+7. The last 1-2 should be action-oriented: booking, pricing, getting contact info.
+8. Each suggestion should be 3-7 words in natural spoken Hebrew.
+9. Never repeat something the customer already asked.
+10. Think: "What would I actually SAY to a receptionist?" — not "What formal question would I write?"
 
 Return exactly 10 suggestions.`,
         response_json_schema: {
