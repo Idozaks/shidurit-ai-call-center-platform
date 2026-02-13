@@ -181,6 +181,5 @@ export default function Layout({ children, currentPageName }) {
         {children}
       </main>
       </div>
-      </TooltipProvider>
       );
       }
