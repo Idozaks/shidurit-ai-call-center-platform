@@ -272,39 +272,52 @@ Return exactly 10 suggestions.`,
           <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
         </div>
       ) : followUpSuggestions.length > 0 && (
-        <div className="overflow-x-auto pb-1" style={{ scrollbarWidth: 'thin', scrollbarColor: `${themeColor}40 transparent` }}>
-          <div className="flex gap-2 w-max">
-            {row1.map((text, i) => (
-              <button
-                key={`s1-${i}`}
-                onClick={() => handleChipClick(text)}
-                disabled={disabled}
-                className="text-sm px-3 py-1.5 rounded-full border transition-colors whitespace-nowrap disabled:opacity-50 flex-shrink-0"
-                style={{ borderColor: `${themeColor}40`, color: themeColor, backgroundColor: `${themeColor}08` }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}18`; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}08`; }}
-              >
-                {text}
-              </button>
-            ))}
+        <div>
+          {/* Collapse/Expand toggle */}
+          <div className="flex justify-center mb-1.5">
+            <button
+              onClick={() => setExpandedChips(!expandedChips)}
+              className="text-[10px] px-2 py-0.5 rounded-full flex items-center gap-0.5 transition-all"
+              style={{ color: `${themeColor}90` }}
+            >
+              {expandedChips ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              {expandedChips ? 'צמצם הצעות' : 'הרחב הצעות'}
+            </button>
           </div>
-          {row2.length > 0 && (
-            <div className="flex gap-2 w-max mt-1.5">
-              {row2.map((text, i) => (
+          <div className="overflow-x-auto pb-1" style={{ scrollbarWidth: 'thin', scrollbarColor: `${themeColor}40 transparent` }}>
+            <div className="flex gap-2 w-max">
+              {row1.map((text, i) => (
                 <button
-                  key={`s2-${i}`}
+                  key={`s1-${i}`}
                   onClick={() => handleChipClick(text)}
                   disabled={disabled}
-                  className="text-sm px-3 py-1.5 rounded-full border transition-colors whitespace-nowrap disabled:opacity-50 flex-shrink-0"
-                  style={{ borderColor: `${themeColor}40`, color: themeColor, backgroundColor: `${themeColor}08` }}
-                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}18`; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}08`; }}
+                  className="text-sm px-3 py-1.5 rounded-full border-[1.5px] transition-all whitespace-nowrap disabled:opacity-50 flex-shrink-0 shadow-sm hover:shadow-md"
+                  style={{ borderColor: `${themeColor}50`, color: themeColor, backgroundColor: `${themeColor}10` }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}20`; e.currentTarget.style.borderColor = `${themeColor}70`; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}10`; e.currentTarget.style.borderColor = `${themeColor}50`; }}
                 >
                   {text}
                 </button>
               ))}
             </div>
-          )}
+            {expandedChips && row2.length > 0 && (
+              <div className="flex gap-2 w-max mt-1.5">
+                {row2.map((text, i) => (
+                  <button
+                    key={`s2-${i}`}
+                    onClick={() => handleChipClick(text)}
+                    disabled={disabled}
+                    className="text-sm px-3 py-1.5 rounded-full border-[1.5px] transition-all whitespace-nowrap disabled:opacity-50 flex-shrink-0 shadow-sm hover:shadow-md"
+                    style={{ borderColor: `${themeColor}50`, color: themeColor, backgroundColor: `${themeColor}10` }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}20`; e.currentTarget.style.borderColor = `${themeColor}70`; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}10`; e.currentTarget.style.borderColor = `${themeColor}50`; }}
+                  >
+                    {text}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
