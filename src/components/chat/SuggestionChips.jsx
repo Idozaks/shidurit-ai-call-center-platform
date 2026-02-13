@@ -18,12 +18,11 @@ const publicApi = async (payload) => {
   }
 };
 
-export default function SuggestionChips({ tenantId, messages, onSelect, themeColor, disabled, onOpenDetailsModal }) {
+export default function SuggestionChips({ tenantId, messages, onSelect, themeColor, disabled, onOpenDetailsModal, detailsSubmitted }) {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
-  const row1Ref = useRef(null);
-  const row2Ref = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     if (!tenantId) return;
