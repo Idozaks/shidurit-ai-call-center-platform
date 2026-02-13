@@ -14,6 +14,7 @@ import {
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { motion, AnimatePresence } from "framer-motion";
+import { getDoctorAvatarUrl } from '../components/utils/doctorAvatar';
 
 export default function DoctorsCatalog() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -151,7 +152,7 @@ export default function DoctorsCatalog() {
                         {/* Doctor Header */}
                         <div className="flex items-start gap-4 mb-4">
                           <Avatar className="w-14 h-14 ring-2 ring-white shadow-md">
-                            <AvatarImage src={doctor.image_url} />
+                            <AvatarImage src={getDoctorAvatarUrl(doctor)} />
                             <AvatarFallback 
                               className="text-white font-bold text-lg"
                               style={{ backgroundColor: tenant?.theme_color || '#6366f1' }}
