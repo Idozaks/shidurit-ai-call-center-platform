@@ -422,7 +422,40 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
           </div>
         ) : (
           <div className="grid gap-4">
-            {filteredEntries.map((entry) => (
+            {/* Source files section */}
+            {filteredEntries.some(e => e.title?.startsWith('📎')) && (
+              <div className="mb-2">
+                <h3 className="text-sm font-medium text-slate-500 mb-2 flex items-center gap-2">
+                  <Paperclip className="w-4 h-4" />
+                  קבצי מקור שהועלו
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {filteredEntries.filter(e => e.title?.startsWith('📎')).map((entry) => (
+                    <div key={entry.id} className="flex items-center gap-2 p-2.5 rounded-lg bg-indigo-50 border border-indigo-200 group">
+                      <File className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+                      <a href={entry.file_url} target="_blank" rel="noopener noreferrer" className="text-sm text-indigo-700 hover:underline font-medium">
+                        {entry.file_name || 'קובץ'}
+                      </a>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6 opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => deleteMutation.mutate(entry.id)}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>מחק קובץ</TooltipContent>
+                      </Tooltip>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {/* Knowledge entries */}
+            {filteredEntries.filter(e => !e.title?.startsWith('📎')).map((entry) => (
               <div 
                 key={entry.id}
                 className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
@@ -436,7 +469,7 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
                         <Badge variant="secondary">מושבת</Badge>
                       )}
                     </div>
-                    <p className="text-sm text-slate-500 line-clamp-2">{entry.content}</p>
+                    <p className="text-sm text-slate-500 line-clamp-3">{entry.content}</p>
                     <div className="flex items-center gap-4 mt-2 text-xs text-slate-400">
                       <Badge variant="outline">
                         {CATEGORIES.find(c => c.value === entry.category)?.label || entry.category}
