@@ -85,12 +85,26 @@ export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], s
     const transcript = messages.map(m => `${m.role === 'user' ? 'לקוח' : 'בוט'}: ${m.content}`).join('\n');
     
     const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `נתח את השיחה הבאה עם הליד וספק סנטימנט, סיכום, ציון כוונה, ופעולה מומלצת.\n\nשם: ${lead.customer_name}\nשיחה:\n${transcript}`,
+      prompt: `נתח את השיחה הבאה עם הליד וספק סנטימנט, סיכום קצר (שורה אחת), ניתוח מפורט (כמה פסקאות), ציון כוונה, ופעולה מומלצת.
+
+שם: ${lead.customer_name}
+עסק: ${tenant?.company_name || ''}
+שיחה:
+${transcript}
+
+הסיכום הקצר (summary) צריך להיות שורה אחת תמציתית.
+הניתוח המפורט (detailed_analysis) צריך לכלול:
+- ניתוח צרכי הלקוח
+- נקודות מפתח מהשיחה
+- הערכת מוכנות לרכישה/סגירה
+- המלצות ספציפיות לנציג
+- סיכון ונקודות לשיפור`,
       response_json_schema: {
         type: "object",
         properties: {
           sentiment: { type: "string", enum: ["positive", "neutral", "negative"] },
           summary: { type: "string" },
+          detailed_analysis: { type: "string" },
           intent_score: { type: "number" },
           ai_suggested_action: { type: "string" },
           urgency_level: { type: "string", enum: ["low", "medium", "high"] }
@@ -106,6 +120,8 @@ export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], s
       urgency_level: result.urgency_level,
       last_analysis_at: new Date().toISOString()
     });
+    setDetailedAnalysis(result.detailed_analysis || '');
+    setAnalysisExpanded(true);
     queryClient.invalidateQueries({ queryKey: ['leads'] });
     toast.success('ניתוח AI הושלם');
     setAnalyzing(false);
