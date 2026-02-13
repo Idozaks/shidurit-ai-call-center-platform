@@ -127,7 +127,13 @@ export default function Layout({ children, currentPageName }) {
                 <button 
                   type="button"
                   className="w-full flex items-center justify-start gap-3 text-red-600 px-3 py-3 rounded-lg hover:bg-red-50 active:bg-red-100 transition-colors text-sm font-medium"
-                  onClick={handleLogout}
+                  onPointerDown={(e) => {
+                    e.stopPropagation();
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleLogout();
+                  }}
                 >
                   <LogOut className="w-5 h-5" />
                   התנתק
