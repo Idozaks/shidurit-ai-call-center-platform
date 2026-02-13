@@ -152,7 +152,9 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
       title: entry.title,
       content: entry.content,
       category: isPrebuilt ? (entry.category || 'general') : 'other',
-      is_active: entry.is_active !== false
+      is_active: entry.is_active !== false,
+      file_url: entry.file_url || '',
+      file_name: entry.file_name || ''
     });
     setCustomCategory(isPrebuilt ? '' : (entry.category || ''));
     setIsDialogOpen(true);
