@@ -23,7 +23,8 @@ export default function SuggestionChips({ tenantId, messages, onSelect, themeCol
   const generateSuggestions = async () => {
     setLoading(true);
     try {
-      const knowledge = await base44.entities.KnowledgeEntry.filter({ tenant_id: tenantId, is_active: true });
+      const knowledgeRes = await publicApi({ action: 'getKnowledge', tenant_id: tenantId });
+      const knowledge = knowledgeRes.entries || [];
       
       if (knowledge.length === 0) {
         setSuggestions([]);
