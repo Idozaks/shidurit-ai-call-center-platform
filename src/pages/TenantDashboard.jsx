@@ -246,15 +246,23 @@ export default function TenantDashboard() {
                     ) : (
                       <div className="space-y-3">
                         {leads.slice(0, 5).map((lead) => (
-                          <div key={lead.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50">
-                            <div>
-                              <p className="font-medium">{lead.customer_name}</p>
-                              <p className="text-sm text-slate-500">{lead.inquiry_reason || 'פנייה כללית'}</p>
-                            </div>
-                            <Badge variant={lead.status === 'new' ? 'default' : 'secondary'}>
-                              {lead.status === 'new' ? 'חדש' : lead.status === 'contacted' ? 'נוצר קשר' : lead.status}
-                            </Badge>
-                          </div>
+                          <Dialog key={lead.id} open={selectedOverviewLead?.id === lead.id} onOpenChange={(open) => { if (!open) setSelectedOverviewLead(null); }}>
+                            <button
+                              onClick={() => setSelectedOverviewLead(lead)}
+                              className="w-full flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer text-right"
+                            >
+                              <div>
+                                <p className="font-medium">{lead.customer_name}</p>
+                                <p className="text-sm text-slate-500">{lead.inquiry_reason || 'פנייה כללית'}</p>
+                              </div>
+                              <Badge variant={lead.status === 'new' ? 'default' : 'secondary'}>
+                                {lead.status === 'new' ? 'חדש' : lead.status === 'contacted' ? 'נוצר קשר' : lead.status}
+                              </Badge>
+                            </button>
+                            {selectedOverviewLead?.id === lead.id && (
+                              <LeadDetailDialog lead={selectedOverviewLead} tenantId={tenantId} tenant={tenant} leads={leads} sessions={sessions} onClose={() => setSelectedOverviewLead(null)} />
+                            )}
+                          </Dialog>
                         ))}
                       </div>
                     )}
