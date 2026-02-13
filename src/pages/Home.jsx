@@ -19,6 +19,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showArchitect, setShowArchitect] = useState(false);
+  const [architectDismissed, setArchitectDismissed] = useState(false);
   const queryClient = useQueryClient();
 
   const currentWorker = React.useMemo(() => {
@@ -66,12 +67,8 @@ export default function Home() {
 
   const hasNoTenants = !isLoading && tenants.length === 0;
 
-  if (hasNoTenants && showArchitect !== false) {
-    return <ArchitectOverlay onDismiss={() => setShowArchitect(false)} />;
-  }
-
-  if (showArchitect) {
-    return <ArchitectOverlay onDismiss={() => setShowArchitect(false)} />;
+  if ((hasNoTenants && !architectDismissed) || showArchitect) {
+    return <ArchitectOverlay onDismiss={() => { setShowArchitect(false); setArchitectDismissed(true); }} />;
   }
 
   return (
