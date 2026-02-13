@@ -380,8 +380,7 @@ export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], s
         ) : messages.length === 0 ? (
           <p className="text-center text-sm text-slate-400 py-4">אין שיחה מקושרת</p>
         ) : (
-          <ScrollArea className="max-h-[300px]">
-            <div className="space-y-3">
+          <div className="space-y-3 pb-4">
               {messages.map((msg) => (
                 <div key={msg.id} className={`flex gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
                   <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${
@@ -395,7 +394,6 @@ export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], s
                 </div>
               ))}
             </div>
-          </ScrollArea>
         )}
       </div>
     </DialogContent>
