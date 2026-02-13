@@ -94,10 +94,24 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
 
   const handleBulkFileUpload = async (files) => {
     setBulkUploading(true);
+    const uploaded = [];
     for (const file of files) {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      uploaded.push({ file_url, file_name: file.name, status: 'uploaded', title: '', content: '', category: 'general' });
+    }
+    setPendingFiles(prev => [...prev, ...uploaded]);
+    setBulkUploading(false);
+  };
+
+  const handleAnalyzeFiles = async () => {
+    setAnalyzing(true);
+    const updated = [...pendingFiles];
+    for (let i = 0; i < updated.length; i++) {
+      if (updated[i].status !== 'uploaded') continue;
+      updated[i].status = 'analyzing';
+      setPendingFiles([...updated]);
       const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
-        file_url,
+        file_url: updated[i].file_url,
         json_schema: {
           type: "object",
           properties: {
@@ -110,29 +124,35 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
       });
       if (result.status === 'success' && result.output) {
         const extracted = Array.isArray(result.output) ? result.output[0] : result.output;
-        await base44.entities.KnowledgeEntry.create({
-          tenant_id: tenantId,
-          title: extracted.title || file.name,
-          content: extracted.content || '',
-          category: extracted.category || 'general',
-          file_url,
-          file_name: file.name,
-          is_active: true
-        });
+        updated[i] = { ...updated[i], status: 'analyzed', title: extracted.title || updated[i].file_name, content: extracted.content || '', category: extracted.category || 'general' };
       } else {
-        await base44.entities.KnowledgeEntry.create({
-          tenant_id: tenantId,
-          title: file.name,
-          content: `קובץ מצורף: ${file.name}`,
-          category: 'general',
-          file_url,
-          file_name: file.name,
-          is_active: true
-        });
+        updated[i] = { ...updated[i], status: 'analyzed', title: updated[i].file_name, content: `קובץ מצורף: ${updated[i].file_name}`, category: 'general' };
       }
+      setPendingFiles([...updated]);
+    }
+    setAnalyzing(false);
+  };
+
+  const handleSavePendingFiles = async () => {
+    setSavingBulk(true);
+    for (const pf of pendingFiles) {
+      await base44.entities.KnowledgeEntry.create({
+        tenant_id: tenantId,
+        title: pf.title || pf.file_name,
+        content: pf.content || '',
+        category: pf.category || 'general',
+        file_url: pf.file_url,
+        file_name: pf.file_name,
+        is_active: true
+      });
     }
     queryClient.invalidateQueries({ queryKey: ['knowledge', tenantId] });
-    setBulkUploading(false);
+    setPendingFiles([]);
+    setSavingBulk(false);
+  };
+
+  const removePendingFile = (index) => {
+    setPendingFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = (e) => {
