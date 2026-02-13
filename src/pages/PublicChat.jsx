@@ -15,11 +15,25 @@ import SuggestionChips from '../components/chat/SuggestionChips';
 import DetailsInputModal from '../components/chat/DetailsInputModal';
 
 // Helper to call the public backend function via direct HTTP (no auth needed)
+const getApiBaseUrl = () => {
+  // In production, use relative path. In preview, construct full URL.
+  const origin = window.location.origin;
+  return origin;
+};
+
 const publicApi = async (payload) => {
-  // Use the base44 SDK to invoke the function - works in both preview and production
-  const { base44 } = await import('@/api/base44Client');
-  const response = await base44.functions.invoke('publicChat', payload);
-  return response.data;
+  const baseUrl = getApiBaseUrl();
+  const res = await fetch(`${baseUrl}/api/publicChat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    console.error('publicApi error:', res.status, text);
+    throw new Error(`API error: ${res.status}`);
+  }
+  return res.json();
 };
 
 export default function PublicChat() {
