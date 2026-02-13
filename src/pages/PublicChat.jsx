@@ -75,13 +75,14 @@ export default function PublicChat() {
   useEffect(() => {
     if (!sessionId) return;
     const interval = setInterval(async () => {
-      const sessions = await base44.entities.ChatSession.filter({ id: sessionId });
-      const s = sessions[0];
+      const sessionRes = await publicApi({ action: 'getSession', session_id: sessionId });
+      const s = sessionRes.session;
       if (s) {
         setSessionStatus(s.status);
       }
       // Fetch any worker messages not yet shown
-      const allMsgs = await base44.entities.ChatMessage.filter({ session_id: sessionId }, 'created_date');
+      const msgsRes = await publicApi({ action: 'getMessages', session_id: sessionId });
+      const allMsgs = msgsRes.messages || [];
       const workerMsgs = allMsgs.filter(m => m.role === 'worker');
       if (workerMsgs.length > 0) {
         setMessages(prev => {
