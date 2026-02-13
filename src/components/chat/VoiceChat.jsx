@@ -87,7 +87,7 @@ export default function VoiceChat({ tenant, themeColor, onTranscript }) {
     setupCompleteRef.current = false;
     
     try {
-      const response = await fetch('/api/getGeminiToken', {
+      const response = await fetch('/functions/getGeminiToken', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
