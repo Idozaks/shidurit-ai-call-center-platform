@@ -336,7 +336,7 @@ ${question}
               <p className="text-slate-400 text-sm max-w-md">שאל כל שאלה עסקית — המצפן ינתח את הלידים, השיחות והנתונים שלך ויחזיר תובנות אסטרטגיות.</p>
             </div>
             <div className="flex flex-wrap justify-center gap-2">
-              {QUICK_CHIPS.map((chip, i) => (
+              {INITIAL_CHIPS.map((chip, i) => (
                 <button
                   key={i}
                   onClick={() => handleSend(chip.label)}
