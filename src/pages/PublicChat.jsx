@@ -713,8 +713,7 @@ ${history}
       {!showNameInput && chatMode === 'text' && (
         <div className="flex-shrink-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-t px-4 pt-2 pb-4">
           <div className="max-w-3xl mx-auto">
-            {!isTyping && (
-                <SuggestionChips
+            <SuggestionChips
                   tenantId={tenant?.id}
                   messages={messages}
                   onSelect={(text) => sendChat(text)}
@@ -723,7 +722,6 @@ ${history}
                   onOpenDetailsModal={() => setShowDetailsModal(true)}
                   detailsSubmitted={detailsSubmitted}
                 />
-              )}
           </div>
           <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto flex gap-2">
             <Input
