@@ -163,7 +163,7 @@ export default function DoctorProfile() {
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {doctor.procedures.map((proc, i) => (
-                        <Link key={i} to={createPageUrl('ProcedurePage') + `&name=${encodeURIComponent(proc)}`}>
+                        <Link key={i} to={createPageUrl(`ProcedurePage?name=${encodeURIComponent(proc)}`)}>
                           <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-indigo-50 hover:shadow-sm transition-all cursor-pointer">
                             <div 
                               className="w-2 h-2 rounded-full shrink-0"
