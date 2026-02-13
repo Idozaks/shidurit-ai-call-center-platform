@@ -623,16 +623,25 @@ ${history}
                         {message.role === 'user' ? <User className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
                       </AvatarFallback>
                     </Avatar>
-                    <div 
-                      className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${
-                        message.role === 'user' 
-                          ? 'bg-slate-200 dark:bg-slate-700 rounded-tr-sm' 
-                          : 'bg-white dark:bg-slate-800 rounded-tl-sm border'
-                      }`}
-                    >
-                      <ReactMarkdown className="prose prose-sm dark:prose-invert max-w-none">
-                        {message.content}
-                      </ReactMarkdown>
+                    <div className={`max-w-[80%] ${message.role === 'user' ? '' : ''}`}>
+                      <div 
+                        className={`rounded-2xl px-4 py-3 shadow-sm ${
+                          message.role === 'user' 
+                            ? 'bg-slate-200 dark:bg-slate-700 rounded-tr-sm' 
+                            : 'bg-white dark:bg-slate-800 rounded-tl-sm border'
+                        }`}
+                      >
+                        <ReactMarkdown className="prose prose-sm dark:prose-invert max-w-none">
+                          {message.content}
+                        </ReactMarkdown>
+                      </div>
+                      {message.role === 'assistant' && doctors.length > 0 && (
+                        <DoctorCards
+                          messageContent={message.content}
+                          doctors={doctors}
+                          themeColor={themeColor}
+                        />
+                      )}
                     </div>
                   </motion.div>
                 ))}
