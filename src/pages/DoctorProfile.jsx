@@ -77,10 +77,10 @@ export default function DoctorProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 overflow-auto" dir="rtl">
       {/* Hero Banner */}
       <div 
-        className="relative h-36 md:h-48"
+        className="relative h-32 md:h-40"
         style={{ background: `linear-gradient(135deg, ${themeColor}, ${themeColor}cc)` }}
       >
         <div className="absolute inset-0 bg-black/10" />
@@ -97,13 +97,13 @@ export default function DoctorProfile() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 md:px-8 -mt-16 relative z-10 pb-12">
+      <div className="max-w-4xl mx-auto px-4 md:px-8 -mt-12 relative z-10 pb-12">
         {/* Profile Card */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden">
             <CardContent className="p-6 md:p-8">
               <div className="flex flex-col sm:flex-row items-start gap-5">
-                <Avatar className="w-24 h-24 ring-4 ring-white shadow-lg -mt-16 sm:-mt-20">
+                <Avatar className="w-20 h-20 ring-4 ring-white shadow-lg -mt-14 sm:-mt-16">
                   <AvatarImage src={getDoctorAvatarUrl(doctor)} />
                   <AvatarFallback 
                     className="text-white font-bold text-3xl"
