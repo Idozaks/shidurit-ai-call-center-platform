@@ -343,6 +343,72 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
         </div>
       </CardHeader>
       <CardContent>
+        {/* Pending uploaded files */}
+        {pendingFiles.length > 0 && (
+          <div className="mb-6 p-4 rounded-xl border-2 border-dashed border-indigo-200 bg-indigo-50/50">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-medium text-indigo-800 flex items-center gap-2">
+                <Upload className="w-4 h-4" />
+                קבצים שהועלו ({pendingFiles.length})
+              </h3>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1.5 border-indigo-300 text-indigo-700 hover:bg-indigo-100"
+                  disabled={analyzing || pendingFiles.every(f => f.status === 'analyzed')}
+                  onClick={handleAnalyzeFiles}
+                >
+                  {analyzing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                  {analyzing ? 'מנתח...' : 'נתח נתונים'}
+                </Button>
+                <Button
+                  size="sm"
+                  className="gap-1.5 bg-indigo-600 hover:bg-indigo-700"
+                  disabled={savingBulk || analyzing || !pendingFiles.some(f => f.status === 'analyzed')}
+                  onClick={handleSavePendingFiles}
+                >
+                  {savingBulk ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                  {savingBulk ? 'שומר...' : 'שמור הכל'}
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {pendingFiles.map((pf, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-2.5 rounded-lg bg-white border">
+                  <File className="w-4 h-4 text-indigo-500 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{pf.file_name}</p>
+                    {pf.status === 'analyzed' && pf.title && (
+                      <p className="text-xs text-slate-500 truncate">כותרת: {pf.title}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {pf.status === 'uploaded' && (
+                      <Badge variant="outline" className="text-xs">ממתין לניתוח</Badge>
+                    )}
+                    {pf.status === 'analyzing' && (
+                      <Badge className="text-xs bg-amber-100 text-amber-700 border-amber-200">
+                        <Loader2 className="w-3 h-3 animate-spin ml-1" />
+                        מנתח
+                      </Badge>
+                    )}
+                    {pf.status === 'analyzed' && (
+                      <Badge className="text-xs bg-green-100 text-green-700 border-green-200">
+                        <CheckCircle2 className="w-3 h-3 ml-1" />
+                        נותח
+                      </Badge>
+                    )}
+                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removePendingFile(idx)}>
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {isLoading ? (
           <div className="flex justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
