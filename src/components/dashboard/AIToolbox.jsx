@@ -12,6 +12,7 @@ import {
   Users, Target
 } from "lucide-react";
 import { toast } from "sonner";
+import ReactMarkdown from 'react-markdown';
 
 const TOOLS = [
   {
@@ -343,7 +344,9 @@ export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [],
                 </div>
               )}
 
-              <p className="text-sm whitespace-pre-wrap bg-slate-50 p-4 rounded-lg">{toolResult.content}</p>
+              <div className="text-sm bg-slate-50 p-4 rounded-lg prose prose-sm prose-slate max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0" dir="rtl">
+                <ReactMarkdown>{toolResult.content}</ReactMarkdown>
+              </div>
               {toolResult.action_items?.length > 0 && (
                 <div>
                   <p className="font-medium text-sm mb-2">פעולות מומלצות:</p>
@@ -377,7 +380,9 @@ export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [],
           {toolResult && (
             <div className="space-y-4">
               <h3 className="font-bold">{toolResult.title}</h3>
-              <p className="text-sm whitespace-pre-wrap bg-slate-50 p-4 rounded-lg">{toolResult.content}</p>
+              <div className="text-sm bg-slate-50 p-4 rounded-lg prose prose-sm prose-slate max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0" dir="rtl">
+                <ReactMarkdown>{toolResult.content}</ReactMarkdown>
+              </div>
               {toolResult.action_items?.length > 0 && (
                 <div>
                   <p className="font-medium text-sm mb-2">פעולות מומלצות:</p>
