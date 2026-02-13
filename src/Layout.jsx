@@ -14,7 +14,7 @@ export default function Layout({ children, currentPageName }) {
   const [currentWorker, setCurrentWorker] = React.useState(null);
   const navigate = useNavigate();
 
-  const publicPages = ['PublicChat', 'WorkerLogin', 'DoctorProfile'];
+  const publicPages = ['PublicChat', 'WorkerLogin', 'DoctorProfile', 'ProcedurePage'];
   const isPublicPage = publicPages.includes(currentPageName);
 
   // Check if worker is logged in (only for non-public pages)
