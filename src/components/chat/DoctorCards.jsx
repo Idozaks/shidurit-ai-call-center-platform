@@ -13,6 +13,7 @@ import {
   CheckCircle2, ExternalLink, ChevronLeft, ChevronRight
 } from "lucide-react";
 import { createPageUrl } from '@/utils';
+import { getDoctorAvatarUrl } from '../utils/doctorAvatar';
 
 const DOCTOR_PREFIXES = ["דר'", 'ד"ר', "דר", "פרופ'", "פרופ"];
 
@@ -121,7 +122,7 @@ function DoctorMiniCard({ doctor, themeColor, onClick }) {
     >
       <div className="p-3 flex items-center gap-3">
         <Avatar className="w-10 h-10 shrink-0">
-          <AvatarImage src={doctor.image_url} />
+          <AvatarImage src={getDoctorAvatarUrl(doctor)} />
           <AvatarFallback
             className="text-white font-bold text-sm"
             style={{ backgroundColor: themeColor }}
@@ -165,7 +166,7 @@ function DoctorDetailModal({ doctor, open, onClose, themeColor }) {
         >
           <div className="absolute -bottom-8 right-6">
             <Avatar className="w-16 h-16 ring-4 ring-white shadow-lg">
-              <AvatarImage src={doctor.image_url} />
+              <AvatarImage src={getDoctorAvatarUrl(doctor)} />
               <AvatarFallback
                 className="text-white font-bold text-xl"
                 style={{ backgroundColor: themeColor }}

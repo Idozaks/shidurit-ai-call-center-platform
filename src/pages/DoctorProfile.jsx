@@ -13,6 +13,7 @@ import {
   Loader2, CheckCircle2, Award, BookOpen, GraduationCap, Star
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { getDoctorAvatarUrl } from '../components/utils/doctorAvatar';
 
 async function publicApi(action, data) {
   try {
@@ -103,7 +104,7 @@ export default function DoctorProfile() {
             <CardContent className="p-6 md:p-8">
               <div className="flex flex-col sm:flex-row items-start gap-5">
                 <Avatar className="w-24 h-24 ring-4 ring-white shadow-lg -mt-16 sm:-mt-20">
-                  <AvatarImage src={doctor.image_url} />
+                  <AvatarImage src={getDoctorAvatarUrl(doctor)} />
                   <AvatarFallback 
                     className="text-white font-bold text-3xl"
                     style={{ backgroundColor: themeColor }}

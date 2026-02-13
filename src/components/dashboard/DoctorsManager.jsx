@@ -15,6 +15,7 @@ import {
   Plus, UserPlus, Edit, Trash2, Search, Phone, Mail, 
   MapPin, Loader2, Users
 } from "lucide-react";
+import { getDoctorAvatarUrl } from '../utils/doctorAvatar';
 
 export default function DoctorsManager({ tenantId }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -284,7 +285,7 @@ export default function DoctorsManager({ tenantId }) {
               >
                 <div className="flex items-start gap-3">
                   <Avatar className="w-12 h-12">
-                    <AvatarImage src={doctor.image_url} />
+                    <AvatarImage src={getDoctorAvatarUrl(doctor)} />
                     <AvatarFallback className="bg-indigo-100 text-indigo-600">
                       {doctor.name?.charAt(0)}
                     </AvatarFallback>
