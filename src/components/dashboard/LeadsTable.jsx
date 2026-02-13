@@ -52,12 +52,39 @@ export default function LeadsTable({ tenantId, tenant, leads = [], sessions = []
     }
   });
 
+  const statusOrder = { new: 0, contacted: 1, converted: 2, lost: 3 };
+
   const filteredLeads = leads.filter(lead => {
     const matchesSearch = lead.customer_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           lead.customer_email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           lead.customer_phone?.includes(searchQuery);
     const matchesStatus = statusFilter === 'all' || lead.status === statusFilter;
     return matchesSearch && matchesStatus;
+  }).sort((a, b) => {
+    let valA, valB;
+    switch (sortField) {
+      case 'customer_name':
+        valA = (a.customer_name || '').toLowerCase();
+        valB = (b.customer_name || '').toLowerCase();
+        return sortDirection === 'asc' ? valA.localeCompare(valB, 'he') : valB.localeCompare(valA, 'he');
+      case 'status':
+        valA = statusOrder[a.status] ?? 99;
+        valB = statusOrder[b.status] ?? 99;
+        break;
+      case 'intent_score':
+        valA = a.intent_score ?? -1;
+        valB = b.intent_score ?? -1;
+        break;
+      case 'created_date':
+      default:
+        valA = a.created_date ? new Date(a.created_date).getTime() : 0;
+        valB = b.created_date ? new Date(b.created_date).getTime() : 0;
+        break;
+    }
+    if (sortField !== 'customer_name') {
+      return sortDirection === 'asc' ? valA - valB : valB - valA;
+    }
+    return 0;
   });
 
   const getStatusBadge = (status) => {
