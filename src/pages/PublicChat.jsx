@@ -30,6 +30,7 @@ export default function PublicChat() {
   const [chatMode, setChatMode] = useState('voice'); // 'text' or 'voice'
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const messagesEndRef = useRef(null);
+  const [sessionStatus, setSessionStatus] = useState('active');
 
   const { data: tenant, isLoading: tenantLoading } = useQuery({
     queryKey: ['publicTenant', slug],
@@ -52,6 +53,7 @@ export default function PublicChat() {
     },
     onSuccess: (session) => {
       setSessionId(session.id);
+      setSessionStatus(session.status || 'active');
       setShowNameInput(false);
       if (tenant?.welcome_message) {
         setMessages([{
@@ -63,6 +65,34 @@ export default function PublicChat() {
     }
   });
 
+  // Poll session status & new worker messages when session exists
+  useEffect(() => {
+    if (!sessionId) return;
+    const interval = setInterval(async () => {
+      const sessions = await base44.entities.ChatSession.filter({ id: sessionId });
+      const s = sessions[0];
+      if (s) {
+        setSessionStatus(s.status);
+      }
+      // Fetch any worker messages not yet shown
+      const allMsgs = await base44.entities.ChatMessage.filter({ session_id: sessionId }, 'created_date');
+      const workerMsgs = allMsgs.filter(m => m.role === 'worker');
+      if (workerMsgs.length > 0) {
+        setMessages(prev => {
+          const existingIds = new Set(prev.map(m => m.id));
+          const newWorkerMsgs = workerMsgs.filter(m => !existingIds.has(m.id));
+          if (newWorkerMsgs.length === 0) return prev;
+          return [...prev, ...newWorkerMsgs.map(m => ({
+            id: m.id,
+            role: 'assistant', // Show worker messages as assistant to customer
+            content: m.content
+          }))];
+        });
+      }
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [sessionId]);
+
   const sendMessageMutation = useMutation({
     mutationFn: async ({ content }) => {
       // Save user message
@@ -71,6 +101,11 @@ export default function PublicChat() {
         role: 'user',
         content
       });
+
+      // If a worker has taken control, don't generate AI response
+      if (sessionStatus === 'agent_active') {
+        return null;
+      }
 
       // Get AI response
       const aiResponse = await base44.integrations.Core.InvokeLLM({
@@ -94,9 +129,11 @@ export default function PublicChat() {
 
       return aiResponse;
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       // Run lead intelligence in background after each message exchange
-      analyzeAndManageLead();
+      if (response !== null) {
+        analyzeAndManageLead();
+      }
     }
   });
 
@@ -249,12 +286,14 @@ ${history}
     try {
       const response = await sendMessageMutation.mutateAsync({ content: userMessage });
       
-      // Add AI response
-      setMessages(prev => [...prev, {
-        id: Date.now() + 1,
-        role: 'assistant',
-        content: response
-      }]);
+      // Add AI response (only if bot responded, not when worker is active)
+      if (response) {
+        setMessages(prev => [...prev, {
+          id: Date.now() + 1,
+          role: 'assistant',
+          content: response
+        }]);
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       setMessages(prev => [...prev, {
