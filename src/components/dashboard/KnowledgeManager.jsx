@@ -306,6 +306,7 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
                           type="file"
                           id="single-file-upload"
                           className="hidden"
+                          accept=".pdf,.doc,.docx,.csv,.xlsx,.json,.png,.jpg,.jpeg,.txt,.rtf"
                           onChange={(e) => {
                             if (e.target.files?.[0]) handleFileUpload(e.target.files[0]);
                             e.target.value = '';
