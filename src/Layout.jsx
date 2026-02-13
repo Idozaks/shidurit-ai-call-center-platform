@@ -40,18 +40,18 @@ export default function Layout({ children, currentPageName }) {
   ];
 
   const handleLogout = async () => {
+    // Clear session first to ensure logout always works
+    localStorage.removeItem('shidurit_worker');
+    // Try to update online status, but don't block logout
     try {
-      // Update online status if worker exists
       if (currentWorker) {
         const { base44 } = await import('@/api/base44Client');
         await base44.entities.Worker.update(currentWorker.id, { is_online: false });
       }
-      // Clear session
-      localStorage.removeItem('shidurit_worker');
-      navigate(createPageUrl('WorkerLogin'));
     } catch (e) {
-      console.error('Logout error:', e);
+      console.error('Logout status update error:', e);
     }
+    navigate(createPageUrl('WorkerLogin'));
   };
 
   return (
