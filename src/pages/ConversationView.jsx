@@ -171,7 +171,7 @@ export default function ConversationView() {
       </div>
       {/* Take control bar */}
       {currentWorker && (
-        <div className="max-w-4xl mx-auto px-4 py-2 flex items-center justify-between gap-2 bg-blue-50 border-b border-blue-200">
+        <div className="sticky top-[65px] z-[9] max-w-4xl mx-auto px-4 py-2 flex items-center justify-between gap-2 bg-blue-50 border-b border-blue-200">
           {isWorkerActive ? (
             <>
               <div className="flex items-center gap-1.5 text-blue-700 text-sm font-medium">
@@ -206,7 +206,6 @@ export default function ConversationView() {
           )}
         </div>
       )}
-      </div>
 
       {/* Messages */}
       <div className="max-w-4xl mx-auto px-4 py-6">
