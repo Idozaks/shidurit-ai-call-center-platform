@@ -151,7 +151,7 @@ Return exactly 10 suggestions.`,
   ];
   const isAskingForDetails = detailsKeywords.some(kw => lastAssistantMessage.includes(kw));
   const userMessageCount = messages.filter(m => m.role === 'user').length;
-  const showDetailsChip = isAskingForDetails || userMessageCount >= 2;
+  const showDetailsChip = !detailsSubmitted && (isAskingForDetails || userMessageCount >= 2);
 
   if (suggestions.length === 0 && !showDetailsChip) return null;
 
@@ -181,15 +181,6 @@ Return exactly 10 suggestions.`,
       {text}
     </motion.button>
   );
-
-  const handleScroll = (e) => {
-    const scrollLeft = e.target.scrollLeft;
-    if (e.target === row1Ref.current && row2Ref.current) {
-      row2Ref.current.scrollLeft = scrollLeft;
-    } else if (e.target === row2Ref.current && row1Ref.current) {
-      row1Ref.current.scrollLeft = scrollLeft;
-    }
-  };
 
   const DetailsChip = () => (
     <motion.button
@@ -233,23 +224,23 @@ Return exactly 10 suggestions.`,
           }
         }
       `}</style>
-      <div className="flex items-center gap-1">
+      <div className="flex items-start gap-1">
         {suggestions.length > 0 && row2.length > 0 && (
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="flex-shrink-0 p-1.5 rounded-full hover:bg-slate-100 transition-colors z-10"
+            className="flex-shrink-0 p-1.5 mt-0.5 rounded-full hover:bg-slate-100 transition-colors z-10"
             style={{ color: themeColor }}
           >
-            {collapsed ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            {collapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
           </button>
         )}
-        <div className="flex-1 min-w-0 space-y-1.5">
-          <div ref={row1Ref} onScroll={handleScroll} className="flex gap-2 overflow-x-auto pb-1.5 chips-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: `${themeColor}40 transparent` }}>
+        <div ref={containerRef} className="flex-1 min-w-0 overflow-x-auto pb-1.5 chips-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: `${themeColor}40 transparent` }}>
+          <div className="flex gap-2 w-max">
             {showDetailsChip && <DetailsChip />}
             {row1.map((text, i) => <ChipButton key={`r1-${i}`} text={text} index={i} />)}
           </div>
           {!collapsed && row2.length > 0 && (
-            <div ref={row2Ref} onScroll={handleScroll} className="flex gap-2 overflow-x-auto pb-1.5 chips-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: `${themeColor}40 transparent` }}>
+            <div className="flex gap-2 w-max mt-1.5">
               {row2.map((text, i) => <ChipButton key={`r2-${i}`} text={text} index={i + midpoint} />)}
             </div>
           )}
