@@ -181,17 +181,17 @@ export default function ConversationView() {
               </div>
             </div>
           </div>
-          {session?.status !== 'closed' && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50"
-              onClick={handleCloseSession}
-            >
-              <XCircle className="w-4 h-4" />
-              סגור שיחה
-            </Button>
-          )}
+          <Select value={session?.status || 'active'} onValueChange={handleChangeStatus}>
+            <SelectTrigger className="w-40 h-9 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="active">🤖 פעיל (בוט)</SelectItem>
+              <SelectItem value="waiting_for_agent">⏳ ממתין לנציג</SelectItem>
+              <SelectItem value="agent_active">👤 נציג פעיל</SelectItem>
+              <SelectItem value="closed">🔒 סגור</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
