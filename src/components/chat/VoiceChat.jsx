@@ -87,13 +87,17 @@ export default function VoiceChat({ tenant, themeColor, onTranscript }) {
     setupCompleteRef.current = false;
     
     try {
-      const response = await base44.functions.invoke('getGeminiToken', {
-        system_prompt: tenant?.system_prompt || '',
-        persona_name: tenant?.ai_persona_name || 'נועה',
-        company_name: tenant?.company_name || '',
+      const response = await fetch('/api/getGeminiToken', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_prompt: tenant?.system_prompt || '',
+          persona_name: tenant?.ai_persona_name || 'נועה',
+          company_name: tenant?.company_name || '',
+        })
       });
-      
-      const { apiKey, model } = response.data;
+      if (!response.ok) throw new Error('Failed to get token');
+      const { apiKey, model } = await response.json();
 
       const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${apiKey}`;
       const ws = new WebSocket(wsUrl);
