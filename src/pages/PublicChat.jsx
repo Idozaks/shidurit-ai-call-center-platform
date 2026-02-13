@@ -322,8 +322,20 @@ IMPORTANT: Adapt your judgment to the business category. For example:
     const history = messages.map(m => `${m.role === 'user' ? 'לקוח' : tenant?.ai_persona_name || 'נועה'}: ${m.content}`).join('\n');
     const isFirstMessage = messages.filter(m => m.role === 'user').length === 0;
     
+    // Build collected details context
+    const detailsParts = [];
+    if (collectedDetails.full_name) detailsParts.push(`שם: ${collectedDetails.full_name}`);
+    if (collectedDetails.phone) detailsParts.push(`טלפון: ${collectedDetails.phone}`);
+    if (collectedDetails.email) detailsParts.push(`אימייל: ${collectedDetails.email}`);
+    if (collectedDetails.preferred_time) detailsParts.push(`זמן מועדף: ${collectedDetails.preferred_time}`);
+    if (collectedDetails.notes) detailsParts.push(`הערות: ${collectedDetails.notes}`);
+    const detailsContext = detailsParts.length > 0 
+      ? `\n\nפרטים שהלקוח כבר מסר (אל תבקש אותם שוב!):\n${detailsParts.join('\n')}` 
+      : '';
+
     return `אתה ${tenant?.ai_persona_name || 'נועה'}, נציג/ת שירות לקוחות של ${tenant?.company_name || 'העסק'}.
 ${tenant?.system_prompt || ''}
+${detailsContext}
 
 היסטוריית השיחה:
 ${history}
@@ -334,7 +346,8 @@ ${history}
 - CRITICAL: You MUST respond ONLY in Hebrew. Do NOT use any other language (no English, no Chinese, no Arabic, no other language). Every single word in your response must be in Hebrew.
 - ענה בעברית בצורה ידידותית ומקצועית. היה תמציתי וענייני.
 - ${isFirstMessage ? 'זו ההודעה הראשונה של הלקוח - הצג את עצמך בשמך פעם אחת בלבד.' : 'זו שיחה מתמשכת - אל תציג את עצמך שוב, אל תגיד שלום שוב, אל תחזור על שמך. פשוט המשך את השיחה ישירות וענה לשאלה.'}
-- אל תחזור על מידע שכבר אמרת בהיסטוריית השיחה.`;
+- אל תחזור על מידע שכבר אמרת בהיסטוריית השיחה.
+- CRITICAL: אם הלקוח כבר מסר פרטים (שם, טלפון, אימייל, זמן מועדף) - אל תבקש אותם שוב! השתמש במידע שכבר נאסף.`;
   };
 
   const handleStartChat = (e) => {
