@@ -500,60 +500,12 @@ ${leadsInfo}
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
-              <div className={`rounded-xl p-4 ${selectedTool?.bgColor} border`}>
-                <div className="flex items-center gap-2 mb-1">
-                  {selectedTool && <selectedTool.icon className={`w-5 h-5 ${selectedTool?.color}`} />}
-                  <h3 className="font-bold text-base">{toolResult.title}</h3>
-                </div>
-              </div>
-
-              {/* Score details for lead_scorer */}
-              {toolResult.scoreDetails && (
-                <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Badge className={toolResult.scoreDetails.sentiment === 'positive' ? 'bg-green-100 text-green-700' : toolResult.scoreDetails.sentiment === 'negative' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700'}>
-                      {toolResult.scoreDetails.sentiment === 'positive' ? 'חיובי' : toolResult.scoreDetails.sentiment === 'negative' ? 'שלילי' : 'ניטרלי'}
-                    </Badge>
-                    <div className="flex items-center gap-3">
-                      <Badge className={toolResult.scoreDetails.urgency_level === 'high' ? 'bg-red-100 text-red-700' : toolResult.scoreDetails.urgency_level === 'medium' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}>
-                        דחיפות: {toolResult.scoreDetails.urgency_level === 'high' ? 'גבוהה' : toolResult.scoreDetails.urgency_level === 'medium' ? 'בינונית' : 'נמוכה'}
-                      </Badge>
-                      <div className="text-center">
-                        <span className="text-2xl font-bold text-indigo-600">{toolResult.scoreDetails.intent_score}</span>
-                        <span className="text-xs text-slate-500">/100</span>
-                      </div>
-                    </div>
-                  </div>
-                  {toolResult.scoreDetails.conversation_description && (
-                    <p className="text-sm text-slate-600">{toolResult.scoreDetails.conversation_description}</p>
-                  )}
-                </div>
-              )}
-
-              <div className="text-sm bg-white border rounded-xl p-5 prose prose-sm prose-slate max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 leading-relaxed [&_h1]:text-base [&_h1]:font-bold [&_h1]:mt-4 [&_h1]:mb-2 [&_h2]:text-sm [&_h2]:font-bold [&_h2]:mt-3 [&_h2]:mb-1.5 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:mt-2 [&_h3]:mb-1 [&_strong]:text-slate-800 [&_li]:my-0.5 [&_p]:my-1.5 [&_ul]:my-1 [&_ol]:my-1 [&_hr]:my-3" dir="rtl">
-                <ReactMarkdown>{toolResult.content}</ReactMarkdown>
-              </div>
-              {toolResult.action_items?.length > 0 && (
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                  <p className="font-semibold text-sm mb-3 flex items-center gap-2">
-                    <span className="text-lg">💡</span>
-                    פעולות מומלצות
-                  </p>
-                  <div className="space-y-2">
-                    {toolResult.action_items.map((item, i) => (
-                      <div key={i} className="text-sm flex items-start gap-2.5 bg-white rounded-lg px-3 py-2 border border-amber-100">
-                        <span className="bg-amber-400 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">{i + 1}</span>
-                        <span>{typeof item === 'object' ? (item.name || item.description || item.recommendation || JSON.stringify(item)) : item}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <Button variant="outline" className="w-full rounded-xl" onClick={() => { setToolResult(null); setSelectedLeadId(''); }}>
-                🔄 הפעל שוב
-              </Button>
-            </div>
+            <AIResultDisplay
+              toolResult={toolResult}
+              selectedTool={selectedTool}
+              scoreDetails={toolResult.scoreDetails}
+              onReset={() => { setToolResult(null); setSelectedLeadId(''); }}
+            />
           )}
         </DialogContent>
       </Dialog>
