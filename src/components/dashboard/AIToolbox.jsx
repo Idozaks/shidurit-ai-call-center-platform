@@ -111,7 +111,8 @@ export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [] 
       closer_mode: '',
       competitor_clash: `נתח את השיחה עם הליד וזהה אזכורי מתחרים. צור נקודות מכירה ייחודיות לעסק.\n\nשם לקוח: ${lead?.customer_name}\nסיכום: ${lead?.summary || 'אין'}\nעובדות: ${JSON.stringify(lead?.facts_json || {})}\nעסק: ${tenant?.company_name}`,
       bot_health: `צור 3 תרחישי בדיקה ("קונה סמוי") לבוט AI של העסק "${tenant?.company_name}". כלול שאלות קשות, מצבי קצה, ובדיקות לאיכות השירות. הבוט שם ${tenant?.ai_persona_name || 'נועה'}.`,
-      revenue_leak: `נתח את השיחות הבאות וזהה הזדמנויות שפוספסו ודליפות הכנסה.\n\nשיחות סגורות: ${sessions.filter(s => s.status === 'closed').length}\nלידים שאבדו: ${leads.filter(l => l.status === 'lost').length}\nסה"כ לידים: ${leads.length}\nלידים חמים: ${leads.filter(l => l.intent_score >= 70).length}`
+      revenue_leak: `נתח את השיחות הבאות וזהה הזדמנויות שפוספסו ודליפות הכנסה.\n\nשיחות סגורות: ${sessions.filter(s => s.status === 'closed').length}\nלידים שאבדו: ${leads.filter(l => l.status === 'lost').length}\nסה"כ לידים: ${leads.length}\nלידים חמים: ${leads.filter(l => l.intent_score >= 70).length}`,
+      knowledge_gaps: `אתה מנתח שיחות של בוט AI שירות לקוחות של העסק "${tenant?.company_name}". נתח את כל השיחות וזהה פערי ידע — שאלות שלקוחות שאלו אך הבוט לא ידע לתת להן מענה מדויק, התחמק, נתן תשובה כללית מדי, או הפנה ללא צורך לנציג אנושי.\n\nסה"כ שיחות: ${sessions.length}\nסה"כ לידים: ${leads.length}\nסיכומי לידים:\n${leads.slice(0, 15).map(l => `- ${l.customer_name}: ${l.inquiry_reason || 'לא צוין'} | סיכום: ${l.summary || 'אין'}`).join('\n')}\n\nזהה את הנושאים העיקריים שהבוט לא ידע לענות עליהם, תן דוגמאות ספציפיות, והמלץ איזה ידע צריך להוסיף לבסיס הידע.`
     };
 
     if (tool.id === 'closer_mode') {
