@@ -129,17 +129,10 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
               setIsDialogOpen(open);
               if (!open) resetForm();
             }}>
-              <DialogTrigger asChild>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700">
-                      <Plus className="w-4 h-4" />
-                      הוסף פריט
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>הוסף ידע חדש לבוט</TooltipContent>
-                </Tooltip>
-              </DialogTrigger>
+              <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700" onClick={() => setIsDialogOpen(true)}>
+                <Plus className="w-4 h-4" />
+                הוסף פריט
+              </Button>
               <DialogContent className="max-w-lg" dir="rtl">
                 <DialogHeader>
                   <DialogTitle>{editingEntry ? 'עריכת פריט' : 'הוספת פריט חדש'}</DialogTitle>
