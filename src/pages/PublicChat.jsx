@@ -142,7 +142,8 @@ export default function PublicChat() {
     const businessType = tenant?.system_prompt || '';
     const businessName = tenant?.company_name || 'העסק';
 
-    const analysis = await base44.integrations.Core.InvokeLLM({
+    const llmAnalysis = await publicApi({
+      action: 'invokeLLM',
       prompt: `You are a lead detection engine. Analyze this customer service conversation and decide if the person qualifies as a lead.
 
 Business name: ${businessName}
@@ -203,6 +204,7 @@ IMPORTANT: Adapt your judgment to the business category. For example:
         required: ["is_lead", "intent_score", "sentiment", "inquiry_reason", "urgency_level", "priority", "summary", "ai_suggested_action", "competitor_detected", "status"]
       }
     });
+    const analysis = llmAnalysis.result;
 
     if (!analysis.is_lead) return;
 
