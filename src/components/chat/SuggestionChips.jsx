@@ -3,6 +3,11 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 
+const publicApi = async (payload) => {
+  const res = await base44.functions.invoke('publicChat', payload);
+  return res.data;
+};
+
 export default function SuggestionChips({ tenantId, messages, onSelect, themeColor, disabled, onOpenDetailsModal }) {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
