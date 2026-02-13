@@ -14,16 +14,19 @@ export default function Layout({ children, currentPageName }) {
   const [currentWorker, setCurrentWorker] = React.useState(null);
   const navigate = useNavigate();
 
-  // Check if worker is logged in
+  const publicPages = ['PublicChat', 'WorkerLogin', 'DoctorProfile'];
+  const isPublicPage = publicPages.includes(currentPageName);
+
+  // Check if worker is logged in (only for non-public pages)
     React.useEffect(() => {
+      if (isPublicPage) return;
       const workerData = localStorage.getItem('shidurit_worker');
       if (workerData) {
         setCurrentWorker(JSON.parse(workerData));
-      } else if (currentPageName !== 'WorkerLogin' && currentPageName !== 'PublicChat') {
-        // Redirect to login if not logged in and not on login/public pages
+      } else {
         navigate(createPageUrl('WorkerLogin'));
       }
-    }, [currentPageName]);
+    }, [currentPageName, isPublicPage]);
 
   // Pages that should not have the sidebar/header
   const publicPages = ['PublicChat', 'WorkerLogin', 'DoctorProfile'];
