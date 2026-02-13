@@ -103,15 +103,37 @@ export default function SessionsList({ tenantId, sessions = [], tenant, onRefres
     return matchesSearch && matchesStatus;
   });
 
-  const getStatusBadge = (status) => {
+  const handleChangeStatus = async (sessionId, newStatus) => {
+    await base44.entities.ChatSession.update(sessionId, { status: newStatus });
+    queryClient.invalidateQueries({ queryKey: ['sessions'] });
+    queryClient.invalidateQueries({ queryKey: ['chat-sessions'] });
+    onRefresh?.();
+    const labels = { active: 'פעיל (בוט)', waiting_for_agent: 'ממתין לנציג', agent_active: 'נציג פעיל', closed: 'סגור' };
+    toast.success(`סטטוס שונה ל: ${labels[newStatus]}`);
+  };
+
+  const getStatusBadge = (status, sessionId) => {
     const config = {
-      active: { label: 'פעיל', variant: 'default' },
-      waiting_for_agent: { label: 'ממתין לנציג', variant: 'secondary' },
-      agent_active: { label: 'נציג פעיל', variant: 'default' },
-      closed: { label: 'סגור', variant: 'outline' }
+      active: { label: '🤖 פעיל', className: 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200' },
+      waiting_for_agent: { label: '⏳ ממתין לנציג', className: 'bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-200' },
+      agent_active: { label: '👤 נציג פעיל', className: 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200' },
+      closed: { label: '🔒 סגור', className: 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200' }
     };
-    const { label, variant } = config[status] || config.active;
-    return <Badge variant={variant}>{label}</Badge>;
+    const current = config[status] || config.active;
+
+    return (
+      <Select value={status || 'active'} onValueChange={(val) => handleChangeStatus(sessionId, val)}>
+        <SelectTrigger className={`h-7 w-auto gap-1 text-xs font-semibold rounded-md border px-2 py-0.5 ${current.className}`}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="active">🤖 פעיל (בוט)</SelectItem>
+          <SelectItem value="waiting_for_agent">⏳ ממתין לנציג</SelectItem>
+          <SelectItem value="agent_active">👤 נציג פעיל</SelectItem>
+          <SelectItem value="closed">🔒 סגור</SelectItem>
+        </SelectContent>
+      </Select>
+    );
   };
 
   return (
