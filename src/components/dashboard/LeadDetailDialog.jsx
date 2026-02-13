@@ -13,6 +13,7 @@ import {
   Loader2, User, Bot, X, Zap, Swords, ShieldCheck, TrendingDown, Copy, HelpCircle, ChevronDown, ChevronUp
 } from "lucide-react";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 import LeadMetricsCards from './LeadMetricsCards';
 
 export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], sessions = [], onClose }) {
@@ -271,11 +272,22 @@ ${transcript}
                   <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
                 </div>
               </button>
-              {analysisExpanded && (
-                <div className="px-3 py-3 bg-white">
-                  <p className="text-sm text-slate-700 whitespace-pre-wrap text-right leading-relaxed">{detailedAnalysis}</p>
-                </div>
-              )}
+              <AnimatePresence initial={false}>
+                {analysisExpanded && (
+                  <motion.div
+                    key="analysis-content"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    className="overflow-hidden"
+                  >
+                    <div className="px-3 py-3 bg-white">
+                      <p className="text-sm text-slate-700 whitespace-pre-wrap text-right leading-relaxed">{detailedAnalysis}</p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           )}
         </div>
