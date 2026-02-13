@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Switch } from "@/components/ui/switch";
 import { 
   Plus, BookOpen, Edit, Trash2, Search, FileText, 
-  Globe, Image, Loader2
+  Globe, Image, Loader2, Upload, Paperclip, X, File
 } from "lucide-react";
 import { format } from 'date-fns';
 
