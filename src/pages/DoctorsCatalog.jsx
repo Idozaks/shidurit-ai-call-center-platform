@@ -204,9 +204,11 @@ export default function DoctorsCatalog() {
                         {doctor.procedures?.length > 0 && (
                           <div className="flex flex-wrap gap-1.5 mb-4">
                             {doctor.procedures.map((proc, j) => (
-                              <Badge key={j} variant="outline" className="text-xs font-normal">
-                                {proc}
-                              </Badge>
+                              <Link key={j} to={createPageUrl('ProcedurePage') + `&name=${encodeURIComponent(proc)}`}>
+                                <Badge variant="outline" className="text-xs font-normal cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 transition-colors">
+                                  {proc}
+                                </Badge>
+                              </Link>
                             ))}
                           </div>
                         )}
