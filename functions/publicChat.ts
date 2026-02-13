@@ -74,6 +74,24 @@ Deno.serve(async (req) => {
       return Response.json({ entries });
     }
 
+    if (action === 'getDoctor') {
+      const { doctor_id } = body;
+      const doctors = await sr.entities.Doctor.filter({ id: doctor_id });
+      return Response.json({ doctor: doctors[0] || null });
+    }
+
+    if (action === 'getDoctors') {
+      const { tenant_id } = body;
+      const doctors = await sr.entities.Doctor.filter({ tenant_id });
+      return Response.json({ doctors: doctors.filter(d => d.is_available !== false) });
+    }
+
+    if (action === 'getTenantById') {
+      const { tenant_id } = body;
+      const tenants = await sr.entities.Tenant.filter({ id: tenant_id });
+      return Response.json({ tenant: tenants[0] || null });
+    }
+
     if (action === 'invokeLLM') {
       const { prompt, response_json_schema } = body;
       const result = await sr.integrations.Core.InvokeLLM({ prompt, response_json_schema });
