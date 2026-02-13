@@ -223,19 +223,23 @@ IMPORTANT: Adapt your judgment to the business category. For example:
 
     if (currentLeadId) {
       // Lead exists — update it with fresh intelligence
-      await base44.entities.Lead.update(currentLeadId, leadData);
+      await publicApi({ action: 'updateLead', lead_id: currentLeadId, data: leadData });
     } else {
       // Create lead for the first time
-      const newLead = await base44.entities.Lead.create({
-        tenant_id: tenant.id,
-        customer_name: customerName,
-        ...leadData
+      const leadRes = await publicApi({
+        action: 'createLead',
+        leadData: {
+          tenant_id: tenant.id,
+          customer_name: customerName,
+          ...leadData
+        }
       });
+      const newLead = leadRes.lead;
       leadIdRef.current = newLead.id;
       setLeadId(newLead.id);
       // Link session to lead
       if (sessionId) {
-        await base44.entities.ChatSession.update(sessionId, { lead_id: newLead.id });
+        await publicApi({ action: 'updateSession', session_id: sessionId, data: { lead_id: newLead.id } });
       }
     }
   };
