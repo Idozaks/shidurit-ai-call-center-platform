@@ -159,11 +159,10 @@ Return exactly 10 suggestions.`,
   const row1 = suggestions.slice(0, midpoint);
   const row2 = suggestions.slice(midpoint);
 
-  const ChipButton = React.memo(({ text, index, onSelect, disabled, themeColor, clearSuggestions }) => (
-    <motion.button
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: index * 0.04 }}
+  const clearSuggestions = React.useCallback(() => setSuggestions([]), []);
+
+  const ChipButton = ({ text, index }) => (
+    <button
       onClick={() => {
         onSelect(text);
         clearSuggestions();
@@ -179,13 +178,11 @@ Return exactly 10 suggestions.`,
       onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}08`; }}
     >
       {text}
-    </motion.button>
-  ));
+    </button>
+  );
 
-  const DetailsChip = React.memo(({ disabled, themeColor, onOpenDetailsModal }) => (
-    <motion.button
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
+  const DetailsChip = () => (
+    <button
       onClick={() => onOpenDetailsModal?.()}
       disabled={disabled}
       className="text-sm px-4 py-1.5 rounded-full border-2 transition-colors whitespace-nowrap disabled:opacity-50 flex-shrink-0 font-medium"
@@ -196,8 +193,8 @@ Return exactly 10 suggestions.`,
       }}
     >
       📋 השאר פרטים
-    </motion.button>
-  ));
+    </button>
+  );
 
   return (
     <div className="py-2">
