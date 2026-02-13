@@ -351,6 +351,12 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
                       <Badge variant="outline">
                         {CATEGORIES.find(c => c.value === entry.category)?.label || entry.category}
                       </Badge>
+                      {entry.file_url && (
+                        <a href={entry.file_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-indigo-500 hover:underline">
+                          <Paperclip className="w-3 h-3" />
+                          {entry.file_name || 'קובץ'}
+                        </a>
+                      )}
                       {entry.created_date && (
                         <span>{format(new Date(entry.created_date), 'dd/MM/yyyy')}</span>
                       )}
