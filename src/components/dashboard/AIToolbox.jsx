@@ -25,7 +25,11 @@ const TOOLS = [
     speed: 'מהיר',
     color: 'text-amber-500',
     bgColor: 'bg-amber-50',
-    action: 'select_lead'
+    action: 'multi_lead',
+    allLabel: 'נתח את כל הלידים',
+    allDesc: 'ניקוד אוטומטי לכל הלידים',
+    selectLabel: 'בחר לידים לניקוד',
+    selectDesc: 'בחירה ידנית של לידים ספציפיים'
   },
   {
     id: 'smart_followup',
@@ -58,7 +62,11 @@ const TOOLS = [
     speed: 'מהיר',
     color: 'text-purple-500',
     bgColor: 'bg-purple-50',
-    action: 'select_lead'
+    action: 'multi_lead',
+    allLabel: 'נתח את כל הלידים',
+    allDesc: 'סריקת כל השיחות לאזכורי מתחרים',
+    selectLabel: 'בחר לידים לניתוח',
+    selectDesc: 'בחירה ידנית של לידים ספציפיים'
   },
   {
     id: 'bot_health',
@@ -124,7 +132,11 @@ const TOOLS = [
     speed: 'עמוק',
     color: 'text-rose-500',
     bgColor: 'bg-rose-50',
-    action: 'hallucination'
+    action: 'multi_lead',
+    allLabel: 'נתח את כל השיחות',
+    allDesc: 'סריקה כוללת של כל שיחות הבוט',
+    selectLabel: 'בחר לידים לניתוח',
+    selectDesc: 'בחירה ידנית של לידים ספציפיים'
   }
 ];
 
@@ -133,7 +145,7 @@ export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [],
   const [selectedTool, setSelectedTool] = useState(null);
   const [selectedLeadId, setSelectedLeadId] = useState('');
   const [toolResult, setToolResult] = useState(null);
-  const [hallucinationMode, setHallucinationMode] = useState(null); // null | 'all' | 'select'
+  const [multiLeadMode, setMultiLeadMode] = useState(null); // null | 'all' | 'select'
   const [selectedLeadIds, setSelectedLeadIds] = useState([]);
   const queryClient = useQueryClient();
 
@@ -209,94 +221,128 @@ export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [],
     setRunningTool(null);
   };
 
-  const runHallucinationDetector = async (leadIds) => {
-    const tool = TOOLS.find(t => t.id === 'hallucination_detector');
-    setRunningTool('hallucination_detector');
+  const runMultiLeadTool = async (tool, leadIds) => {
+    setRunningTool(tool.id);
     setToolResult(null);
 
-    // Gather sessions for the selected leads
-    const targetLeads = leadIds.length > 0 ? leads.filter(l => leadIds.includes(l.id)) : [];
-    let targetSessions = [];
+    const targetLeads = leadIds.length > 0 ? leads.filter(l => leadIds.includes(l.id)) : leads;
+    const leadNames = leadIds.length > 0 ? targetLeads.map(l => l.customer_name).join(', ') : 'כל הלקוחות';
 
-    if (targetLeads.length > 0) {
-      for (const leadObj of targetLeads) {
-        const matched = sessions.filter(s =>
-          s.lead_id === leadObj.id ||
-          s.customer_name === leadObj.customer_name ||
-          (leadObj.customer_phone && s.customer_phone === leadObj.customer_phone)
-        );
-        targetSessions.push(...matched);
-      }
-    }
-    if (targetSessions.length === 0) targetSessions = sessions.slice(0, 15);
-    // Deduplicate
-    targetSessions = [...new Map(targetSessions.map(s => [s.id, s])).values()];
-
-    let allBotMessages = [];
-    for (const session of targetSessions.slice(0, 15)) {
-      const msgsRes = await base44.entities.ChatMessage.filter({ session_id: session.id }, 'created_date');
-      allBotMessages.push(...msgsRes.filter(m => m.role === 'assistant').map(m => ({
-        session_id: session.id,
-        customer: session.customer_name || 'לא ידוע',
-        content: m.content
-      })));
-    }
-
-    const knowledgeText = knowledge.map(e => `[${e.category || 'general'}] ${e.title}: ${e.content}`).join('\n');
-    const leadNames = targetLeads.length > 0 ? targetLeads.map(l => l.customer_name).join(', ') : 'כל הלקוחות';
-
-    const hallucinationPrompt = `אתה מנתח בקרת איכות מומחה. המשימה שלך: לסרוק את תשובות הבוט AI של העסק "${tenant?.company_name}" בשיחות עם: ${leadNames}, ולזהות מידע שהומצא (הזיות / hallucinations).
-
-=== מקורות מידע מורשים (הבסיס היחיד שהבוט יכול להשתמש בו) ===
-
-הנחיות מערכת (System Prompt):
-${tenant?.system_prompt || 'אין'}
-
-בסיס ידע:
-${knowledgeText || 'ריק'}
-
-=== תשובות הבוט לבדיקה ===
-${allBotMessages.slice(0, 40).map((m) => `[שיחה עם ${m.customer}]:\n${m.content}`).join('\n\n---\n\n')}
-
-=== הוראות ניתוח ===
-עבור כל תשובה של הבוט, בדוק:
-1. האם יש שמות חבילות/מוצרים/שירותים שלא מופיעים במקורות?
-2. האם יש מחירים שלא מופיעים במקורות?
-3. האם יש שעות פעילות, מיקומים, או פרטי קשר שונים מהמקורות?
-4. האם יש שמות עובדים/רופאים/אנשי צוות שלא מופיעים במקורות?
-5. האם יש הבטחות, מבצעים, תכונות שלא קיימות במקורות?
-6. האם הבוט המציא תוכן של חבילות (לדוגמה: הוסיף BBQ, אזור פרטי, תחרויות שלא קיימים)?
-
-לכל הזיה שמצאת, ציין:
-- מה הבוט אמר (ציטוט)
-- מה המידע הנכון לפי המקורות (או שאין מידע כזה)
-- רמת חומרה: קריטי (מחירים/חבילות שגויים), בינוני (פרטים לא מדויקים), נמוך (ניסוח מוגזם)
-
-אם לא מצאת הזיות — ציין את זה בבירור.
-
-כתוב בעברית.`;
-
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: hallucinationPrompt,
-      response_json_schema: {
-        type: "object",
-        properties: {
-          title: { type: "string" },
-          content: { type: "string" },
-          action_items: { type: "array", items: { type: "string" } }
+    if (tool.id === 'hallucination_detector') {
+      // Gather bot messages from sessions
+      let targetSessions = [];
+      if (leadIds.length > 0) {
+        for (const leadObj of targetLeads) {
+          const matched = sessions.filter(s =>
+            s.lead_id === leadObj.id ||
+            s.customer_name === leadObj.customer_name ||
+            (leadObj.customer_phone && s.customer_phone === leadObj.customer_phone)
+          );
+          targetSessions.push(...matched);
         }
       }
-    });
+      if (targetSessions.length === 0) targetSessions = sessions.slice(0, 15);
+      targetSessions = [...new Map(targetSessions.map(s => [s.id, s])).values()];
 
-    setToolResult(result);
+      let allBotMessages = [];
+      for (const session of targetSessions.slice(0, 15)) {
+        const msgsRes = await base44.entities.ChatMessage.filter({ session_id: session.id }, 'created_date');
+        allBotMessages.push(...msgsRes.filter(m => m.role === 'assistant').map(m => ({
+          session_id: session.id, customer: session.customer_name || 'לא ידוע', content: m.content
+        })));
+      }
+
+      const knowledgeText = knowledge.map(e => `[${e.category || 'general'}] ${e.title}: ${e.content}`).join('\n');
+
+      const prompt = `אתה מנתח בקרת איכות מומחה. המשימה שלך: לסרוק את תשובות הבוט AI של העסק "${tenant?.company_name}" בשיחות עם: ${leadNames}, ולזהות מידע שהומצא (הזיות / hallucinations).
+
+=== מקורות מידע מורשים ===
+הנחיות מערכת: ${tenant?.system_prompt || 'אין'}
+בסיס ידע: ${knowledgeText || 'ריק'}
+
+=== תשובות הבוט ===
+${allBotMessages.slice(0, 40).map(m => `[שיחה עם ${m.customer}]:\n${m.content}`).join('\n\n---\n\n')}
+
+=== הוראות ===
+בדוק: שמות חבילות/מוצרים שלא קיימים, מחירים שגויים, שעות/מיקומים, שמות צוות, הבטחות לא מבוססות.
+לכל הזיה: ציטוט, מה נכון לפי המקורות, רמת חומרה (קריטי/בינוני/נמוך).
+אם אין הזיות — ציין בבירור. כתוב בעברית.`;
+
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt, response_json_schema: { type: "object", properties: { title: { type: "string" }, content: { type: "string" }, action_items: { type: "array", items: { type: "string" } } } }
+      });
+      setToolResult(result);
+
+    } else if (tool.id === 'lead_scorer') {
+      const leadsInfo = targetLeads.slice(0, 20).map(l =>
+        `- ${l.customer_name}: סיבת פנייה: ${l.inquiry_reason || 'לא צוין'} | סיכום: ${l.summary || 'אין'} | עובדות: ${JSON.stringify(l.facts_json || {})}`
+      ).join('\n');
+
+      const prompt = `נתח את הלידים הבאים של העסק "${tenant?.company_name}" ותן לכל אחד ציון כוונת רכישה (0-100), רמת דחיפות (low/medium/high), סנטימנט, ותיאור קצר.
+
+לידים לניתוח (${leadNames}):
+${leadsInfo}
+
+לכל ליד ציין: שם, ציון, דחיפות, סנטימנט, והסבר קצר. לאחר מכן תן סיכום כללי והמלצות.
+כתוב בעברית.`;
+
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt, response_json_schema: { type: "object", properties: { title: { type: "string" }, content: { type: "string" }, action_items: { type: "array", items: { type: "string" } } } }
+      });
+
+      // Also update each lead with individual scores
+      if (leadIds.length > 0) {
+        const scorePrompt = `תן ציון לכל ליד. החזר JSON.\n\n${leadsInfo}`;
+        const scores = await base44.integrations.Core.InvokeLLM({
+          prompt: scorePrompt,
+          response_json_schema: {
+            type: "object",
+            properties: {
+              scores: { type: "array", items: { type: "object", properties: { name: { type: "string" }, intent_score: { type: "number" }, urgency_level: { type: "string" }, sentiment: { type: "string" } } } }
+            }
+          }
+        });
+        for (const score of (scores.scores || [])) {
+          const matchLead = targetLeads.find(l => l.customer_name === score.name);
+          if (matchLead) {
+            await base44.entities.Lead.update(matchLead.id, {
+              intent_score: score.intent_score,
+              urgency_level: score.urgency_level,
+              sentiment: score.sentiment
+            });
+          }
+        }
+        queryClient.invalidateQueries({ queryKey: ['leads'] });
+      }
+
+      setToolResult(result);
+
+    } else if (tool.id === 'competitor_clash') {
+      const leadsInfo = targetLeads.slice(0, 20).map(l =>
+        `- ${l.customer_name}: סיבת פנייה: ${l.inquiry_reason || 'לא צוין'} | סיכום: ${l.summary || 'אין'} | עובדות: ${JSON.stringify(l.facts_json || {})} | מתחרה זוהה: ${l.competitor_detected ? 'כן' : 'לא'}`
+      ).join('\n');
+
+      const prompt = `נתח את השיחות עם הלידים הבאים של העסק "${tenant?.company_name}" וזהה אזכורי מתחרים. צור נקודות מכירה ייחודיות לעסק.
+
+לידים (${leadNames}):
+${leadsInfo}
+
+זהה: 1) אילו מתחרים הוזכרו 2) מה הלקוחות השוו 3) נקודות מכירה ייחודיות שאפשר להדגיש 4) המלצות לשיפור. כתוב בעברית.`;
+
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt, response_json_schema: { type: "object", properties: { title: { type: "string" }, content: { type: "string" }, action_items: { type: "array", items: { type: "string" } } } }
+      });
+      setToolResult(result);
+    }
+
     setRunningTool(null);
   };
 
   const handleToolClick = (tool) => {
-    if (tool.action === 'hallucination') {
+    if (tool.action === 'multi_lead') {
       setSelectedTool(tool);
       setToolResult(null);
-      setHallucinationMode(null);
+      setMultiLeadMode(null);
       setSelectedLeadIds([]);
     } else if (tool.action === 'select_lead') {
       setSelectedTool(tool);
@@ -367,8 +413,8 @@ ${allBotMessages.slice(0, 40).map((m) => `[שיחה עם ${m.customer}]:\n${m.co
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : tool.action === 'select_lead' ? (
                     <>בחר ליד והפעל <ArrowLeft className="w-4 h-4" /></>
-                  ) : tool.action === 'hallucination' ? (
-                    <>סרוק הזיות <ArrowLeft className="w-4 h-4" /></>
+                  ) : tool.action === 'multi_lead' ? (
+                    <>בחר לידים והפעל <ArrowLeft className="w-4 h-4" /></>
                   ) : (
                     'הפעל ניתוח'
                   )}
@@ -517,19 +563,19 @@ ${allBotMessages.slice(0, 40).map((m) => `[שיחה עם ${m.customer}]:\n${m.co
         </DialogContent>
       </Dialog>
 
-      {/* Hallucination detector dialog */}
-      <Dialog open={!!selectedTool && selectedTool.action === 'hallucination'} onOpenChange={(open) => { if (!open) { setSelectedTool(null); setToolResult(null); setHallucinationMode(null); setSelectedLeadIds([]); } }}>
+      {/* Multi-lead selection dialog (hallucination, lead_scorer, competitor_clash) */}
+      <Dialog open={!!selectedTool && selectedTool.action === 'multi_lead'} onOpenChange={(open) => { if (!open) { setSelectedTool(null); setToolResult(null); setMultiLeadMode(null); setSelectedLeadIds([]); } }}>
         <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto" dir="rtl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-rose-500" />
-              גלאי הזיות
+              {selectedTool && <selectedTool.icon className={`w-5 h-5 ${selectedTool?.color}`} />}
+              {selectedTool?.name}
             </DialogTitle>
           </DialogHeader>
 
           {!toolResult ? (
             <div className="space-y-4">
-              {!hallucinationMode ? (
+              {!multiLeadMode ? (
                 <>
                   <p className="text-sm text-slate-500">בחר אופן ניתוח:</p>
                   <div className="grid grid-cols-1 gap-3">
@@ -538,33 +584,33 @@ ${allBotMessages.slice(0, 40).map((m) => `[שיחה עם ${m.customer}]:\n${m.co
                       className="h-auto py-4 flex flex-col items-center gap-2"
                       disabled={!!runningTool}
                       onClick={() => {
-                        setHallucinationMode('all');
-                        runHallucinationDetector([]);
+                        setMultiLeadMode('all');
+                        runMultiLeadTool(selectedTool, []);
                       }}
                     >
-                      {runningTool === 'hallucination_detector' && hallucinationMode === 'all' ? (
+                      {runningTool === selectedTool?.id && multiLeadMode === 'all' ? (
                         <Loader2 className="w-5 h-5 animate-spin" />
                       ) : (
-                        <Users className="w-5 h-5 text-rose-500" />
+                        <Users className={`w-5 h-5 ${selectedTool?.color}`} />
                       )}
-                      <span className="font-bold">נתח את כל השיחות</span>
-                      <span className="text-xs text-slate-400">סריקה כוללת של כל שיחות הבוט</span>
+                      <span className="font-bold">{selectedTool?.allLabel || 'נתח הכל'}</span>
+                      <span className="text-xs text-slate-400">{selectedTool?.allDesc}</span>
                     </Button>
                     <Button
                       variant="outline"
                       className="h-auto py-4 flex flex-col items-center gap-2"
-                      onClick={() => setHallucinationMode('select')}
+                      onClick={() => setMultiLeadMode('select')}
                     >
-                      <CheckSquare className="w-5 h-5 text-rose-500" />
-                      <span className="font-bold">בחר לידים לניתוח</span>
-                      <span className="text-xs text-slate-400">בחירה ידנית של לידים ספציפיים</span>
+                      <CheckSquare className={`w-5 h-5 ${selectedTool?.color}`} />
+                      <span className="font-bold">{selectedTool?.selectLabel || 'בחר לידים'}</span>
+                      <span className="text-xs text-slate-400">{selectedTool?.selectDesc}</span>
                     </Button>
                   </div>
                 </>
-              ) : hallucinationMode === 'all' ? (
+              ) : multiLeadMode === 'all' ? (
                 <div className="flex flex-col items-center gap-3 py-8">
-                  <Loader2 className="w-8 h-8 animate-spin text-rose-500" />
-                  <p className="text-sm text-slate-500">סורק את כל שיחות הבוט...</p>
+                  <Loader2 className={`w-8 h-8 animate-spin ${selectedTool?.color}`} />
+                  <p className="text-sm text-slate-500">מנתח...</p>
                 </div>
               ) : (
                 <>
@@ -587,22 +633,16 @@ ${allBotMessages.slice(0, 40).map((m) => `[שיחה עם ${m.customer}]:\n${m.co
                     ))}
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setHallucinationMode(null)}
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => setMultiLeadMode(null)}>
                       חזרה
                     </Button>
                     <Button
                       className="flex-1 gap-2"
                       disabled={selectedLeadIds.length === 0 || !!runningTool}
-                      onClick={() => runHallucinationDetector(selectedLeadIds)}
+                      onClick={() => runMultiLeadTool(selectedTool, selectedLeadIds)}
                     >
-                      {runningTool === 'hallucination_detector' ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : null}
-                      {runningTool === 'hallucination_detector' ? 'מנתח...' : `נתח ${selectedLeadIds.length} לידים`}
+                      {runningTool === selectedTool?.id ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                      {runningTool === selectedTool?.id ? 'מנתח...' : `נתח ${selectedLeadIds.length} לידים`}
                     </Button>
                   </div>
                 </>
@@ -620,14 +660,14 @@ ${allBotMessages.slice(0, 40).map((m) => `[שיחה עם ${m.customer}]:\n${m.co
                   <ul className="space-y-1">
                     {toolResult.action_items.map((item, i) => (
                       <li key={i} className="text-sm flex items-start gap-2">
-                        <span className="text-rose-500 mt-0.5">•</span>
+                        <span className={`${selectedTool?.color} mt-0.5`}>•</span>
                         {typeof item === 'object' ? (item.name || item.description || item.recommendation || JSON.stringify(item)) : item}
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
-              <Button variant="outline" className="w-full" onClick={() => { setToolResult(null); setHallucinationMode(null); setSelectedLeadIds([]); }}>
+              <Button variant="outline" className="w-full" onClick={() => { setToolResult(null); setMultiLeadMode(null); setSelectedLeadIds([]); }}>
                 הפעל שוב
               </Button>
             </div>
