@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 
 const publicApi = async (payload) => {
-  const res = await fetch('/api/publicChat', {
+  const res = await fetch('/functions/publicChat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
