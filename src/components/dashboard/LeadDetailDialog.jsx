@@ -21,6 +21,8 @@ export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], s
   const [generatingMsg, setGeneratingMsg] = useState(false);
   const [runningToolId, setRunningToolId] = useState(null);
   const [toolResult, setToolResult] = useState(null);
+  const [detailedAnalysis, setDetailedAnalysis] = useState('');
+  const [analysisExpanded, setAnalysisExpanded] = useState(true);
   const queryClient = useQueryClient();
 
   const updateMutation = useMutation({
