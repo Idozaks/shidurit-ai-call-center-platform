@@ -154,7 +154,7 @@ function DoctorMiniCard({ doctor, themeColor, onClick }) {
 function DoctorDetailModal({ doctor, open, onClose, themeColor }) {
   if (!doctor) return null;
 
-  const profileUrl = createPageUrl('DoctorProfile') + `?id=${doctor.id}`;
+  const profileUrl = createPageUrl(`DoctorProfile?id=${doctor.id}`);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
