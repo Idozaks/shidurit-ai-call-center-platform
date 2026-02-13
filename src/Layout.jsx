@@ -99,21 +99,32 @@ export default function Layout({ children, currentPageName }) {
                 </Link>
               ))}
             </nav>
-            <div className="p-4 border-t border-slate-200 dark:border-slate-800">
+            <div className="p-4 border-t border-slate-200 dark:border-slate-800" style={{ position: 'relative', zIndex: 9999 }}>
               {currentWorker && (
                 <div className="px-3 py-2 mb-2 text-sm">
                   <p className="font-medium text-slate-900 dark:text-slate-100">{currentWorker.full_name}</p>
                   <p className="text-xs text-slate-500">{currentWorker.email}</p>
                 </div>
               )}
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-red-600 hover:bg-red-50 active:bg-red-100 transition-colors text-sm font-medium"
+              <div
+                role="button"
+                tabIndex={0}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleLogout();
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleLogout();
+                }}
+                className="w-full flex items-center gap-3 px-3 py-4 rounded-lg text-red-600 bg-red-50 active:bg-red-100 transition-colors text-sm font-medium cursor-pointer select-none"
+                style={{ WebkitTapHighlightColor: 'rgba(239,68,68,0.2)', touchAction: 'manipulation' }}
               >
                 <LogOut className="w-5 h-5" />
                 התנתק
-              </button>
+              </div>
             </div>
           </div>
         </div>
