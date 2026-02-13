@@ -76,10 +76,60 @@ export default function KnowledgeManager({ tenantId, knowledge = [] }) {
   });
 
   const resetForm = () => {
-    setFormData({ title: '', content: '', category: 'general', is_active: true });
+    setFormData({ title: '', content: '', category: 'general', is_active: true, file_url: '', file_name: '' });
     setCustomCategory('');
     setEditingEntry(null);
     setIsDialogOpen(false);
+  };
+
+  const handleFileUpload = async (file) => {
+    setUploading(true);
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    setFormData(prev => ({ ...prev, file_url, file_name: file.name }));
+    setUploading(false);
+  };
+
+  const handleBulkFileUpload = async (files) => {
+    setBulkUploading(true);
+    for (const file of files) {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
+        file_url,
+        json_schema: {
+          type: "object",
+          properties: {
+            title: { type: "string", description: "A short descriptive title for this document" },
+            content: { type: "string", description: "The full text content of the document" },
+            category: { type: "string", description: "One of: general, services, products, faq, pricing, contact, hours, about, team, policies, locations" }
+          },
+          required: ["title", "content"]
+        }
+      });
+      if (result.status === 'success' && result.output) {
+        const extracted = Array.isArray(result.output) ? result.output[0] : result.output;
+        await base44.entities.KnowledgeEntry.create({
+          tenant_id: tenantId,
+          title: extracted.title || file.name,
+          content: extracted.content || '',
+          category: extracted.category || 'general',
+          file_url,
+          file_name: file.name,
+          is_active: true
+        });
+      } else {
+        await base44.entities.KnowledgeEntry.create({
+          tenant_id: tenantId,
+          title: file.name,
+          content: `קובץ מצורף: ${file.name}`,
+          category: 'general',
+          file_url,
+          file_name: file.name,
+          is_active: true
+        });
+      }
+    }
+    queryClient.invalidateQueries({ queryKey: ['knowledge', tenantId] });
+    setBulkUploading(false);
   };
 
   const handleSubmit = (e) => {
