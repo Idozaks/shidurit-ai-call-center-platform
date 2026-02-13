@@ -74,6 +74,14 @@ export function useTenantDoctors(tenantId) {
   });
 }
 
+const scrollbarStyle = `
+.styled-scrollbar::-webkit-scrollbar { height: 6px; }
+.styled-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+.styled-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+.styled-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+.styled-scrollbar { scrollbar-width: thin; scrollbar-color: #cbd5e1 #f1f5f9; }
+`;
+
 export default function DoctorCards({ messageContent, doctors, themeColor }) {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   
