@@ -351,7 +351,7 @@ export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [],
                     {toolResult.action_items.map((item, i) => (
                       <li key={i} className="text-sm flex items-start gap-2">
                         <span className="text-amber-500 mt-0.5">•</span>
-                        {item}
+                        {typeof item === 'object' ? (item.name || item.description || item.recommendation || JSON.stringify(item)) : item}
                       </li>
                     ))}
                   </ul>
@@ -385,7 +385,7 @@ export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [],
                     {toolResult.action_items.map((item, i) => (
                       <li key={i} className="text-sm flex items-start gap-2">
                         <span className="text-amber-500 mt-0.5">•</span>
-                        {item}
+                        {typeof item === 'object' ? (item.name || item.description || item.recommendation || JSON.stringify(item)) : item}
                       </li>
                     ))}
                   </ul>
