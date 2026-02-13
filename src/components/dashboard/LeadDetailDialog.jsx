@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from 'react-markdown';
 import LeadMetricsCards from './LeadMetricsCards';
 
 export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], sessions = [], onClose }) {
@@ -283,7 +284,9 @@ ${transcript}
                     className="overflow-hidden"
                   >
                     <div className="px-3 py-3 bg-white">
-                      <p className="text-sm text-slate-700 whitespace-pre-wrap text-right leading-relaxed">{detailedAnalysis}</p>
+                      <div className="text-sm text-slate-700 text-right leading-relaxed prose prose-sm prose-slate max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+                    <ReactMarkdown>{detailedAnalysis}</ReactMarkdown>
+                  </div>
                     </div>
                   </motion.div>
                 )}
@@ -325,7 +328,9 @@ ${transcript}
               </Button>
               <p className="text-sm font-bold text-amber-800">{toolResult.title}</p>
             </div>
-            <p className="text-xs text-amber-900 whitespace-pre-wrap">{toolResult.content}</p>
+            <div className="text-xs text-amber-900 prose prose-sm prose-amber max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+              <ReactMarkdown>{toolResult.content}</ReactMarkdown>
+            </div>
             {toolResult.action_items?.length > 0 && (
               <ul className="space-y-0.5">
                 {toolResult.action_items.map((item, i) => (
