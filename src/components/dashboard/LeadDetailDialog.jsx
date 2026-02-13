@@ -109,7 +109,7 @@ export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], s
     { id: 'lead_scorer', name: 'ניקוד ליד', icon: Sparkles, color: 'text-amber-500' },
     { id: 'smart_followup', name: 'הודעת מעקב', icon: MessageSquare, color: 'text-green-500' },
     { id: 'competitor_clash', name: 'ניתוח מתחרים', icon: Swords, color: 'text-purple-500' },
-    { id: 'revenue_leak', name: 'דליפות הכנסה', icon: TrendingDown, color: 'text-red-500' },
+    { id: 'revenue_leak', name: 'דליפות ונטישה', icon: TrendingDown, color: 'text-red-500' },
     { id: 'knowledge_gaps', name: 'פערי ידע', icon: HelpCircle, color: 'text-orange-500' },
   ];
 
