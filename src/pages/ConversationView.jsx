@@ -44,7 +44,14 @@ export default function ConversationView() {
 
   const { data: messages = [], isLoading: messagesLoading } = useQuery({
     queryKey: ['conversation-messages', sessionId],
-    queryFn: () => base44.entities.ChatMessage.filter({ session_id: sessionId }, 'created_date'),
+    queryFn: async () => {
+      const msgs = await base44.entities.ChatMessage.filter({ session_id: sessionId }, 'created_date');
+      return msgs.sort((a, b) => {
+        const dateCompare = new Date(a.created_date) - new Date(b.created_date);
+        if (dateCompare !== 0) return dateCompare;
+        return a.id.localeCompare(b.id);
+      });
+    },
     enabled: !!sessionId,
     refetchInterval: 3000
   });
