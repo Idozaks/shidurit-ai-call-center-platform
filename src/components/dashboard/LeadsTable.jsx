@@ -23,6 +23,8 @@ export default function LeadsTable({ tenantId, tenant, leads = [], sessions = []
   const [selectedLead, setSelectedLead] = useState(null);
   const [exporting, setExporting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [sortField, setSortField] = useState('created_date');
+  const [sortDirection, setSortDirection] = useState('desc');
   const queryClient = useQueryClient();
 
   const handleExportToSheets = async () => {
