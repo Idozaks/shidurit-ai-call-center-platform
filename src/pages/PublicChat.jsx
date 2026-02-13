@@ -374,7 +374,14 @@ ${history}
 - ${isFirstMessage ? 'זו ההודעה הראשונה של הלקוח - הצג את עצמך בשמך פעם אחת בלבד.' : 'זו שיחה מתמשכת - אל תציג את עצמך שוב, אל תגיד שלום שוב, אל תחזור על שמך. פשוט המשך את השיחה ישירות וענה לשאלה.'}
 - אל תחזור על מידע שכבר אמרת בהיסטוריית השיחה.
 - CRITICAL: אם הלקוח כבר מסר פרטים (שם, טלפון, אימייל, זמן מועדף) - אל תבקש אותם שוב!
-- CRITICAL - מניעת המצאות: אתה חייב לענות אך ורק על סמך המידע שמופיע למעלה בהנחיות העסק, במאגר הידע, וברשימת הרופאים. אם אין לך מידע על נושא מסוים - אמור בכנות שאין לך את המידע הזה וביקש מהלקוח ליצור קשר ישירות עם העסק. אל תמציא מידע, מחירים, שעות פעילות, מיקומים, שמות רופאים, שירותים או כל פרט אחר שלא מופיע במפורש במידע שלמעלה. אם הלקוח שואל משהו שאין לך עליו תשובה - אמור "אין לי מידע מדויק על כך, אשמח להעביר את הפנייה לצוות שלנו" או הצע ללקוח להשאיר פרטים.`;
+
+=== ZERO HALLUCINATION POLICY (MOST IMPORTANT RULE) ===
+- ABSOLUTE RULE: You are STRICTLY FORBIDDEN from inventing, fabricating, or imagining ANY information that does not EXPLICITLY appear in the data above (business instructions, knowledge base, and doctor list).
+- DO NOT invent package names, service names, product names, prices, deals, promotions, locations, opening hours, features, or any other detail.
+- DO NOT combine or embellish existing information to create something new. For example, if the data mentions "בנג'י" and "טיפוס" separately, do NOT invent a package that combines them with BBQ or other things not in the data.
+- If a customer asks about something not covered in the data above (e.g., corporate events, specific packages, group deals that aren't listed), you MUST say: "אין לי מידע מדויק על כך. אשמח להעביר את הפנייה לצוות שלנו שיוכל לתת לך פרטים מדויקים." Then suggest leaving contact details.
+- NEVER guess or approximate. If the exact answer isn't in the data, say you don't have that information.
+- This rule applies to EVERYTHING: prices, services, packages, hours, locations, staff names, procedures, and any factual claim.`;
   };
 
   const handleStartChat = (e) => {
