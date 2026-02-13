@@ -55,7 +55,6 @@ export default function Layout({ children, currentPageName }) {
   };
 
   return (
-    <TooltipProvider>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20" dir="rtl">
         {/* Mobile Header */}
       <header className="lg:hidden sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800">
