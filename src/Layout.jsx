@@ -68,14 +68,9 @@ export default function Layout({ children, currentPageName }) {
               שידורית AI
             </span>
           </Link>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)}>
-                {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>תפריט</TooltipContent>
-          </Tooltip>
+          <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)}>
+            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </Button>
         </div>
       </header>
 
@@ -129,14 +124,14 @@ export default function Layout({ children, currentPageName }) {
                     <p className="text-xs text-slate-500">{currentWorker.email}</p>
                   </div>
                 )}
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start gap-3 text-red-600"
+                <button 
+                  type="button"
+                  className="w-full flex items-center justify-start gap-3 text-red-600 px-3 py-3 rounded-lg hover:bg-red-50 active:bg-red-100 transition-colors text-sm font-medium"
                   onClick={handleLogout}
                 >
                   <LogOut className="w-5 h-5" />
                   התנתק
-                </Button>
+                </button>
               </div>
             </motion.aside>
           </>
