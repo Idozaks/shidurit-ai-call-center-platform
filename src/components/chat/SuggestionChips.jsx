@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Loader2, Phone, Clock, Info, CalendarCheck, MessageSquare, HelpCircle } from 'lucide-react';
+import { Loader2, Phone, Clock, Info, CalendarCheck, HelpCircle, ChevronDown, ChevronUp, Grid3X3 } from 'lucide-react';
 
 const publicApi = async (payload) => {
   try {
@@ -27,43 +27,45 @@ const FIXED_ACTIONS = [
 ];
 
 export default function SuggestionChips({ tenantId, messages, onSelect, themeColor, disabled, onOpenDetailsModal, detailsSubmitted }) {
-  const [topics, setTopics] = useState([]);
+  const [initialTopics, setInitialTopics] = useState([]);
+  const [followUpSuggestions, setFollowUpSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [hasGenerated, setHasGenerated] = useState(false);
+  const [showFixedActions, setShowFixedActions] = useState(false);
+  const prevMsgCountRef = useRef(0);
 
-  const isFirstInteraction = messages.filter(m => m.role === 'user').length === 0;
+  const userMessageCount = messages.filter(m => m.role === 'user').length;
+  const isFirstInteraction = userMessageCount === 0;
 
+  // Generate initial topics once on mount
   useEffect(() => {
-    if (!tenantId || hasGenerated) return;
-    generateTopics();
+    if (!tenantId) return;
+    generateInitialTopics();
   }, [tenantId]);
 
-  // Regenerate topics after each AI response (not first)
+  // Generate follow-up suggestions after conversation progresses
   useEffect(() => {
     if (!tenantId || isFirstInteraction) return;
-    generateTopics();
+    // Only regenerate when message count actually changes
+    if (messages.length !== prevMsgCountRef.current) {
+      prevMsgCountRef.current = messages.length;
+      generateFollowUps();
+    }
   }, [messages.length]);
 
-  const generateTopics = async () => {
+  const generateInitialTopics = async () => {
     setLoading(true);
     try {
       const knowledgeRes = await publicApi({ action: 'getKnowledge', tenant_id: tenantId });
       const knowledge = knowledgeRes.entries || [];
       if (knowledge.length === 0) {
-        setTopics(['מה אתם מציעים?', 'כמה זה עולה?', 'איפה אתם נמצאים?', 'ספרו לי עליכם', 'יש מבצעים?']);
+        setInitialTopics(['מה אתם מציעים?', 'כמה זה עולה?', 'איפה אתם נמצאים?', 'ספרו לי עליכם', 'יש מבצעים?']);
         setLoading(false);
-        setHasGenerated(true);
         return;
       }
-
       const knowledgeSummary = knowledge.map(k => `- ${k.title} (${k.category}): ${k.content?.slice(0, 100) || ''}`).join('\n');
-
-      const conversationContext = messages.length > 0
-        ? messages.map(m => `${m.role === 'user' ? 'לקוח' : 'נציג'}: ${m.content}`).join('\n')
-        : '';
-
-      const prompt = isFirstInteraction
-        ? `You are generating "popular topic" buttons for a customer chat. These appear BEFORE the customer asks anything.
+      const llmRes = await publicApi({
+        action: 'invokeLLM',
+        prompt: `You are generating "popular topic" buttons for a customer chat. These appear BEFORE the customer asks anything.
 
 Business knowledge base:
 ${knowledgeSummary}
@@ -71,50 +73,71 @@ ${knowledgeSummary}
 Generate EXACTLY 6 short topic suggestions (2-5 words each) in Hebrew.
 These should be the most relevant and interesting topics a customer would want to ask about THIS SPECIFIC business, based on its knowledge base.
 Make them sound like natural questions or topics, not formal.
-Examples: "התמחויות זמינות", "שירותים לרופאים", "מיקומי מרפאות", "מחירון טיפולים", "פורטל רופאים", "שירותים למטופלים"
 
-Return exactly 6 suggestions.`
-        : `Generate follow-up topic suggestions for an ongoing customer chat.
-
-Business knowledge:
-${knowledgeSummary}
-
-Conversation so far:
-${conversationContext}
-
-Generate EXACTLY 6 short follow-up topics (2-5 words each) in Hebrew.
-These should be natural next questions based on what was discussed.
-Don't repeat topics already covered in the conversation.
-
-Return exactly 6 suggestions.`;
-
-      const llmRes = await publicApi({
-        action: 'invokeLLM',
-        prompt,
+Return exactly 6 suggestions.`,
         response_json_schema: {
           type: "object",
-          properties: {
-            suggestions: {
-              type: "array",
-              items: { type: "string" },
-              description: "Array of exactly 6 short topic texts in Hebrew"
-            }
-          },
+          properties: { suggestions: { type: "array", items: { type: "string" } } },
           required: ["suggestions"]
         }
       });
-
-      setTopics(llmRes.result?.suggestions?.slice(0, 6) || []);
-      setHasGenerated(true);
+      setInitialTopics(llmRes.result?.suggestions?.slice(0, 6) || []);
     } catch (err) {
-      console.error('Error generating topics:', err);
-      setTopics([]);
+      console.error('Error generating initial topics:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Show details chip logic
+  const generateFollowUps = async () => {
+    setLoading(true);
+    try {
+      const knowledgeRes = await publicApi({ action: 'getKnowledge', tenant_id: tenantId });
+      const knowledge = knowledgeRes.entries || [];
+      const knowledgeSummary = knowledge.map(k => `- ${k.title} (${k.category}): ${k.content?.slice(0, 80) || ''}`).join('\n');
+      const fullConversation = messages.map(m => `${m.role === 'user' ? 'לקוח' : 'נציג'}: ${m.content}`).join('\n');
+      const lastAssistantMsg = [...messages].reverse().find(m => m.role === 'assistant')?.content || '';
+
+      const llmRes = await publicApi({
+        action: 'invokeLLM',
+        prompt: `You are generating suggestion chips for a customer chat interface in Hebrew.
+
+The business has knowledge about these topics:
+${knowledgeSummary}
+
+Full conversation so far:
+${fullConversation}
+
+Last assistant message: "${lastAssistantMsg}"
+
+Rules:
+1. Generate EXACTLY 10 suggestions.
+2. Suggestions should sound like things a REAL CUSTOMER would naturally say.
+3. GOOD examples: "אני רוצה לקבוע תור", "כמה עולה טיפול?", "איזה רופא מומלץ?"
+4. BAD examples: "מהם זמני ההמתנה?", "למה כדאי לבחור בכם?" — these sound robotic.
+5. The first 4-5 should be ACTIONABLE follow-ups directly related to what was just discussed.
+6. The next 3-4 should explore other relevant topics.
+7. The last 1-2 should be action-oriented: booking, pricing, contact info.
+8. Each suggestion should be 3-7 words in natural spoken Hebrew.
+9. Never repeat something the customer already asked.
+
+Return exactly 10 suggestions.`,
+        response_json_schema: {
+          type: "object",
+          properties: { suggestions: { type: "array", items: { type: "string" } } },
+          required: ["suggestions"]
+        }
+      });
+      setFollowUpSuggestions(llmRes.result?.suggestions?.slice(0, 10) || []);
+    } catch (err) {
+      console.error('Error generating follow-ups:', err);
+      setFollowUpSuggestions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Details chip logic
   const lastAssistantMessage = [...messages].reverse().find(m => m.role === 'assistant')?.content || '';
   const detailsKeywords = [
     'שמך', 'שם מלא', 'מספר טלפון', 'טלפון שלך', 'פרטים', 'פרטי התקשרות',
@@ -122,33 +145,27 @@ Return exactly 6 suggestions.`;
     'נחזור אליך', 'ניצור קשר', 'מוזמן להשאיר', 'מוזמנת להשאיר',
   ];
   const isAskingForDetails = detailsKeywords.some(kw => lastAssistantMessage.includes(kw));
-  const userMessageCount = messages.filter(m => m.role === 'user').length;
-  const showDetailsChip = !detailsSubmitted && (isAskingForDetails || userMessageCount >= 2);
-
-  const handleChipClick = (text) => {
-    onSelect(text);
-  };
+  const showDetailsChip = !detailsSubmitted && !isFirstInteraction && (isAskingForDetails || userMessageCount >= 2);
 
   const chipBaseStyle = {
     borderColor: `${themeColor}30`,
     color: themeColor === '#ffffff' || themeColor === '#fff' ? '#334155' : themeColor,
   };
 
-  return (
-    <div className="py-2 space-y-3">
-      {/* Row 1: Fixed quick actions */}
-      <div>
+  const handleChipClick = (text) => {
+    onSelect(text);
+    setShowFixedActions(false);
+    setFollowUpSuggestions([]);
+  };
+
+  // ==========================================
+  // BEFORE first user message: show initial view
+  // ==========================================
+  if (isFirstInteraction) {
+    return (
+      <div className="py-2 space-y-3">
+        {/* Fixed quick actions */}
         <div className="flex flex-wrap justify-center gap-2">
-          {showDetailsChip && (
-            <button
-              onClick={() => onOpenDetailsModal?.()}
-              disabled={disabled}
-              className="text-sm px-4 py-2 rounded-full border-2 transition-all whitespace-nowrap disabled:opacity-50 font-medium"
-              style={{ borderColor: themeColor, color: 'white', backgroundColor: themeColor }}
-            >
-              📋 השאר פרטים
-            </button>
-          )}
           {FIXED_ACTIONS.map((action, i) => (
             <button
               key={`action-${i}`}
@@ -162,35 +179,133 @@ Return exactly 6 suggestions.`;
             </button>
           ))}
         </div>
+
+        {/* Popular topics */}
+        <div>
+          <p className="text-center text-xs text-slate-400 mb-2">נושאים פופולריים</p>
+          {loading ? (
+            <div className="flex justify-center py-1">
+              <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+            </div>
+          ) : (
+            <div className="flex flex-wrap justify-center gap-2">
+              {initialTopics.map((topic, i) => (
+                <motion.button
+                  key={`topic-${i}`}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.05 }}
+                  onClick={() => handleChipClick(topic)}
+                  disabled={disabled}
+                  className="text-sm px-3.5 py-2 rounded-full border transition-all whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5 hover:shadow-md bg-white/80 backdrop-blur-sm"
+                  style={chipBaseStyle}
+                >
+                  {topic}
+                </motion.button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // AFTER first user message: show follow-up suggestions
+  // ==========================================
+  const midpoint = Math.ceil(followUpSuggestions.length / 2);
+  const row1 = followUpSuggestions.slice(0, midpoint);
+  const row2 = followUpSuggestions.slice(midpoint);
+
+  return (
+    <div className="py-2 space-y-2">
+      {/* Toggle button for fixed actions */}
+      <div className="flex items-center justify-center gap-2">
+        {showDetailsChip && (
+          <button
+            onClick={() => onOpenDetailsModal?.()}
+            disabled={disabled}
+            className="text-sm px-4 py-1.5 rounded-full border-2 transition-all whitespace-nowrap disabled:opacity-50 font-medium"
+            style={{ borderColor: themeColor, color: 'white', backgroundColor: themeColor }}
+          >
+            📋 השאר פרטים
+          </button>
+        )}
+        <button
+          onClick={() => setShowFixedActions(!showFixedActions)}
+          className="text-xs px-3 py-1.5 rounded-full border transition-all flex items-center gap-1 hover:shadow-sm"
+          style={{ borderColor: `${themeColor}30`, color: `${themeColor}90` }}
+        >
+          <Grid3X3 className="w-3 h-3" />
+          פעולות מהירות
+          {showFixedActions ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+        </button>
       </div>
 
-      {/* Row 2: AI-generated popular topics */}
-      <div>
-        <p className="text-center text-xs text-slate-400 mb-2">נושאים פופולריים</p>
-        {loading && !hasGenerated ? (
-          <div className="flex justify-center py-1">
-            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-          </div>
-        ) : (
-          <div className="flex flex-wrap justify-center gap-2">
-            {topics.map((topic, i) => (
-              <motion.button
-                key={`topic-${i}`}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.05 }}
-                onClick={() => handleChipClick(topic)}
+      {/* Collapsible fixed actions */}
+      {showFixedActions && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          className="flex flex-wrap justify-center gap-2 overflow-hidden"
+        >
+          {FIXED_ACTIONS.map((action, i) => (
+            <button
+              key={`action-${i}`}
+              onClick={() => handleChipClick(action.label)}
+              disabled={disabled}
+              className="text-sm px-3.5 py-1.5 rounded-full border transition-all whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5 hover:shadow-md bg-white/80 backdrop-blur-sm"
+              style={chipBaseStyle}
+            >
+              <action.icon className="w-3.5 h-3.5" />
+              {action.label}
+            </button>
+          ))}
+        </motion.div>
+      )}
+
+      {/* Follow-up suggestion chips */}
+      {loading ? (
+        <div className="flex justify-center py-1">
+          <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+        </div>
+      ) : followUpSuggestions.length > 0 && (
+        <div className="overflow-x-auto pb-1" style={{ scrollbarWidth: 'thin', scrollbarColor: `${themeColor}40 transparent` }}>
+          <div className="flex gap-2 w-max">
+            {row1.map((text, i) => (
+              <button
+                key={`s1-${i}`}
+                onClick={() => handleChipClick(text)}
                 disabled={disabled}
-                className="text-sm px-3.5 py-2 rounded-full border transition-all whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5 hover:shadow-md bg-white/80 backdrop-blur-sm"
-                style={chipBaseStyle}
+                className="text-sm px-3 py-1.5 rounded-full border transition-colors whitespace-nowrap disabled:opacity-50 flex-shrink-0"
+                style={{ borderColor: `${themeColor}40`, color: themeColor, backgroundColor: `${themeColor}08` }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}18`; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}08`; }}
               >
-                <MessageSquare className="w-3.5 h-3.5" />
-                {topic}
-              </motion.button>
+                {text}
+              </button>
             ))}
           </div>
-        )}
-      </div>
+          {row2.length > 0 && (
+            <div className="flex gap-2 w-max mt-1.5">
+              {row2.map((text, i) => (
+                <button
+                  key={`s2-${i}`}
+                  onClick={() => handleChipClick(text)}
+                  disabled={disabled}
+                  className="text-sm px-3 py-1.5 rounded-full border transition-colors whitespace-nowrap disabled:opacity-50 flex-shrink-0"
+                  style={{ borderColor: `${themeColor}40`, color: themeColor, backgroundColor: `${themeColor}08` }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}18`; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}08`; }}
+                >
+                  {text}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
