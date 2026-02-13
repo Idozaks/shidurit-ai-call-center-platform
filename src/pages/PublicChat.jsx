@@ -41,8 +41,8 @@ export default function PublicChat() {
   const { data: tenant, isLoading: tenantLoading } = useQuery({
     queryKey: ['publicTenant', slug],
     queryFn: async () => {
-      const tenants = await base44.entities.Tenant.filter({ slug, is_active: true });
-      return tenants[0];
+      const res = await publicApi({ action: 'getTenant', slug });
+      return res.tenant;
     },
     enabled: !!slug
   });
