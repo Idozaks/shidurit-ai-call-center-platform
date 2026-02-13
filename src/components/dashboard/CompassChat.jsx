@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import { Send, Compass, Loader2, Sparkles, Activity, Plus, History, X, Trash2, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const QUICK_CHIPS = [
+const INITIAL_CHIPS = [
   { label: 'למה לקוחות לא סוגרים?', icon: '🔍' },
   { label: 'מה המוצר הכי מבוקש?', icon: '🏆' },
   { label: 'ניתוח ROI שבועי', icon: '📊' },
