@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
-  Search, Phone, Mail,
+  Search, Phone, Mail, ArrowUpDown,
   AlertCircle, CheckCircle, XCircle, User, FileSpreadsheet, Loader2, RefreshCw
 } from "lucide-react";
 import { format } from 'date-fns';
