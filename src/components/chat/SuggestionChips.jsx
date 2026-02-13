@@ -3,13 +3,9 @@ import { motion } from 'framer-motion';
 import { Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 
 const publicApi = async (payload) => {
-  const res = await fetch('/functions/publicChat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return res.json();
+  const { base44 } = await import('@/api/base44Client');
+  const response = await base44.functions.invoke('publicChat', payload);
+  return response.data;
 };
 
 export default function SuggestionChips({ tenantId, messages, onSelect, themeColor, disabled, onOpenDetailsModal }) {
