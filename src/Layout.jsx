@@ -166,19 +166,14 @@ export default function Layout({ children, currentPageName }) {
               <p className="text-xs text-slate-500">{currentWorker.email}</p>
             </div>
           )}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                onClick={handleLogout}
-              >
-                <LogOut className="w-5 h-5" />
-                התנתק
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>יציאה מהמערכת</TooltipContent>
-          </Tooltip>
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start gap-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+            onClick={handleLogout}
+          >
+            <LogOut className="w-5 h-5" />
+            התנתק
+          </Button>
         </div>
       </aside>
 
