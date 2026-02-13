@@ -8,7 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Sparkles, Zap, MessageSquare, Swords, ShieldCheck, 
-  TrendingDown, BarChart3, Loader2, ArrowLeft, HelpCircle
+  TrendingDown, BarChart3, Loader2, ArrowLeft, HelpCircle, 
+  Users, Target
 } from "lucide-react";
 import { toast } from "sonner";
 
