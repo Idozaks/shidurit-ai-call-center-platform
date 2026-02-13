@@ -75,74 +75,61 @@ export default function Layout({ children, currentPageName }) {
       </header>
 
       {/* Mobile Sidebar Overlay */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-              onClick={() => setSidebarOpen(false)}
-            />
-            <motion.aside
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-64 bg-white dark:bg-slate-900 z-50 shadow-xl lg:hidden flex flex-col"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="p-4 border-b border-slate-200 dark:border-slate-800">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-white" />
-                  </div>
-                  <span className="font-bold text-lg">שידורית AI</span>
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <div 
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setSidebarOpen(false)}
+          />
+          <div className="absolute top-0 right-0 bottom-0 w-64 bg-white dark:bg-slate-900 shadow-xl flex flex-col">
+            <div className="p-4 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-white" />
                 </div>
+                <span className="font-bold text-lg">שידורית AI</span>
               </div>
-              <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={createPageUrl(item.name)}
-                    onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                      currentPageName === item.name
-                        ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
-                        : 'hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span>{item.label}</span>
-                  </Link>
-                ))}
+            </div>
+            <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  to={createPageUrl(item.name)}
+                  onClick={() => setSidebarOpen(false)}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                    currentPageName === item.name
+                      ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
+                      : 'hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span>{item.label}</span>
+                </Link>
+              ))}
 
-                {/* Logout inside nav list */}
-                <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
-                  {currentWorker && (
-                    <div className="px-3 py-2 mb-2 text-sm">
-                      <p className="font-medium text-slate-900 dark:text-slate-100">{currentWorker.full_name}</p>
-                      <p className="text-xs text-slate-500">{currentWorker.email}</p>
-                    </div>
-                  )}
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => {
-                      handleLogout();
-                    }}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 active:bg-red-100 transition-colors cursor-pointer select-none"
-                  >
-                    <LogOut className="w-5 h-5 pointer-events-none" />
-                    <span className="pointer-events-none">התנתק</span>
+              <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
+                {currentWorker && (
+                  <div className="px-3 py-2 mb-2 text-sm">
+                    <p className="font-medium text-slate-900 dark:text-slate-100">{currentWorker.full_name}</p>
+                    <p className="text-xs text-slate-500">{currentWorker.email}</p>
                   </div>
-                </div>
-              </nav>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+                )}
+                <a
+                  href="#logout"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleLogout();
+                  }}
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 active:bg-red-100 transition-colors"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span>התנתק</span>
+                </a>
+              </div>
+            </nav>
+          </div>
+        </div>
+      )}
 
       {/* Desktop Sidebar */}
       <aside className="hidden lg:fixed lg:right-0 lg:top-0 lg:bottom-0 lg:w-64 lg:flex lg:flex-col lg:bg-white/80 lg:dark:bg-slate-900/80 lg:backdrop-blur-lg lg:border-l lg:border-slate-200 lg:dark:border-slate-800 lg:z-40">
