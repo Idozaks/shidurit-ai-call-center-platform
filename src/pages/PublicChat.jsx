@@ -348,21 +348,33 @@ IMPORTANT: Adapt your judgment to the business category. For example:
       ? `\n\nפרטים שהלקוח כבר מסר (אל תבקש אותם שוב!):\n${detailsParts.join('\n')}` 
       : '';
 
+    // Build doctors context
+    const doctorsContext = doctors.length > 0
+      ? `\n\nרופאים זמינים בעסק (אלה הרופאים היחידים שאתה יכול להזכיר!):\n${doctors.map(d => `- ${d.name}: ${d.specialty}${d.procedures?.length ? ', טיפולים: ' + d.procedures.join(', ') : ''}${d.clinic_location ? ', מיקום: ' + d.clinic_location : ''}${d.availability ? ', זמינות: ' + d.availability : ''}`).join('\n')}`
+      : '';
+
     return `אתה ${tenant?.ai_persona_name || 'נועה'}, נציג/ת שירות לקוחות של ${tenant?.company_name || 'העסק'}.
-${tenant?.system_prompt || ''}
+
+=== הנחיות העסק ===
+${tenant?.system_prompt || 'אין הנחיות מיוחדות.'}
+
+=== מאגר הידע של העסק ===
+${knowledgeBase || 'אין מידע נוסף.'}
+${doctorsContext}
 ${detailsContext}
 
-היסטוריית השיחה:
+=== היסטוריית השיחה ===
 ${history}
 
 לקוח: ${userMessage}
 
-כללים חשובים:
-- CRITICAL: You MUST respond ONLY in Hebrew. Do NOT use any other language (no English, no Chinese, no Arabic, no other language). Every single word in your response must be in Hebrew.
+=== כללים קריטיים ===
+- CRITICAL: You MUST respond ONLY in Hebrew. Do NOT use any other language.
 - ענה בעברית בצורה ידידותית ומקצועית. היה תמציתי וענייני.
 - ${isFirstMessage ? 'זו ההודעה הראשונה של הלקוח - הצג את עצמך בשמך פעם אחת בלבד.' : 'זו שיחה מתמשכת - אל תציג את עצמך שוב, אל תגיד שלום שוב, אל תחזור על שמך. פשוט המשך את השיחה ישירות וענה לשאלה.'}
 - אל תחזור על מידע שכבר אמרת בהיסטוריית השיחה.
-- CRITICAL: אם הלקוח כבר מסר פרטים (שם, טלפון, אימייל, זמן מועדף) - אל תבקש אותם שוב! השתמש במידע שכבר נאסף.`;
+- CRITICAL: אם הלקוח כבר מסר פרטים (שם, טלפון, אימייל, זמן מועדף) - אל תבקש אותם שוב!
+- CRITICAL - מניעת המצאות: אתה חייב לענות אך ורק על סמך המידע שמופיע למעלה בהנחיות העסק, במאגר הידע, וברשימת הרופאים. אם אין לך מידע על נושא מסוים - אמור בכנות שאין לך את המידע הזה וביקש מהלקוח ליצור קשר ישירות עם העסק. אל תמציא מידע, מחירים, שעות פעילות, מיקומים, שמות רופאים, שירותים או כל פרט אחר שלא מופיע במפורש במידע שלמעלה. אם הלקוח שואל משהו שאין לך עליו תשובה - אמור "אין לי מידע מדויק על כך, אשמח להעביר את הפנייה לצוות שלנו" או הצע ללקוח להשאיר פרטים.`;
   };
 
   const handleStartChat = (e) => {
