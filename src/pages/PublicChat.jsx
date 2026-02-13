@@ -48,6 +48,7 @@ export default function PublicChat() {
   const leadIdRef = useRef(null);
   const [chatMode, setChatMode] = useState('voice'); // 'text' or 'voice'
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [detailsSubmitted, setDetailsSubmitted] = useState(false);
   const messagesEndRef = useRef(null);
   const [sessionStatus, setSessionStatus] = useState('active');
 
