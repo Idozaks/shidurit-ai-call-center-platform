@@ -297,7 +297,7 @@ export default function TenantDashboard() {
             {/* knowledge moved to "info" tab */}
 
             <TabsContent value="toolbox">
-              <AIToolbox tenantId={tenantId} tenant={tenant} leads={leads} sessions={sessions} />
+              <AIToolbox tenantId={tenantId} tenant={tenant} leads={leads} sessions={sessions} onNavigateToPerformance={() => setActiveTab('performance')} />
             </TabsContent>
 
             <TabsContent value="performance">

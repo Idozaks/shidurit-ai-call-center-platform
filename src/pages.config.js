@@ -53,9 +53,9 @@ import DoctorProfile from './pages/DoctorProfile';
 import DoctorsCatalog from './pages/DoctorsCatalog';
 import Home from './pages/Home';
 import PublicChat from './pages/PublicChat';
+import ShiduritSystemPrompt from './pages/ShiduritSystemPrompt';
 import TenantDashboard from './pages/TenantDashboard';
 import WorkerLogin from './pages/WorkerLogin';
-import ShiduritSystemPrompt from './pages/ShiduritSystemPrompt';
 import __Layout from './Layout.jsx';
 
 
@@ -66,9 +66,9 @@ export const PAGES = {
     "DoctorsCatalog": DoctorsCatalog,
     "Home": Home,
     "PublicChat": PublicChat,
+    "ShiduritSystemPrompt": ShiduritSystemPrompt,
     "TenantDashboard": TenantDashboard,
     "WorkerLogin": WorkerLogin,
-    "ShiduritSystemPrompt": ShiduritSystemPrompt,
 }
 
 export const pagesConfig = {

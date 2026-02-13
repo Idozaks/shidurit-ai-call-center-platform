@@ -115,7 +115,7 @@ const TOOLS = [
   }
 ];
 
-export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [] }) {
+export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [], onNavigateToPerformance }) {
   const [runningTool, setRunningTool] = useState(null);
   const [selectedTool, setSelectedTool] = useState(null);
   const [selectedLeadId, setSelectedLeadId] = useState('');
@@ -263,7 +263,7 @@ export default function AIToolbox({ tenantId, tenant, leads = [], sessions = [] 
       <Card className="border shadow-sm">
         <CardContent className="p-5">
           <div className="flex items-center justify-between">
-            <Button variant="outline" className="gap-2" onClick={() => {}}>
+            <Button variant="outline" className="gap-2" onClick={() => onNavigateToPerformance?.()}>
               <BarChart3 className="w-4 h-4" />
               פתח דשבורד
             </Button>
