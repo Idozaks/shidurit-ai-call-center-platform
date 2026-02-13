@@ -2,7 +2,6 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Phone, PhoneOff, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { base44 } from '@/api/base44Client';
 
 const SEND_SAMPLE_RATE = 16000;
 const RECEIVE_SAMPLE_RATE = 24000;
