@@ -256,6 +256,28 @@ ${transcript}
               <p className="text-sm bg-slate-50 p-3 rounded-lg text-right">{lead.summary}</p>
             </div>
           )}
+          {/* Detailed Analysis - collapsible */}
+          {detailedAnalysis && (
+            <div className="border border-indigo-100 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setAnalysisExpanded(!analysisExpanded)}
+                className="w-full flex items-center justify-between px-3 py-2 bg-indigo-50/50 hover:bg-indigo-50 transition-colors"
+              >
+                <div className="flex items-center gap-1">
+                  {analysisExpanded ? <ChevronUp className="w-4 h-4 text-indigo-500" /> : <ChevronDown className="w-4 h-4 text-indigo-500" />}
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-medium text-indigo-700">ניתוח מפורט</span>
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                </div>
+              </button>
+              {analysisExpanded && (
+                <div className="px-3 py-3 bg-white">
+                  <p className="text-sm text-slate-700 whitespace-pre-wrap text-right leading-relaxed">{detailedAnalysis}</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
