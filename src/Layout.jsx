@@ -126,18 +126,17 @@ export default function Layout({ children, currentPageName }) {
                       <p className="text-xs text-slate-500">{currentWorker.email}</p>
                     </div>
                   )}
-                  <Link
-                    to={createPageUrl('WorkerLogin')}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setSidebarOpen(false);
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
                       handleLogout();
                     }}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 active:bg-red-100 transition-colors"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 active:bg-red-100 transition-colors cursor-pointer select-none"
                   >
-                    <LogOut className="w-5 h-5" />
-                    <span>התנתק</span>
-                  </Link>
+                    <LogOut className="w-5 h-5 pointer-events-none" />
+                    <span className="pointer-events-none">התנתק</span>
+                  </div>
                 </div>
               </nav>
             </motion.aside>
