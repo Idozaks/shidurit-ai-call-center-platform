@@ -91,6 +91,7 @@ export default function Layout({ children, currentPageName }) {
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="fixed top-0 right-0 bottom-0 w-64 bg-white dark:bg-slate-900 z-50 shadow-xl lg:hidden"
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="p-4 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-2">
@@ -127,8 +128,10 @@ export default function Layout({ children, currentPageName }) {
                 <button 
                   type="button"
                   className="w-full flex items-center justify-start gap-3 text-red-600 px-3 py-3 rounded-lg hover:bg-red-50 active:bg-red-100 transition-colors text-sm font-medium"
-                  onPointerDown={(e) => {
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
+                    handleLogout();
                   }}
                   onClick={(e) => {
                     e.stopPropagation();
