@@ -23,6 +23,7 @@ import SessionsList from '@/components/dashboard/SessionsList.jsx';
 import AIToolbox from '@/components/dashboard/AIToolbox.jsx';
 import PerformanceDashboard from '@/components/dashboard/PerformanceDashboard.jsx';
 import GeminiKeySection from '@/components/dashboard/GeminiKeySection.jsx';
+import LeadDetailDialog from '@/components/dashboard/LeadDetailDialog.jsx';
 
 export default function TenantDashboard() {
   const navigate = useNavigate();
