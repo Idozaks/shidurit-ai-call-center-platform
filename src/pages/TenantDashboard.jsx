@@ -173,24 +173,19 @@ export default function TenantDashboard() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    className="gap-2 bg-gradient-to-l from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white"
-                    onClick={() => setArchitectOpen(true)}
-                  >
-                    <Wand2 className="w-4 h-4" />
-                    דבר עם האדריכל
-                  </Button>
-                  <a href={createPageUrl('PublicChat') + `?slug=${tenant?.slug}`} target="_blank">
-                    <Button variant="outline" className="gap-2">
-                      <ExternalLink className="w-4 h-4" />
-                      פתח צ׳אט
-                    </Button>
-                  </a>
-                </TooltipTrigger>
-                <TooltipContent>פתח את הצ'אט הציבורי</TooltipContent>
-              </Tooltip>
+              <Button
+                className="gap-2 bg-gradient-to-l from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white"
+                onClick={() => setArchitectOpen(true)}
+              >
+                <Wand2 className="w-4 h-4" />
+                דבר עם האדריכל
+              </Button>
+              <a href={createPageUrl('PublicChat') + `?slug=${tenant?.slug}`} target="_blank">
+                <Button variant="outline" className="gap-2">
+                  <ExternalLink className="w-4 h-4" />
+                  פתח צ׳אט
+                </Button>
+              </a>
             </div>
           </div>
         </motion.div>
