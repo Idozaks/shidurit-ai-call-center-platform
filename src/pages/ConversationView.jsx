@@ -169,6 +169,7 @@ export default function ConversationView() {
           </div>
         </div>
       </div>
+
       {/* Take control bar */}
       {currentWorker && (
         <div className="sticky top-[65px] z-[9] max-w-4xl mx-auto px-4 py-2 flex items-center justify-between gap-2 bg-blue-50 border-b border-blue-200">
