@@ -13,7 +13,7 @@ import {
   Users, Target, AlertTriangle, CheckSquare
 } from "lucide-react";
 import { toast } from "sonner";
-import ReactMarkdown from 'react-markdown';
+import AIResultDisplay from './AIResultDisplay';
 
 const TOOLS = [
   {
