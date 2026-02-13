@@ -163,6 +163,26 @@ export default function LeadsTable({ tenantId, tenant, leads = [], sessions = []
                 <SelectItem value="lost">אבוד</SelectItem>
               </SelectContent>
             </Select>
+            <Select value={`${sortField}_${sortDirection}`} onValueChange={(val) => {
+              const [field, dir] = val.split('_');
+              setSortField(field);
+              setSortDirection(dir);
+            }}>
+              <SelectTrigger className="w-40 gap-1">
+                <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
+                <SelectValue placeholder="מיון" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="created_date_desc">תאריך - חדש לישן</SelectItem>
+                <SelectItem value="created_date_asc">תאריך - ישן לחדש</SelectItem>
+                <SelectItem value="customer_name_asc">שם - א-ת</SelectItem>
+                <SelectItem value="customer_name_desc">שם - ת-א</SelectItem>
+                <SelectItem value="intent_score_desc">ציון כוונה - גבוה</SelectItem>
+                <SelectItem value="intent_score_asc">ציון כוונה - נמוך</SelectItem>
+                <SelectItem value="status_asc">סטטוס - חדש קודם</SelectItem>
+                <SelectItem value="status_desc">סטטוס - אבוד קודם</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </CardHeader>
