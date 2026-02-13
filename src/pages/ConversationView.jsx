@@ -173,6 +173,17 @@ export default function ConversationView() {
               </div>
             </div>
           </div>
+          {session?.status !== 'closed' && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50"
+              onClick={handleCloseSession}
+            >
+              <XCircle className="w-4 h-4" />
+              סגור שיחה
+            </Button>
+          )}
         </div>
       </div>
 
