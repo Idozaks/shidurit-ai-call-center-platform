@@ -83,7 +83,7 @@ export default function DoctorCards({ messageContent, doctors, themeColor }) {
 
   return (
     <>
-      <div className="flex gap-2 overflow-x-auto py-2 px-1 -mx-1 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <div className="flex gap-2 overflow-x-auto py-2 px-1 -mx-1 styled-scrollbar">
         {matchedDoctors.map((doctor) => (
           <DoctorMiniCard
             key={doctor.id}
