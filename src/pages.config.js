@@ -56,6 +56,7 @@ import PublicChat from './pages/PublicChat';
 import ShiduritSystemPrompt from './pages/ShiduritSystemPrompt';
 import TenantDashboard from './pages/TenantDashboard';
 import WorkerLogin from './pages/WorkerLogin';
+import ProcedurePage from './pages/ProcedurePage';
 import __Layout from './Layout.jsx';
 
 
@@ -69,6 +70,7 @@ export const PAGES = {
     "ShiduritSystemPrompt": ShiduritSystemPrompt,
     "TenantDashboard": TenantDashboard,
     "WorkerLogin": WorkerLogin,
+    "ProcedurePage": ProcedurePage,
 }
 
 export const pagesConfig = {
