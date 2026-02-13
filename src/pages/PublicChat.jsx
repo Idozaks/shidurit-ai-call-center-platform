@@ -593,7 +593,10 @@ ${history}
       <DetailsInputModal
         open={showDetailsModal}
         onClose={() => setShowDetailsModal(false)}
-        onSubmit={(text) => sendChat(text)}
+        onSubmit={(text) => {
+          setDetailsSubmitted(true);
+          sendChat(text);
+        }}
         themeColor={themeColor}
       />
 
