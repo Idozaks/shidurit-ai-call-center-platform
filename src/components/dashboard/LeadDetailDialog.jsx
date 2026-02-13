@@ -205,6 +205,9 @@ export default function LeadDetailDialog({ lead, tenantId, tenant, leads = [], s
         </div>
       )}
 
+      {/* Metrics Cards */}
+      <LeadMetricsCards lead={lead} messagesCount={messages.length} />
+
       {/* AI Analysis */}
       <div className="flex items-center gap-2 justify-end">
         <Button 
