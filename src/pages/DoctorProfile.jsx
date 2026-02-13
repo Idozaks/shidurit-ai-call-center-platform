@@ -102,11 +102,11 @@ export default function DoctorProfile() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden">
             <CardContent className="p-6 md:p-8">
-              <div className="flex flex-col sm:flex-row items-start gap-5">
-                <Avatar className="w-20 h-20 ring-4 ring-white shadow-lg -mt-14 sm:-mt-16">
+              <div className="flex flex-row items-center gap-5">
+                <Avatar className="w-16 h-16 ring-4 ring-white shadow-lg shrink-0">
                   <AvatarImage src={getDoctorAvatarUrl(doctor)} />
                   <AvatarFallback 
-                    className="text-white font-bold text-3xl"
+                    className="text-white font-bold text-2xl"
                     style={{ backgroundColor: themeColor }}
                   >
                     {doctor.name?.charAt(0)}
