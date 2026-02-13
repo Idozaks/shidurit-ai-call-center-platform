@@ -142,6 +142,7 @@ export default function PublicChat() {
     onSuccess: (response) => {
       // Run lead intelligence in background after each message exchange
       if (response !== null) {
+        extractAndStoreDetails();
         analyzeAndManageLead();
       }
     }
