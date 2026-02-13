@@ -71,9 +71,9 @@ const TOOLS = [
   },
   {
     id: 'revenue_leak',
-    name: 'דליפות הכנסה',
-    nameEn: 'Revenue Leak',
-    description: 'ניתוח עמוק של שיחות שנפלו וזיהוי הזדמנויות שפוספסו',
+    name: 'דליפות הכנסה ונטישה',
+    nameEn: 'Revenue Leak & Drop-off',
+    description: 'ניתוח עמוק של שיחות שנפלו, דפוסי נטישה, וזיהוי הזדמנויות שפוספסו',
     icon: TrendingDown,
     speed: 'עמוק',
     color: 'text-red-500',
@@ -89,6 +89,28 @@ const TOOLS = [
     speed: 'עמוק',
     color: 'text-orange-500',
     bgColor: 'bg-orange-50',
+    action: 'run'
+  },
+  {
+    id: 'customer_segments',
+    name: 'פילוח לקוחות',
+    nameEn: 'Customer Segmentation',
+    description: 'חלוקת כל הלידים לקבוצות לפי עניין, דחיפות, סנטימנט והתנהגות',
+    icon: Users,
+    speed: 'עמוק',
+    color: 'text-teal-500',
+    bgColor: 'bg-teal-50',
+    action: 'run'
+  },
+  {
+    id: 'conversion_forecast',
+    name: 'תחזית המרה',
+    nameEn: 'Conversion Forecast',
+    description: 'ניבוי אילו לידים הכי סביר שיומרו ללקוחות משלמים',
+    icon: Target,
+    speed: 'עמוק',
+    color: 'text-emerald-500',
+    bgColor: 'bg-emerald-50',
     action: 'run'
   }
 ];
