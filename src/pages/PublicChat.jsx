@@ -16,7 +16,7 @@ import DetailsInputModal from '../components/chat/DetailsInputModal';
 
 // Helper to call the public backend function via direct HTTP (no auth needed)
 const publicApi = async (payload) => {
-  const res = await fetch(`/api/publicChat`, {
+  const res = await fetch(`/functions/publicChat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
