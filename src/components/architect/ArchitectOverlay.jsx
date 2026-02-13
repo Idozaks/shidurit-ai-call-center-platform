@@ -8,11 +8,13 @@ import { Sparkles, X } from "lucide-react";
 import { motion } from "framer-motion";
 import ArchitectChat from './ArchitectChat';
 import ConfirmationModal from './ConfirmationModal';
+import ConfigEditorModal from './ConfigEditorModal';
 
 export default function ArchitectOverlay({ onDismiss }) {
   const [showChat, setShowChat] = useState(false);
   const [buildConfig, setBuildConfig] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showEditor, setShowEditor] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -22,17 +24,27 @@ export default function ArchitectOverlay({ onDismiss }) {
     setShowConfirm(true);
   };
 
-  const handleConfirm = async () => {
+  const handleEdit = () => {
+    setShowConfirm(false);
+    setShowEditor(true);
+  };
+
+  const handleEditorConfirm = async (editedConfig) => {
+    setBuildConfig(editedConfig);
+    await doCreate(editedConfig);
+  };
+
+  const doCreate = async (config) => {
     setIsCreating(true);
     const tenantData = {
-      ...buildConfig.tenant_config,
+      ...config.tenant_config,
       is_active: true,
       usage_limit: 100
     };
     const newTenant = await base44.entities.Tenant.create(tenantData);
 
-    if (buildConfig.knowledge_base?.length > 0) {
-      for (const entry of buildConfig.knowledge_base) {
+    if (config.knowledge_base?.length > 0) {
+      for (const entry of config.knowledge_base) {
         await base44.entities.KnowledgeEntry.create({
           ...entry,
           tenant_id: newTenant.id,
@@ -44,6 +56,7 @@ export default function ArchitectOverlay({ onDismiss }) {
     queryClient.invalidateQueries({ queryKey: ['tenants'] });
     setIsCreating(false);
     setShowConfirm(false);
+    setShowEditor(false);
     navigate(createPageUrl('TenantDashboard') + `?id=${newTenant.id}`);
   };
 
@@ -113,8 +126,15 @@ export default function ArchitectOverlay({ onDismiss }) {
         open={showConfirm}
         onOpenChange={setShowConfirm}
         config={buildConfig}
-        onConfirm={handleConfirm}
-        onEdit={() => setShowConfirm(false)}
+        onConfirm={() => doCreate(buildConfig)}
+        onEdit={handleEdit}
+        isCreating={isCreating}
+      />
+      <ConfigEditorModal
+        open={showEditor}
+        onOpenChange={setShowEditor}
+        config={buildConfig}
+        onConfirm={handleEditorConfirm}
         isCreating={isCreating}
       />
     </div>

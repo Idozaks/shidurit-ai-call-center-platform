@@ -49,7 +49,7 @@ Phase 3: Readiness & Output
 
 Tone: Professional, witty, encouraging, and fluent Hebrew.
 Always respond in Hebrew.
-Start by introducing yourself and asking the user to upload files or describe their business.`;
+IMPORTANT: Do NOT introduce yourself again - the user has already seen your introduction in the UI. Jump straight into the conversation.`;
 
 const UPDATE_SYSTEM_PROMPT = (tenantData, knowledgeData) => `Role: You are the "Shidurit Architect" (אדריכל שידורית), an elite business analyst and AI configuration expert.
 
@@ -82,7 +82,7 @@ When you have improvements ready, return a structured JSON wrapped in \`\`\`json
 
 Tone: Professional, witty, encouraging, and fluent Hebrew.
 Always respond in Hebrew.
-Start by summarizing the current bot configuration and asking what the user would like to improve.`;
+IMPORTANT: Do NOT introduce yourself again - the user has already seen your introduction in the UI. Jump straight into the conversation.`;
 
 function estimateProgress(messages) {
   const userMessages = messages.filter(m => m.role === 'user').length;

@@ -5,10 +5,12 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Sparkles } from "lucide-react";
 import ArchitectChat from './ArchitectChat';
 import ConfirmationModal from './ConfirmationModal';
+import ConfigEditorModal from './ConfigEditorModal';
 
 export default function ArchitectDrawer({ open, onOpenChange, tenant, knowledge, tenantId }) {
   const [buildConfig, setBuildConfig] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showEditor, setShowEditor] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const queryClient = useQueryClient();
 
@@ -17,9 +19,19 @@ export default function ArchitectDrawer({ open, onOpenChange, tenant, knowledge,
     setShowConfirm(true);
   };
 
-  const handleConfirm = async () => {
+  const handleEdit = () => {
+    setShowConfirm(false);
+    setShowEditor(true);
+  };
+
+  const handleEditorConfirm = async (editedConfig) => {
+    setBuildConfig(editedConfig);
+    await doConfirm(editedConfig);
+  };
+
+  const doConfirm = async (config) => {
     setIsCreating(true);
-    const { tenant_config, knowledge_base } = buildConfig;
+    const { tenant_config, knowledge_base } = config;
 
     // Update existing tenant
     await base44.entities.Tenant.update(tenantId, {
@@ -45,6 +57,7 @@ export default function ArchitectDrawer({ open, onOpenChange, tenant, knowledge,
     queryClient.invalidateQueries({ queryKey: ['knowledge', tenantId] });
     setIsCreating(false);
     setShowConfirm(false);
+    setShowEditor(false);
     onOpenChange(false);
   };
 
@@ -72,8 +85,15 @@ export default function ArchitectDrawer({ open, onOpenChange, tenant, knowledge,
         open={showConfirm}
         onOpenChange={setShowConfirm}
         config={buildConfig}
-        onConfirm={handleConfirm}
-        onEdit={() => setShowConfirm(false)}
+        onConfirm={() => doConfirm(buildConfig)}
+        onEdit={handleEdit}
+        isCreating={isCreating}
+      />
+      <ConfigEditorModal
+        open={showEditor}
+        onOpenChange={setShowEditor}
+        config={buildConfig}
+        onConfirm={handleEditorConfirm}
         isCreating={isCreating}
       />
     </>
