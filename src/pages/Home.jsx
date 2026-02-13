@@ -13,10 +13,12 @@ import {
   Search, Settings, ExternalLink, BarChart3, Sparkles, RefreshCw
 } from "lucide-react";
 import { motion } from "framer-motion";
+import ArchitectOverlay from '@/components/architect/ArchitectOverlay';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showArchitect, setShowArchitect] = useState(false);
   const queryClient = useQueryClient();
 
   const currentWorker = React.useMemo(() => {
@@ -62,6 +64,16 @@ export default function Home() {
     totalSessions: sessions.length
   };
 
+  const hasNoTenants = !isLoading && tenants.length === 0;
+
+  if (hasNoTenants && showArchitect !== false) {
+    return <ArchitectOverlay onDismiss={() => setShowArchitect(false)} />;
+  }
+
+  if (showArchitect) {
+    return <ArchitectOverlay onDismiss={() => setShowArchitect(false)} />;
+  }
+
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20" dir="rtl">
@@ -105,14 +117,26 @@ export default function Home() {
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
+                  <Button
+                    className="bg-gradient-to-l from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-lg shadow-indigo-500/25"
+                    onClick={() => setShowArchitect(true)}
+                  >
+                    <Sparkles className="w-4 h-4 ml-2" />
+                    בנה עסק עם האדריכל
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>אדריכל שידורית יבנה לך בוט בקלות</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <Link to={createPageUrl('CreateTenant')}>
-                    <Button className="bg-gradient-to-l from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-lg shadow-indigo-500/25">
+                    <Button variant="outline">
                       <Plus className="w-4 h-4 ml-2" />
-                      הוסף עסק חדש
+                      עסק ידני
                     </Button>
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent>יצירת עסק חדש במערכת</TooltipContent>
+                <TooltipContent>יצירת עסק ידנית</TooltipContent>
               </Tooltip>
             </div>
           </div>
