@@ -1,0 +1,263 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import ReactMarkdown from 'react-markdown';
+import { Send, Compass, Loader2, Sparkles, Activity } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const QUICK_CHIPS = [
+  { label: 'למה לקוחות לא סוגרים?', icon: '🔍' },
+  { label: 'מה המוצר הכי מבוקש?', icon: '🏆' },
+  { label: 'ניתוח ROI שבועי', icon: '📊' },
+  { label: 'מה נקודות החיכוך העיקריות?', icon: '⚡' },
+  { label: 'תן לי שורה תחתונה', icon: '💡' },
+];
+
+const SYSTEM_PROMPT = `You are 'The Compass of Knowledge (מצפן הידע)', a world-class Business Consultant and Data Analyst. Your goal is to analyze the provided ChatSessions, Leads, and conversations and extracted Facts to give the business owner strategic advice.
+• Focus: Identify revenue leaks, high-converting patterns, common customer friction points, and untapped opportunities.
+• Tone: Direct, professional, insightful, and action-oriented. Use 'Business-Hebrew'.
+• Structure: Start with a 'Bottom Line' (שורה תחתונה), followed by deep insights, and end with 3 specific 'Action Items' (פעולות לביצוע).
+• Constraint: Do not just repeat data. Interpret it. If 20 people asked about price and 0 bought, tell them their pricing strategy or value proposition needs fixing.`;
+
+export default function CompassChat({ tenantId, leads = [], sessions = [] }) {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [pulseActive, setPulseActive] = useState(false);
+  const scrollRef = useRef(null);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, isLoading]);
+
+  const buildContext = () => {
+    const leadSummaries = leads.slice(0, 80).map(l => ({
+      name: l.customer_name,
+      status: l.status,
+      sentiment: l.sentiment,
+      intent_score: l.intent_score,
+      inquiry: l.inquiry_reason,
+      summary: l.summary,
+      action: l.ai_suggested_action,
+      urgency: l.urgency_level,
+      competitor: l.competitor_detected,
+      facts: l.facts_json,
+    }));
+
+    const sessionSummaries = sessions.slice(0, 50).map(s => ({
+      customer: s.customer_name,
+      status: s.status,
+      inquiry: s.inquiry_reason,
+      collected: s.collected_details,
+    }));
+
+    const statsBlock = {
+      total_leads: leads.length,
+      new: leads.filter(l => l.status === 'new').length,
+      contacted: leads.filter(l => l.status === 'contacted').length,
+      converted: leads.filter(l => l.status === 'converted').length,
+      lost: leads.filter(l => l.status === 'lost').length,
+      avg_intent: leads.length ? Math.round(leads.reduce((s, l) => s + (l.intent_score || 0), 0) / leads.length) : 0,
+      positive_sentiment: leads.filter(l => l.sentiment === 'positive').length,
+      negative_sentiment: leads.filter(l => l.sentiment === 'negative').length,
+      competitor_mentions: leads.filter(l => l.competitor_detected).length,
+      active_sessions: sessions.filter(s => s.status === 'active').length,
+    };
+
+    return JSON.stringify({ stats: statsBlock, leads: leadSummaries, sessions: sessionSummaries }, null, 0);
+  };
+
+  const handleSend = async (text) => {
+    const question = text || input.trim();
+    if (!question || isLoading) return;
+
+    const newMessages = [...messages, { role: 'user', content: question }];
+    setMessages(newMessages);
+    setInput('');
+    setIsLoading(true);
+    setPulseActive(true);
+
+    const context = buildContext();
+
+    const conversationHistory = newMessages.slice(-6).map(m =>
+      `${m.role === 'user' ? 'שאלת הבעלים' : 'המצפן'}:\n${m.content}`
+    ).join('\n\n');
+
+    const prompt = `${SYSTEM_PROMPT}
+
+=== נתוני העסק (${leads.length} לידים, ${sessions.length} שיחות) ===
+${context}
+
+=== היסטוריית שיחה ===
+${conversationHistory}
+
+=== שאלה נוכחית ===
+${question}
+
+ענה בעברית. היה ישיר וקצר לעניין. השתמש במבנה: שורה תחתונה -> תובנות -> פעולות לביצוע.`;
+
+    try {
+      const result = await base44.integrations.Core.InvokeLLM({ prompt });
+      setMessages([...newMessages, { role: 'assistant', content: result }]);
+    } catch (err) {
+      setMessages([...newMessages, { role: 'assistant', content: '❌ שגיאה בניתוח. נסה שוב.' }]);
+    } finally {
+      setIsLoading(false);
+      setPulseActive(false);
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950/80 shadow-2xl overflow-hidden">
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+            <Compass className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              מצפן הידע
+              <Sparkles className="w-4 h-4 text-amber-400" />
+            </h2>
+            <p className="text-xs text-slate-400">יועץ עסקי AI · מנתח {leads.length} לידים ו-{sessions.length} שיחות</p>
+          </div>
+        </div>
+        <AnimatePresence>
+          {pulseActive && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-500/30"
+            >
+              <Activity className="w-3.5 h-3.5 text-indigo-400 animate-pulse" />
+              <span className="text-xs text-indigo-300">מנתח נתונים...</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Messages Area */}
+      <div ref={scrollRef} className="h-[450px] overflow-y-auto px-6 py-4 space-y-4 scroll-smooth">
+        {messages.length === 0 && !isLoading && (
+          <div className="flex flex-col items-center justify-center h-full text-center gap-6">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 border border-indigo-500/20 flex items-center justify-center">
+              <Compass className="w-8 h-8 text-indigo-400" />
+            </div>
+            <div>
+              <p className="text-white font-semibold text-lg mb-1">שאל את המצפן</p>
+              <p className="text-slate-400 text-sm max-w-md">שאל כל שאלה עסקית — המצפן ינתח את הלידים, השיחות והנתונים שלך ויחזיר תובנות אסטרטגיות.</p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-2">
+              {QUICK_CHIPS.map((chip, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSend(chip.label)}
+                  className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-300 hover:bg-indigo-500/20 hover:border-indigo-500/30 hover:text-white transition-all duration-200 flex items-center gap-1.5"
+                >
+                  <span>{chip.icon}</span>
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {messages.map((msg, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-start'}`}
+          >
+            {msg.role === 'user' ? (
+              <div className="max-w-[85%] px-4 py-2.5 rounded-2xl bg-indigo-600 text-white text-sm leading-relaxed">
+                {msg.content}
+              </div>
+            ) : (
+              <div className="max-w-full w-full">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
+                    <Compass className="w-3.5 h-3.5 text-white" />
+                  </div>
+                  <span className="text-xs text-slate-400 font-medium">המצפן</span>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm text-slate-200 prose prose-sm prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 leading-relaxed [&_h1]:text-base [&_h1]:font-bold [&_h1]:text-white [&_h2]:text-sm [&_h2]:font-bold [&_h2]:text-indigo-300 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:text-indigo-200 [&_strong]:text-white [&_li]:my-0.5 [&_p]:my-1.5 [&_ul]:my-1 [&_ol]:my-1 [&_hr]:border-white/10 [&_hr]:my-3">
+                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        ))}
+
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center gap-3"
+          >
+            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
+              <Compass className="w-3.5 h-3.5 text-white animate-spin" />
+            </div>
+            <div className="flex gap-1">
+              {[0, 1, 2].map(j => (
+                <motion.div
+                  key={j}
+                  className="w-2 h-2 rounded-full bg-indigo-400"
+                  animate={{ opacity: [0.3, 1, 0.3] }}
+                  transition={{ duration: 1.2, repeat: Infinity, delay: j * 0.2 }}
+                />
+              ))}
+            </div>
+            <span className="text-xs text-slate-500">מנתח את הנתונים שלך...</span>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Quick chips after messages started */}
+      {messages.length > 0 && !isLoading && (
+        <div className="px-6 pb-2 flex flex-wrap gap-1.5">
+          {QUICK_CHIPS.slice(0, 3).map((chip, i) => (
+            <button
+              key={i}
+              onClick={() => handleSend(chip.label)}
+              className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-slate-400 hover:bg-indigo-500/20 hover:text-white transition-all"
+            >
+              {chip.icon} {chip.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Input */}
+      <div className="px-6 py-4 border-t border-white/10">
+        <form
+          onSubmit={(e) => { e.preventDefault(); handleSend(); }}
+          className="flex gap-2"
+        >
+          <Input
+            ref={inputRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="שאל את המצפן שאלה עסקית..."
+            className="flex-1 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-indigo-500/50 focus:ring-indigo-500/20"
+            disabled={isLoading}
+          />
+          <Button
+            type="submit"
+            disabled={isLoading || !input.trim()}
+            className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-lg shadow-indigo-500/25 px-4"
+          >
+            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+}
