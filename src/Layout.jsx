@@ -33,6 +33,8 @@ export default function Layout({ children, currentPageName }) {
     return <>{children}</>;
   }
 
+  // NOTE: The auth check below only applies to non-public pages
+
   const navItems = [
     { name: 'Home', label: 'בית', icon: LayoutDashboard },
     { name: 'CreateTenant', label: 'עסק חדש', icon: Building2 },
