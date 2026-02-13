@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog } from "@/components/ui/dialog";
 import { 
   ArrowRight, Settings, Users, MessageSquare, BookOpen, 
-  ExternalLink, BarChart3, UserPlus, FileText, Sparkles,
+  ExternalLink, BarChart3, UserPlus, FileText, Sparkles, Wand2,
   Phone, Mail, Clock, TrendingUp, AlertCircle, Wrench, Key, UserCheck, RefreshCw, Compass
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -26,6 +26,7 @@ import PerformanceDashboard from '@/components/dashboard/PerformanceDashboard.js
 import GeminiKeySection from '@/components/dashboard/GeminiKeySection.jsx';
 import LeadDetailDialog from '@/components/dashboard/LeadDetailDialog.jsx';
 import CompassChat from '@/components/dashboard/CompassChat.jsx';
+import ArchitectDrawer from '@/components/architect/ArchitectDrawer.jsx';
 
 export default function TenantDashboard() {
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ export default function TenantDashboard() {
   const tenantId = urlParams.get('id');
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedOverviewLead, setSelectedOverviewLead] = useState(null);
+  const [architectOpen, setArchitectOpen] = useState(false);
 
   const refreshAll = () => {
     queryClient.invalidateQueries({ queryKey: ['tenant', tenantId] });
@@ -161,6 +163,13 @@ export default function TenantDashboard() {
             <div className="flex gap-2">
               <Tooltip>
                 <TooltipTrigger asChild>
+                  <Button
+                    className="gap-2 bg-gradient-to-l from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white"
+                    onClick={() => setArchitectOpen(true)}
+                  >
+                    <Wand2 className="w-4 h-4" />
+                    דבר עם האדריכל
+                  </Button>
                   <a href={createPageUrl('PublicChat') + `?slug=${tenant?.slug}`} target="_blank">
                     <Button variant="outline" className="gap-2">
                       <ExternalLink className="w-4 h-4" />
@@ -389,6 +398,14 @@ export default function TenantDashboard() {
         </motion.div>
       </div>
     </div>
+
+    <ArchitectDrawer
+      open={architectOpen}
+      onOpenChange={setArchitectOpen}
+      tenant={tenant}
+      knowledge={knowledge}
+      tenantId={tenantId}
+    />
     </TooltipProvider>
   );
 }
