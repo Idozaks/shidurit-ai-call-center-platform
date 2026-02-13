@@ -28,15 +28,9 @@ export default function Layout({ children, currentPageName }) {
       }
     }, [currentPageName, isPublicPage]);
 
-  // Pages that should not have the sidebar/header
-  const publicPages = ['PublicChat', 'WorkerLogin', 'DoctorProfile'];
-  const isPublicPage = publicPages.includes(currentPageName);
-
   if (isPublicPage) {
     return <>{children}</>;
   }
-
-  // NOTE: The auth check below only applies to non-public pages
 
   const navItems = [
     { name: 'Home', label: 'בית', icon: LayoutDashboard },
