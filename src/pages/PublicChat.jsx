@@ -53,6 +53,7 @@ export default function PublicChat() {
   const messagesEndRef = useRef(null);
   const [sessionStatus, setSessionStatus] = useState('active');
   const [collectedDetails, setCollectedDetails] = useState({});
+  const [knowledgeBase, setKnowledgeBase] = useState('');
 
   const { data: tenant, isLoading: tenantLoading } = useQuery({
     queryKey: ['publicTenant', slug],
@@ -64,6 +65,17 @@ export default function PublicChat() {
   });
 
   const { data: doctors = [] } = useTenantDoctors(tenant?.id);
+
+  // Fetch knowledge base once tenant is loaded
+  useEffect(() => {
+    if (!tenant?.id) return;
+    (async () => {
+      const res = await publicApi({ action: 'getKnowledge', tenant_id: tenant.id });
+      const entries = res.entries || [];
+      const kb = entries.map(e => `[${e.category || 'general'}] ${e.title}:\n${e.content}`).join('\n\n');
+      setKnowledgeBase(kb);
+    })();
+  }, [tenant?.id]);
 
   const createSessionMutation = useMutation({
     mutationFn: async ({ name }) => {
