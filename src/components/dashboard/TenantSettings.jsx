@@ -242,25 +242,23 @@ export default function TenantSettings({ tenant }) {
           <CardDescription>פעולות אלו אינן הפיכות</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="destructive" 
-                onClick={handleDelete}
-                disabled={deleteMutation.isPending}
-              >
-                {deleteMutation.isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin ml-2" />
-                ) : (
-                  <Trash2 className="w-4 h-4 ml-2" />
-                )}
-                מחק עסק
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>מחק עסק לצמיתות</TooltipContent>
-          </Tooltip>
+          <Button 
+            variant="destructive" 
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            <Trash2 className="w-4 h-4 ml-2" />
+            מחק עסק
+          </Button>
         </CardContent>
       </Card>
+
+      <DeleteTenantDialog
+        open={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirmDelete={() => deleteMutation.mutate()}
+        tenantSlug={tenant.slug}
+        isDeleting={deleteMutation.isPending}
+      />
     </div>
   );
 }
