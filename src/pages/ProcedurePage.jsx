@@ -122,11 +122,17 @@ export default function ProcedurePage() {
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
         </div>
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 right-4 flex gap-2">
           <Link to={createPageUrl('DoctorsCatalog')}>
             <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/20 gap-2">
               <ArrowRight className="w-4 h-4" />
               חזרה לקטלוג
+            </Button>
+          </Link>
+          <Link to={createPageUrl('AllProcedures')}>
+            <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/20 gap-2">
+              <Stethoscope className="w-4 h-4" />
+              כל הטיפולים
             </Button>
           </Link>
         </div>

@@ -58,6 +58,7 @@ import ShiduritSystemPrompt from './pages/ShiduritSystemPrompt';
 import SpecialtyPage from './pages/SpecialtyPage';
 import TenantDashboard from './pages/TenantDashboard';
 import WorkerLogin from './pages/WorkerLogin';
+import AllProcedures from './pages/AllProcedures';
 import __Layout from './Layout.jsx';
 
 
@@ -73,6 +74,7 @@ export const PAGES = {
     "SpecialtyPage": SpecialtyPage,
     "TenantDashboard": TenantDashboard,
     "WorkerLogin": WorkerLogin,
+    "AllProcedures": AllProcedures,
 }
 
 export const pagesConfig = {
