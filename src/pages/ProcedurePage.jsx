@@ -46,36 +46,13 @@ export default function ProcedurePage() {
     setAiLoading(true);
     setAiInfo(null);
 
-    base44.integrations.Core.InvokeLLM({
-      prompt: `תן מידע רפואי כללי על הפרוצדורה/טיפול: "${procedureName}".
-כתוב בעברית, בצורה ברורה ונגישה ללקוח שאינו רופא.
-
-כלול את הסעיפים הבאים:
-1. תיאור כללי - מהו הטיפול ומה מטרתו
-2. למי זה מתאים - אינדיקציות עיקריות
-3. מהלך הטיפול - מה קורה בזמן הטיפול
-4. משך הטיפול - כמה זמן זה לוקח בממוצע
-5. תקופת החלמה - מה צפוי אחרי הטיפול
-6. יתרונות עיקריים
-
-חשוב: זהו מידע כללי בלבד ואינו מהווה ייעוץ רפואי. יש להתייעץ עם רופא מומחה.`,
-      response_json_schema: {
-        type: "object",
-        properties: {
-          description: { type: "string", description: "תיאור כללי" },
-          suitable_for: { type: "string", description: "למי מתאים" },
-          process: { type: "string", description: "מהלך הטיפול" },
-          duration: { type: "string", description: "משך הטיפול" },
-          recovery: { type: "string", description: "תקופת החלמה" },
-          benefits: { type: "array", items: { type: "string" }, description: "יתרונות" }
-        }
-      }
-    }).then(res => {
-      setAiInfo(res);
-      setAiLoading(false);
-    }).catch(() => {
-      setAiLoading(false);
-    });
+    base44.functions.invoke('getProcedureInfo', { procedureName })
+      .then(res => {
+        setAiInfo(res.data);
+        setAiLoading(false);
+      }).catch(() => {
+        setAiLoading(false);
+      });
   }, [procedureName]);
 
   if (!procedureName) {
