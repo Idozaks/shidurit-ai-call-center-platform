@@ -59,47 +59,77 @@ export default function DetailsInputModal({ open, onClose, onSubmit, themeColor 
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="p-4 space-y-3">
-              <div className="space-y-1.5">
-                <Label className="text-xs text-slate-500 flex items-center gap-1">
-                  <User className="w-3 h-3" /> שם מלא
-                </Label>
-                <Input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="ישראל ישראלי"
-                  className="h-10"
-                  autoFocus
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs text-slate-500 flex items-center gap-1">
-                  <Phone className="w-3 h-3" /> מספר טלפון
-                </Label>
-                <Input
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="050-0000000"
-                  type="tel"
-                  inputMode="tel"
-                  className="h-10"
-                  dir="ltr"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs text-slate-500 flex items-center gap-1">
-                  <Calendar className="w-3 h-3" /> מועד נוח לתור (אופציונלי)
-                </Label>
-                <Input
-                  value={preferredTime}
-                  onChange={(e) => setPreferredTime(e.target.value)}
-                  placeholder="למשל: יום ראשון בבוקר"
-                  className="h-10"
-                />
+            <form onSubmit={handleSubmit} className="p-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+                {/* Right column - existing fields */}
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-slate-500 flex items-center gap-1">
+                      <User className="w-3 h-3" /> שם מלא
+                    </Label>
+                    <Input
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="ישראל ישראלי"
+                      className="h-10"
+                      autoFocus
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-slate-500 flex items-center gap-1">
+                      <Phone className="w-3 h-3" /> מספר טלפון
+                    </Label>
+                    <Input
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="050-0000000"
+                      type="tel"
+                      inputMode="tel"
+                      className="h-10"
+                      dir="ltr"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-slate-500 flex items-center gap-1">
+                      <Calendar className="w-3 h-3" /> מועד נוח לתור (אופציונלי)
+                    </Label>
+                    <Input
+                      value={preferredTime}
+                      onChange={(e) => setPreferredTime(e.target.value)}
+                      placeholder="למשל: יום ראשון בבוקר"
+                      className="h-10"
+                    />
+                  </div>
+                </div>
+                {/* Left column - new fields */}
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-slate-500 flex items-center gap-1">
+                      <MapPin className="w-3 h-3" /> עיר (אופציונלי)
+                    </Label>
+                    <Input
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      placeholder="למשל: תל אביב"
+                      className="h-10"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-slate-500 flex items-center gap-1">
+                      <Stethoscope className="w-3 h-3" /> התמחות רפואית (אופציונלי)
+                    </Label>
+                    <Input
+                      value={specialty}
+                      onChange={(e) => setSpecialty(e.target.value)}
+                      placeholder="למשל: רפואת שיניים"
+                      className="h-10"
+                    />
+                  </div>
+                </div>
               </div>
               <Button
                 type="submit"
-                className="w-full h-11 text-white gap-2"
+                className="w-full h-11 text-white gap-2 mt-4"
                 style={{ backgroundColor: themeColor }}
                 disabled={!name.trim() && !phone.trim()}
               >
