@@ -329,7 +329,7 @@ Return exactly 10 suggestions.`,
             )}
           </div>
         </div>
-      )}
+      ))}
     </div>
   );
 }
