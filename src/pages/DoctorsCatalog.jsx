@@ -34,7 +34,7 @@ export default function DoctorsCatalog() {
 
   const tenantMap = Object.fromEntries(tenants.map(t => [t.id, t]));
 
-  const specialties = [...new Set(doctors.map(d => d.specialty).filter(Boolean))];
+  const specialties = [...new Set(doctors.map(d => d.specialty).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'he'));
 
   const filteredDoctors = doctors.filter(d => {
     const matchSearch = !searchQuery || 
