@@ -25,41 +25,52 @@ function detectDoctorNames(text, doctors) {
   for (const doctor of doctors) {
     if (matched.has(doctor.id)) continue;
     const name = doctor.name || '';
-    // Check if any prefix + part of name appears in text
+    // Remove prefix from the doctor's stored name to get the "real" name parts
+    let cleanName = name;
     for (const prefix of DOCTOR_PREFIXES) {
-      if (text.includes(prefix) && nameAppearsNear(text, prefix, name)) {
-        matched.add(doctor.id);
-        results.push(doctor);
+      if (cleanName.startsWith(prefix)) {
+        cleanName = cleanName.slice(prefix.length).trim();
         break;
       }
     }
-    // Also check plain name match (at least last name)
-    if (!matched.has(doctor.id)) {
-      const parts = name.split(' ').filter(p => p.length > 2);
-      // Need at least a meaningful part of the name to appear
-      for (const part of parts) {
-        if (part.length >= 3 && text.includes(part)) {
-          // Verify it's near a prefix or that the full name appears
-          const fullNameInText = parts.every(p => text.includes(p));
-          if (fullNameInText) {
-            matched.add(doctor.id);
-            results.push(doctor);
-            break;
-          }
+    const nameParts = cleanName.split(' ').filter(p => p.length >= 2);
+    if (nameParts.length === 0) continue;
+
+    // Strategy 1: Check if the doctor's last name (most unique part) appears near a prefix in the text
+    const lastName = nameParts[nameParts.length - 1];
+    const firstName = nameParts[0];
+    
+    // Find all prefix occurrences in text and check vicinity
+    let foundViaPrefix = false;
+    for (const prefix of DOCTOR_PREFIXES) {
+      let searchFrom = 0;
+      while (true) {
+        const idx = text.indexOf(prefix, searchFrom);
+        if (idx === -1) break;
+        const vicinity = text.substring(idx, idx + 80);
+        // Must match last name near prefix
+        if (vicinity.includes(lastName)) {
+          foundViaPrefix = true;
+          break;
         }
+        searchFrom = idx + 1;
       }
+      if (foundViaPrefix) break;
+    }
+
+    if (foundViaPrefix) {
+      matched.add(doctor.id);
+      results.push(doctor);
+      continue;
+    }
+
+    // Strategy 2: Both first AND last name appear in text (no prefix needed)
+    if (nameParts.length >= 2 && text.includes(firstName) && text.includes(lastName)) {
+      matched.add(doctor.id);
+      results.push(doctor);
     }
   }
   return results;
-}
-
-function nameAppearsNear(text, prefix, fullName) {
-  const parts = fullName.split(' ').filter(p => p.length > 1);
-  // Check if any significant part of the name appears near (within 50 chars) of the prefix
-  const prefixIdx = text.indexOf(prefix);
-  if (prefixIdx === -1) return false;
-  const vicinity = text.substring(prefixIdx, prefixIdx + 60);
-  return parts.some(part => part.length >= 2 && vicinity.includes(part));
 }
 
 export function useTenantDoctors(tenantId) {
