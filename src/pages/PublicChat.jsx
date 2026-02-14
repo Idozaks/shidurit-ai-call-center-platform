@@ -728,6 +728,8 @@ ${history}
         onClose={() => setShowDetailsModal(false)}
         onSubmit={(text) => {
           setDetailsSubmitted(true);
+          // Immediately parse and store the details from the modal text
+          parseAndStoreDetailsFromText(text);
           sendChat(text);
         }}
         themeColor={themeColor}
