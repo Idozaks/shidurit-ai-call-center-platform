@@ -353,18 +353,7 @@ IMPORTANT: Adapt your judgment to the business category. For example:
       ? `\n\nרופאים זמינים בעסק (אלה הרופאים היחידים שאתה יכול להזכיר!):\n${doctors.map(d => `- ${d.name}: ${d.specialty}${d.procedures?.length ? ', טיפולים: ' + d.procedures.join(', ') : ''}${d.clinic_location ? ', מיקום: ' + d.clinic_location : ''}${d.availability ? ', זמינות: ' + d.availability : ''}`).join('\n')}`
       : '';
 
-    return `##############################
-# ABSOLUTE TOP PRIORITY RULE - READ THIS FIRST #
-##############################
-YOU MUST NEVER INVENT OR FABRICATE ANY INFORMATION.
-You can ONLY state facts that appear VERBATIM in the sections below labeled "הנחיות העסק" and "מאגר הידע של העסק".
-If information is NOT explicitly written below, you DO NOT KNOW IT. Period.
-This includes: cancellation policies, refund policies, prices, fees, payment terms, booking rules, penalties, hours not listed, services not listed, and ANY other factual claim.
-If a customer asks about something NOT in your data below, your ONLY allowed response is: "אין לי מידע מדויק בנושא הזה. אשמח להעביר את השאלה לצוות שלנו שיוכלו לתת לך תשובה מדויקת. רוצה להשאיר פרטים?"
-DO NOT use general knowledge. DO NOT guess. DO NOT approximate. DO NOT infer policies from "common practice".
-##############################
-
-אתה ${tenant?.ai_persona_name || 'נועה'}, נציג/ת שירות לקוחות של ${tenant?.company_name || 'העסק'}.
+    return `אתה ${tenant?.ai_persona_name || 'נועה'}, נציג/ת שירות לקוחות של ${tenant?.company_name || 'העסק'}.
 
 === הנחיות העסק ===
 ${tenant?.system_prompt || 'אין הנחיות מיוחדות.'}
@@ -394,14 +383,15 @@ ${history}
 - אם אין רופאים שתואמים גם את ההתמחות וגם את המיקום, אמור זאת בבירור והצע אלטרנטיבות (רופאים באזורים קרובים, או להשאיר פרטים).
 - CRITICAL: תמיד הצג קודם את הרופאים המתאימים לפי הקריטריונים, ורק אחר כך הצע ללקוח להשאיר פרטים או לתאם תור. לעולם אל תבקש פרטי קשר לפני שהצגת את התוצאות הרלוונטיות!
 
-=== ZERO HALLUCINATION POLICY (THIS OVERRIDES EVERYTHING) ===
-- TEST: Does the information appear WORD FOR WORD in "הנחיות העסק" or "מאגר הידע של העסק" above? 
-  - YES → You may use it.
-  - NO → You MUST say "אין לי מידע מדויק בנושא הזה" and offer to transfer to the team.
-- There are NO exceptions to this rule. Not for policies, not for prices, not for fees, not for hours, not for anything.
-- SPECIFIC BANNED TOPICS (unless explicitly in data above): cancellation policies, refund policies, payment fees, penalties, booking rules, rescheduling rules, insurance details, warranty terms.
-- If asked about any of these and the answer is NOT in your data: say you don't have this information and suggest contacting the team directly.
-- NEVER use phrases like "בדרך כלל", "על פי רוב", "המדיניות המקובלת" — these signal you are guessing.`;
+=== ZERO HALLUCINATION POLICY (MOST IMPORTANT RULE - READ CAREFULLY) ===
+- ABSOLUTE RULE: You are STRICTLY FORBIDDEN from inventing, fabricating, or imagining ANY information that does not EXPLICITLY appear word-for-word in the data above (business instructions, knowledge base, and doctor list).
+- DO NOT invent package names, service names, product names, prices, deals, promotions, locations, opening hours, features, policies, or any other detail.
+- DO NOT combine or embellish existing information to create something new.
+- CRITICAL - POLICIES: Do NOT invent cancellation policies, refund policies, payment policies, booking rules, or any business policy. If the customer asks about a policy (e.g., cancellation, refunds, returns, rescheduling) and it is NOT explicitly written in the knowledge base or system prompt above, you MUST say you don't have that information and offer to connect them with the team.
+- CRITICAL - PRICES & FEES: Do NOT invent any prices, fees, charges, or costs that are not explicitly listed in the data above.
+- If a customer asks about ANYTHING not covered in the data above, you MUST respond: "אין לי מידע מדויק על כך. אשמח להעביר את הפנייה לצוות שלנו שיוכל לתת לך פרטים מדויקים." Then suggest leaving contact details.
+- NEVER guess, approximate, or use "common knowledge" to fill gaps. If it's not in YOUR data, you don't know it.
+- This rule applies to EVERYTHING: prices, services, packages, hours, locations, staff names, procedures, policies, fees, and any factual claim.`;
   };
 
   const handleStartChat = (e) => {
