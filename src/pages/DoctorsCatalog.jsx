@@ -169,12 +169,14 @@ export default function DoctorsCatalog() {
                                 <XCircle className="w-4 h-4 text-red-400 shrink-0" />
                               )}
                             </div>
-                            <Badge 
-                              className="mt-1 text-white"
-                              style={{ backgroundColor: tenant?.theme_color || '#6366f1' }}
-                            >
-                              {doctor.specialty}
-                            </Badge>
+                            <Link to={createPageUrl(`SpecialtyPage?name=${encodeURIComponent(doctor.specialty)}`)}>
+                              <Badge 
+                                className="mt-1 text-white cursor-pointer hover:opacity-80 transition-opacity"
+                                style={{ backgroundColor: tenant?.theme_color || '#6366f1' }}
+                              >
+                                {doctor.specialty}
+                              </Badge>
+                            </Link>
                             {tenant && (
                               <p className="text-xs text-slate-400 mt-1">{tenant.company_name}</p>
                             )}

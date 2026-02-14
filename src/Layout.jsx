@@ -11,7 +11,7 @@ export default function Layout({ children, currentPageName }) {
   const [currentWorker, setCurrentWorker] = React.useState(null);
   const navigate = useNavigate();
 
-  const publicPages = ['PublicChat', 'WorkerLogin', 'DoctorProfile', 'ProcedurePage'];
+  const publicPages = ['PublicChat', 'WorkerLogin', 'DoctorProfile', 'ProcedurePage', 'SpecialtyPage'];
   const isPublicPage = publicPages.includes(currentPageName);
 
   React.useEffect(() => {

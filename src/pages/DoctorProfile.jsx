@@ -122,9 +122,11 @@ export default function DoctorProfile() {
                       </Badge>
                     )}
                   </div>
-                  <Badge className="mt-2 text-white text-sm" style={{ backgroundColor: themeColor }}>
-                    {doctor.specialty}
-                  </Badge>
+                  <Link to={createPageUrl(`SpecialtyPage?name=${encodeURIComponent(doctor.specialty)}`)}>
+                    <Badge className="mt-2 text-white text-sm cursor-pointer hover:opacity-80 transition-opacity" style={{ backgroundColor: themeColor }}>
+                      {doctor.specialty}
+                    </Badge>
+                  </Link>
                   {tenant && (
                     <p className="text-sm text-slate-500 mt-2">{tenant.company_name}</p>
                   )}
