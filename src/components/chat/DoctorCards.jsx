@@ -36,11 +36,10 @@ function detectDoctorNames(text, doctors) {
     const nameParts = cleanName.split(' ').filter(p => p.length >= 2);
     if (nameParts.length === 0) continue;
 
-    // Strategy 1: Check if the doctor's last name (most unique part) appears near a prefix in the text
+    // Strategy 1: Check if ALL name parts appear near a prefix in the text
     const lastName = nameParts[nameParts.length - 1];
     const firstName = nameParts[0];
     
-    // Find all prefix occurrences in text and check vicinity
     let foundViaPrefix = false;
     for (const prefix of DOCTOR_PREFIXES) {
       let searchFrom = 0;
@@ -48,8 +47,9 @@ function detectDoctorNames(text, doctors) {
         const idx = text.indexOf(prefix, searchFrom);
         if (idx === -1) break;
         const vicinity = text.substring(idx, idx + 80);
-        // Must match last name near prefix
-        if (vicinity.includes(lastName)) {
+        // Must match ALL name parts (first AND last) near the prefix
+        const allPartsMatch = nameParts.every(part => vicinity.includes(part));
+        if (allPartsMatch) {
           foundViaPrefix = true;
           break;
         }
@@ -64,10 +64,15 @@ function detectDoctorNames(text, doctors) {
       continue;
     }
 
-    // Strategy 2: Both first AND last name appear in text (no prefix needed)
-    if (nameParts.length >= 2 && text.includes(firstName) && text.includes(lastName)) {
-      matched.add(doctor.id);
-      results.push(doctor);
+    // Strategy 2: Both first AND last name appear close together in text (no prefix needed)
+    if (nameParts.length >= 2) {
+      // Check that all parts appear within a reasonable proximity
+      const firstIdx = text.indexOf(firstName);
+      const lastIdx = text.indexOf(lastName);
+      if (firstIdx !== -1 && lastIdx !== -1 && Math.abs(firstIdx - lastIdx) < 40) {
+        matched.add(doctor.id);
+        results.push(doctor);
+      }
     }
   }
   return results;
