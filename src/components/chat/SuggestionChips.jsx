@@ -32,6 +32,7 @@ export default function SuggestionChips({ tenantId, messages, onSelect, themeCol
   const [loading, setLoading] = useState(false);
   const [showFixedActions, setShowFixedActions] = useState(false);
   const [expandedChips, setExpandedChips] = useState(true);
+  const [panelVisible, setPanelVisible] = useState(true);
   const prevMsgCountRef = useRef(0);
 
   const userMessageCount = messages.filter(m => m.role === 'user').length;
