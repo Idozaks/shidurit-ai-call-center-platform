@@ -32,7 +32,6 @@ export default function SuggestionChips({ tenantId, messages, onSelect, themeCol
   const [loading, setLoading] = useState(false);
   const [showFixedActions, setShowFixedActions] = useState(false);
   const [expandedChips, setExpandedChips] = useState(true);
-  const [panelVisible, setPanelVisible] = useState(true);
   const prevMsgCountRef = useRef(0);
 
   const userMessageCount = messages.filter(m => m.role === 'user').length;
@@ -242,19 +241,10 @@ Return exactly 10 suggestions.`,
           פעולות מהירות
           {showFixedActions ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
         </button>
-        {/* Toggle to hide/show entire suggestions panel */}
-        <button
-          onClick={() => setPanelVisible(!panelVisible)}
-          className="text-[10px] px-2 py-1 rounded-full flex items-center gap-0.5 transition-all"
-          style={{ color: `${themeColor}90` }}
-        >
-          {panelVisible ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />}
-          {panelVisible ? 'סגור הצעות' : 'פתח הצעות'}
-        </button>
       </div>
 
       {/* Collapsible fixed actions */}
-      {panelVisible && showFixedActions && (
+      {showFixedActions && (
         <motion.div
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
@@ -277,7 +267,7 @@ Return exactly 10 suggestions.`,
       )}
 
       {/* Follow-up suggestion chips */}
-      {!panelVisible ? null : loading ? (
+      {loading ? (
         <div className="flex justify-center py-1">
           <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
         </div>
@@ -329,7 +319,7 @@ Return exactly 10 suggestions.`,
             )}
           </div>
         </div>
-      ))}
+      )}
     </div>
   );
 }
