@@ -85,7 +85,15 @@ export function filterDoctorsForQuery(userMessage, allDoctors, maxResults = 10) 
  */
 export function formatDoctorsForPrompt(doctors) {
   if (!doctors || doctors.length === 0) return '';
-  return doctors.map(d => 
-    `- ${d.name}: ${d.specialty}${d.procedures?.length ? ', טיפולים: ' + d.procedures.join(', ') : ''}${d.clinic_location ? ', מיקום: ' + d.clinic_location : ''}${d.availability ? ', זמינות: ' + d.availability : ''}`
-  ).join('\n');
+  return doctors.map(d => {
+    const parts = [`- ${d.name}: ${d.specialty}`];
+    if (d.procedures?.length) parts.push(`  טיפולים: ${d.procedures.join(', ')}`);
+    if (d.clinic_location) parts.push(`  מיקום: ${d.clinic_location}`);
+    if (d.availability) parts.push(`  זמינות: ${d.availability}`);
+    if (d.years_experience) parts.push(`  ניסיון: ${d.years_experience} שנים`);
+    if (d.bio) parts.push(`  אודות: ${d.bio}`);
+    if (d.phone) parts.push(`  טלפון: ${d.phone}`);
+    if (d.email) parts.push(`  אימייל: ${d.email}`);
+    return parts.join('\n');
+  }).join('\n\n');
 }
