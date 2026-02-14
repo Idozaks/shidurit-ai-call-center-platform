@@ -185,7 +185,7 @@ export default function ProcedurePage() {
                         return (
                           <Link
                             key={doctor.id}
-                            to={createPageUrl('DoctorProfile') + `&id=${doctor.id}`}
+                            to={createPageUrl('DoctorProfile') + `?id=${doctor.id}`}
                             className="block"
                           >
                             <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-indigo-50 transition-colors cursor-pointer">
