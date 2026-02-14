@@ -164,6 +164,23 @@ export default function PublicChat() {
     }
   });
 
+  // Immediately parse details from modal submission text (synchronous, no LLM needed)
+  const parseAndStoreDetailsFromText = (text) => {
+    const merged = { ...collectedDetails };
+    // Parse known patterns from the modal: "שמי X, מספר הטלפון שלי Y, שעה נוחה: Z, עיר: W, התמחות רפואית: V"
+    const nameMatch = text.match(/שמי\s+([^,]+)/);
+    if (nameMatch) merged.full_name = nameMatch[1].trim();
+    const phoneMatch = text.match(/מספר הטלפון שלי\s+([^,]+)/);
+    if (phoneMatch) merged.phone = phoneMatch[1].trim();
+    const timeMatch = text.match(/שעה נוחה:\s+([^,]+)/);
+    if (timeMatch) merged.preferred_time = timeMatch[1].trim();
+    const cityMatch = text.match(/עיר:\s+([^,]+)/);
+    if (cityMatch) merged.city = cityMatch[1].trim();
+    const specialtyMatch = text.match(/התמחות רפואית:\s+([^,]+)/);
+    if (specialtyMatch) merged.specialty = specialtyMatch[1].trim();
+    setCollectedDetails(merged);
+  };
+
   const extractAndStoreDetails = async () => {
     const allMessages = messages.map(m => 
       `${m.role === 'user' ? 'לקוח' : 'נציג'}: ${m.content}`
