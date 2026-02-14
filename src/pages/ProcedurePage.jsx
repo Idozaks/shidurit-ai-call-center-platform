@@ -50,37 +50,28 @@ export default function ProcedurePage() {
       prompt: `תן מידע רפואי כללי על הפרוצדורה/טיפול: "${procedureName}".
 כתוב בעברית, בצורה ברורה ונגישה ללקוח שאינו רופא.
 
-כלול את הסעיפים הבאים:
-1. תיאור כללי - מהו הטיפול ומה מטרתו
-2. למי זה מתאים - אינדיקציות עיקריות
-3. מהלך הטיפול - מה קורה בזמן הטיפול
-4. משך הטיפול - כמה זמן זה לוקח בממוצע
-5. תקופת החלמה - מה צפוי אחרי הטיפול
-6. יתרונות עיקריים
+כלול את הסעיפים הבאים בפורמט markdown:
+## תיאור כללי
+מהו הטיפול ומה מטרתו
 
-חשוב: זהו מידע כללי בלבד ואינו מהווה ייעוץ רפואי. יש להתייעץ עם רופא מומחה.`,
-      response_json_schema: {
-        type: "object",
-        properties: {
-          description: { type: "string", description: "תיאור כללי" },
-          suitable_for: { type: "string", description: "למי מתאים" },
-          process: { type: "string", description: "מהלך הטיפול" },
-          duration: { type: "string", description: "משך הטיפול" },
-          recovery: { type: "string", description: "תקופת החלמה" },
-          benefits: { type: "array", items: { type: "string" }, description: "יתרונות" }
-        }
-      }
+## למי זה מתאים
+אינדיקציות עיקריות
+
+## מהלך הטיפול
+מה קורה בזמן הטיפול
+
+## משך הטיפול
+כמה זמן לוקח בממוצע
+
+## תקופת החלמה
+מה צפוי אחרי
+
+## יתרונות עיקריים
+רשימה של יתרונות
+
+חשוב: זהו מידע כללי בלבד ואינו מהווה ייעוץ רפואי.`
     }).then(res => {
-      console.log("AI procedure info response:", JSON.stringify(res));
-      // Handle both direct response and nested response formats
-      if (typeof res === 'string') {
-        try { setAiInfo(JSON.parse(res)); } catch { setAiInfo(null); }
-      } else if (res && typeof res === 'object') {
-        // If the response has a nested data/output field, unwrap it
-        setAiInfo(res.output || res.data || res);
-      } else {
-        setAiInfo(null);
-      }
+      setAiInfo(typeof res === 'string' ? res : (res?.text || res?.content || JSON.stringify(res)));
       setAiLoading(false);
     }).catch((err) => {
       console.error("AI procedure info error:", err);
