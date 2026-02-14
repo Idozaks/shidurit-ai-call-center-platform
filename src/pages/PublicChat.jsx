@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from 'react-markdown';
 import VoiceChat from '../components/chat/VoiceChat';
 import SuggestionChips from '../components/chat/SuggestionChips';
+import PublicChatMenu from '../components/chat/PublicChatMenu';
 import DetailsInputModal from '../components/chat/DetailsInputModal';
 import DoctorCards, { useTenantDoctors } from '../components/chat/DoctorCards';
 import { filterDoctorsForQuery, formatDoctorsForPrompt } from '../components/utils/doctorMatcher';
@@ -555,13 +556,14 @@ ${history}
               <Sparkles className="w-6 h-6" />
             )}
           </div>
-          <div>
+          <div className="flex-1">
             <h1 className="text-white font-bold text-lg">{tenant.company_name}</h1>
             <p className="text-white/80 text-sm flex items-center gap-1">
               <Sparkles className="w-3 h-3" />
               {tenant.ai_persona_name || 'נועה'} - עוזרת וירטואלית
             </p>
           </div>
+          <PublicChatMenu tenant={tenant} themeColor={themeColor} />
         </div>
       </header>
 
