@@ -370,10 +370,10 @@ IMPORTANT: Adapt your judgment to the business category. For example:
       ? `\n\nפרטים שהלקוח כבר מסר (אל תבקש אותם שוב!):\n${detailsParts.join('\n')}` 
       : '';
 
-    // Build doctors context - pre-filter to only relevant doctors
-    // Also check conversation history for doctor names mentioned earlier
-    const fullConversation = messages.map(m => m.content).join(' ') + ' ' + userMessage;
-    const relevantDoctors = filterDoctorsForQuery(fullConversation, doctors, 10);
+    // Build doctors context - filter by CURRENT message keywords only
+    // Pass conversation history only for doctor name lookups
+    const fullConversation = messages.map(m => m.content).join(' ');
+    const relevantDoctors = filterDoctorsForQuery(userMessage, doctors, 10, fullConversation);
     
     // Build a summary of ALL tenant doctor specialties so the AI knows what's available
     const allSpecialties = [...new Set(doctors.map(d => d.specialty).filter(Boolean))];
