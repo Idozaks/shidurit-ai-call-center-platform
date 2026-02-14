@@ -71,9 +71,19 @@ export default function ProcedurePage() {
         }
       }
     }).then(res => {
-      setAiInfo(res);
+      console.log("AI procedure info response:", JSON.stringify(res));
+      // Handle both direct response and nested response formats
+      if (typeof res === 'string') {
+        try { setAiInfo(JSON.parse(res)); } catch { setAiInfo(null); }
+      } else if (res && typeof res === 'object') {
+        // If the response has a nested data/output field, unwrap it
+        setAiInfo(res.output || res.data || res);
+      } else {
+        setAiInfo(null);
+      }
       setAiLoading(false);
-    }).catch(() => {
+    }).catch((err) => {
+      console.error("AI procedure info error:", err);
       setAiLoading(false);
     });
   }, [procedureName]);
