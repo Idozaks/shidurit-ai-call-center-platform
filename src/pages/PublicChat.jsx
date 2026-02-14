@@ -361,6 +361,8 @@ IMPORTANT: Adapt your judgment to the business category. For example:
     if (collectedDetails.phone) detailsParts.push(`טלפון: ${collectedDetails.phone}`);
     if (collectedDetails.email) detailsParts.push(`אימייל: ${collectedDetails.email}`);
     if (collectedDetails.preferred_time) detailsParts.push(`זמן מועדף: ${collectedDetails.preferred_time}`);
+    if (collectedDetails.city) detailsParts.push(`עיר: ${collectedDetails.city}`);
+    if (collectedDetails.specialty) detailsParts.push(`התמחות רפואית: ${collectedDetails.specialty}`);
     if (collectedDetails.notes) detailsParts.push(`הערות: ${collectedDetails.notes}`);
     const detailsContext = detailsParts.length > 0 
       ? `\n\nפרטים שהלקוח כבר מסר (אל תבקש אותם שוב!):\n${detailsParts.join('\n')}` 
