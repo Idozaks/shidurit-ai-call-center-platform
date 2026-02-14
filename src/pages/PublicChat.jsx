@@ -385,6 +385,16 @@ IMPORTANT: Adapt your judgment to the business category. For example:
         ? `\n\nרשימת כל הרופאים שלנו (${doctors.length} רופאים):\n${formatDoctorsForPrompt(doctors)}${specialtySummary}\n\nחפש מתוך רשימה זו בלבד רופאים רלוונטיים לבקשת הלקוח. אם יש רופאים מתאימים - הצג אותם!`
         : '';
 
+    // Build clinic-specific rules
+    const isClinic = tenant?.business_type === 'clinic';
+    const clinicRules = isClinic ? `
+=== כללים ספציפיים למרפאות ===
+- CRITICAL: אין לך יכולת לקבוע תורים בפועל! אל תתנהג כאילו אתה קובע תור ואל תציע תאריכים או שעות ספציפיים.
+- כשלקוח מבקש לקבוע תור, אסוף ממנו: עיר/אזור, תחום רפואי, ובעיה/צורך רפואי. לאחר מכן בקש פרטי קשר כדי שנציג יחזור אליו.
+- אסור לתת אבחנות רפואיות או להמליץ על תרופות ספציפיות.
+- CRITICAL מצב חירום: אם מישהו מתאר כאב חזה חריף, קוצר נשימה חמור, דימום חמור, חום מעל 40, אובדן הכרה, או כל מצב מסכן חיים - הפנה מיד למיון או חייג 101 (מד"א). אל תנסה לעזור רפואית.
+` : '';
+
     return `אתה ${tenant?.ai_persona_name || 'נועה'}, נציג/ת שירות לקוחות של ${tenant?.company_name || 'העסק'}.
 
 === הנחיות העסק ===
@@ -394,6 +404,7 @@ ${tenant?.system_prompt || 'אין הנחיות מיוחדות.'}
 ${knowledgeBase || 'אין מידע נוסף.'}
 ${doctorsContext}
 ${detailsContext}
+${clinicRules}
 
 === היסטוריית השיחה ===
 ${history}
