@@ -374,10 +374,15 @@ IMPORTANT: Adapt your judgment to the business category. For example:
     // Also check conversation history for doctor names mentioned earlier
     const fullConversation = messages.map(m => m.content).join(' ') + ' ' + userMessage;
     const relevantDoctors = filterDoctorsForQuery(fullConversation, doctors, 10);
+    
+    // Build a summary of ALL tenant doctor specialties so the AI knows what's available
+    const allSpecialties = [...new Set(doctors.map(d => d.specialty).filter(Boolean))];
+    const specialtySummary = allSpecialties.length > 0 ? `\nהתמחויות זמינות אצלנו: ${allSpecialties.join(', ')}` : '';
+    
     const doctorsContext = relevantDoctors.length > 0
-      ? `\n\nרופאים רלוונטיים שנמצאו עבור הבקשה (אלה הרופאים היחידים שאתה יכול להזכיר!):\n${formatDoctorsForPrompt(relevantDoctors)}`
+      ? `\n\nרופאים רלוונטיים שנמצאו עבור הבקשה (אלה הרופאים היחידים שאתה יכול להזכיר!):\n${formatDoctorsForPrompt(relevantDoctors)}${specialtySummary}`
       : doctors.length > 0
-        ? `\n\nלא נמצאו רופאים רלוונטיים לבקשה הספציפית. יש ברשותנו ${doctors.length} רופאים בתחומים אחרים. הצע ללקוח להשאיר פרטים או לשאול על תחום אחר.`
+        ? `\n\nרשימת כל הרופאים שלנו (${doctors.length} רופאים):\n${formatDoctorsForPrompt(doctors)}${specialtySummary}\n\nחפש מתוך רשימה זו בלבד רופאים רלוונטיים לבקשת הלקוח. אם יש רופאים מתאימים - הצג אותם!`
         : '';
 
     return `אתה ${tenant?.ai_persona_name || 'נועה'}, נציג/ת שירות לקוחות של ${tenant?.company_name || 'העסק'}.
