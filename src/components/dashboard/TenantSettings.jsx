@@ -71,11 +71,7 @@ export default function TenantSettings({ tenant }) {
     updateMutation.mutate(formData);
   };
 
-  const handleDelete = () => {
-    if (window.confirm('האם אתה בטוח שברצונך למחוק את העסק? פעולה זו אינה הפיכה.')) {
-      deleteMutation.mutate();
-    }
-  };
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   if (!tenant) return null;
 
