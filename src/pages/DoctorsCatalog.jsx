@@ -11,6 +11,7 @@ import {
   Search, Phone, Mail, MapPin, Clock, Stethoscope, 
   Loader2, CheckCircle2, XCircle, Filter, ExternalLink
 } from "lucide-react";
+import { getSpecialtyIcon } from '../components/specialties/SpecialtyIcon';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { motion, AnimatePresence } from "framer-motion";
