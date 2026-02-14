@@ -183,7 +183,7 @@ export default function AllProcedures() {
             <div className="flex flex-wrap items-center gap-2 w-full">
               <Stethoscope className="w-4 h-4 text-slate-400 shrink-0" />
               <div className="flex flex-wrap gap-1.5">
-                {allSpecialties.slice(0, selectedSpecialty !== 'all' ? allSpecialties.length : 8).map(spec => (
+                {allSpecialties.map(spec => (
                   <Button
                     key={spec}
                     variant={selectedSpecialty === spec ? 'default' : 'outline'}
@@ -192,32 +192,6 @@ export default function AllProcedures() {
                     className={`text-xs h-7 ${selectedSpecialty === spec ? 'bg-teal-600 hover:bg-teal-700' : ''}`}
                   >
                     {spec === 'all' ? 'כל ההתמחויות' : spec}
-                  </Button>
-                ))}
-                {selectedSpecialty === 'all' && allSpecialties.length > 8 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs h-7 text-slate-500"
-                    onClick={() => {
-                      const el = document.getElementById('specialty-expand');
-                      if (el) el.classList.toggle('hidden');
-                    }}
-                  >
-                    +{allSpecialties.length - 8} עוד
-                  </Button>
-                )}
-              </div>
-              <div id="specialty-expand" className={`${selectedSpecialty === 'all' ? 'hidden' : ''} flex flex-wrap gap-1.5 w-full mt-1`}>
-                {selectedSpecialty === 'all' && allSpecialties.slice(8).map(spec => (
-                  <Button
-                    key={spec}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedSpecialty(spec)}
-                    className="text-xs h-7"
-                  >
-                    {spec}
                   </Button>
                 ))}
               </div>
