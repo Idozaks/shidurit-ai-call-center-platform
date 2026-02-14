@@ -59,6 +59,7 @@ import SpecialtyPage from './pages/SpecialtyPage';
 import TenantDashboard from './pages/TenantDashboard';
 import WorkerLogin from './pages/WorkerLogin';
 import AllProcedures from './pages/AllProcedures';
+import AllSpecialties from './pages/AllSpecialties';
 import __Layout from './Layout.jsx';
 
 
@@ -75,6 +76,7 @@ export const PAGES = {
     "TenantDashboard": TenantDashboard,
     "WorkerLogin": WorkerLogin,
     "AllProcedures": AllProcedures,
+    "AllSpecialties": AllSpecialties,
 }
 
 export const pagesConfig = {
