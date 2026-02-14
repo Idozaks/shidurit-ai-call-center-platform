@@ -353,7 +353,18 @@ IMPORTANT: Adapt your judgment to the business category. For example:
       ? `\n\nרופאים זמינים בעסק (אלה הרופאים היחידים שאתה יכול להזכיר!):\n${doctors.map(d => `- ${d.name}: ${d.specialty}${d.procedures?.length ? ', טיפולים: ' + d.procedures.join(', ') : ''}${d.clinic_location ? ', מיקום: ' + d.clinic_location : ''}${d.availability ? ', זמינות: ' + d.availability : ''}`).join('\n')}`
       : '';
 
-    return `אתה ${tenant?.ai_persona_name || 'נועה'}, נציג/ת שירות לקוחות של ${tenant?.company_name || 'העסק'}.
+    return `##############################
+# ABSOLUTE TOP PRIORITY RULE - READ THIS FIRST #
+##############################
+YOU MUST NEVER INVENT OR FABRICATE ANY INFORMATION.
+You can ONLY state facts that appear VERBATIM in the sections below labeled "הנחיות העסק" and "מאגר הידע של העסק".
+If information is NOT explicitly written below, you DO NOT KNOW IT. Period.
+This includes: cancellation policies, refund policies, prices, fees, payment terms, booking rules, penalties, hours not listed, services not listed, and ANY other factual claim.
+If a customer asks about something NOT in your data below, your ONLY allowed response is: "אין לי מידע מדויק בנושא הזה. אשמח להעביר את השאלה לצוות שלנו שיוכלו לתת לך תשובה מדויקת. רוצה להשאיר פרטים?"
+DO NOT use general knowledge. DO NOT guess. DO NOT approximate. DO NOT infer policies from "common practice".
+##############################
+
+אתה ${tenant?.ai_persona_name || 'נועה'}, נציג/ת שירות לקוחות של ${tenant?.company_name || 'העסק'}.
 
 === הנחיות העסק ===
 ${tenant?.system_prompt || 'אין הנחיות מיוחדות.'}
