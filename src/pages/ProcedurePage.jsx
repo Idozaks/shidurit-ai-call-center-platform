@@ -40,45 +40,61 @@ export default function ProcedurePage() {
     d.specialty?.includes(procedureName)
   );
 
-  // Generate AI info about the procedure
+  // Load cached procedure info or generate via AI
   useEffect(() => {
     if (!procedureName) return;
     setAiLoading(true);
     setAiInfo(null);
 
-    base44.integrations.Core.InvokeLLM({
-      prompt: `תן מידע רפואי כללי על הפרוצדורה/טיפול: "${procedureName}".
+    (async () => {
+      // Check if we already have cached info
+      const existing = await base44.entities.ProcedureInfo.filter({ name: procedureName });
+      if (existing.length > 0 && (existing[0].description || existing[0].suitable_for || existing[0].process)) {
+        setAiInfo(existing[0]);
+        setAiLoading(false);
+        return;
+      }
+
+      // Generate via AI
+      const res = await base44.integrations.Core.InvokeLLM({
+        prompt: `תן מידע רפואי כללי על הפרוצדורה/טיפול: "${procedureName}".
 כתוב בעברית, בצורה ברורה ונגישה ללקוח שאינו רופא.
 כתוב פסקאות מלאות ומפורטות עבור כל שדה. כל שדה צריך להכיל לפחות 2-3 משפטים.
 עבור שדה benefits, תן בדיוק 4-6 יתרונות קצרים וברורים.`,
-      response_json_schema: {
-        type: "object",
-        properties: {
-          description: { type: "string", description: "תיאור כללי - מהו הטיפול ומה מטרתו (2-3 משפטים)" },
-          suitable_for: { type: "string", description: "למי זה מתאים - אינדיקציות עיקריות (2-3 משפטים)" },
-          process: { type: "string", description: "מהלך הטיפול - מה קורה בזמן הטיפול (2-3 משפטים)" },
-          duration: { type: "string", description: "משך הטיפול - כמה זמן לוקח בממוצע (משפט אחד)" },
-          recovery: { type: "string", description: "תקופת החלמה - מה צפוי אחרי הטיפול (1-2 משפטים)" },
-          benefits: { type: "array", items: { type: "string" }, description: "4-6 יתרונות עיקריים קצרים" }
+        response_json_schema: {
+          type: "object",
+          properties: {
+            description: { type: "string", description: "תיאור כללי - מהו הטיפול ומה מטרתו (2-3 משפטים)" },
+            suitable_for: { type: "string", description: "למי זה מתאים - אינדיקציות עיקריות (2-3 משפטים)" },
+            process: { type: "string", description: "מהלך הטיפול - מה קורה בזמן הטיפול (2-3 משפטים)" },
+            duration: { type: "string", description: "משך הטיפול - כמה זמן לוקח בממוצע (משפט אחד)" },
+            recovery: { type: "string", description: "תקופת החלמה - מה צפוי אחרי הטיפול (1-2 משפטים)" },
+            benefits: { type: "array", items: { type: "string" }, description: "4-6 יתרונות עיקריים קצרים" }
+          }
         }
-      }
-    }).then(res => {
-      console.log("AI procedure raw response:", res);
+      });
+
       let parsed = null;
       if (res && typeof res === 'object') {
         parsed = res.output || res.data || res;
       } else if (typeof res === 'string') {
         try { parsed = JSON.parse(res); } catch { parsed = null; }
       }
-      // Validate we got at least one meaningful field
+
       if (parsed && (parsed.description || parsed.suitable_for || parsed.process)) {
         setAiInfo(parsed);
+        // Save to DB for future visits
+        if (existing.length > 0) {
+          await base44.entities.ProcedureInfo.update(existing[0].id, { ...parsed, name: procedureName });
+        } else {
+          await base44.entities.ProcedureInfo.create({ ...parsed, name: procedureName });
+        }
       } else {
         setAiInfo(null);
       }
       setAiLoading(false);
-    }).catch((err) => {
-      console.error("AI procedure info error:", err);
+    })().catch((err) => {
+      console.error("Procedure info error:", err);
       setAiLoading(false);
     });
   }, [procedureName]);
