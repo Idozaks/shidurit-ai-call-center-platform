@@ -81,19 +81,49 @@ function doctorMatchesTerms(doctor, terms) {
 }
 
 /**
- * Filters doctors relevant to the user's message.
- * @param {string} userMessage - The user's chat message
+ * Filters doctors relevant to the user's CURRENT message only.
+ * Conversation history is only used for doctor name lookups (not specialty searches).
+ * @param {string} currentMessage - The user's latest chat message
  * @param {Array} allDoctors - All available doctors for the tenant
  * @param {number} maxResults - Maximum doctors to return (default 10)
+ * @param {string} conversationHistory - Full conversation text (used only for name matching)
  * @returns {Array} Filtered doctors relevant to the query
  */
-export function filterDoctorsForQuery(userMessage, allDoctors, maxResults = 10) {
-  if (!userMessage || !allDoctors?.length) return [];
+export function filterDoctorsForQuery(currentMessage, allDoctors, maxResults = 10, conversationHistory = '') {
+  if (!currentMessage || !allDoctors?.length) return [];
 
-  const terms = extractSearchTerms(userMessage);
+  // Extract search terms from CURRENT message only (not history)
+  const terms = extractSearchTerms(currentMessage);
   if (terms.length === 0) return [];
 
   const matched = allDoctors.filter(d => doctorMatchesTerms(d, terms));
+  
+  // Also check if the current message mentions a specific doctor by name from history
+  // (e.g. "מה עם ד"ר גולדשטיין?" — name was mentioned earlier)
+  if (conversationHistory) {
+    const DOCTOR_PREFIXES = ["דר'", 'ד"ר', "דר", "פרופ'", "פרופ"];
+    const msgLower = currentMessage.toLowerCase();
+    const matchedIds = new Set(matched.map(d => d.id));
+    
+    for (const doctor of allDoctors) {
+      if (matchedIds.has(doctor.id)) continue;
+      const name = doctor.name || '';
+      let cleanName = name;
+      for (const prefix of DOCTOR_PREFIXES) {
+        if (cleanName.startsWith(prefix)) {
+          cleanName = cleanName.slice(prefix.length).trim();
+          break;
+        }
+      }
+      const nameParts = cleanName.split(' ').filter(p => p.length >= 2);
+      // Check if any name part appears in the current message
+      const nameInCurrentMsg = nameParts.some(part => msgLower.includes(part.toLowerCase()));
+      if (nameInCurrentMsg) {
+        matched.push(doctor);
+      }
+    }
+  }
+  
   return matched.slice(0, maxResults);
 }
 
