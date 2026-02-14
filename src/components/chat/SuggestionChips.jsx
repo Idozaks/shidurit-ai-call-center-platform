@@ -220,105 +220,121 @@ Return exactly 10 suggestions.`,
   const row2 = followUpSuggestions.slice(midpoint);
 
   return (
-    <div className="py-2 space-y-2">
-      {/* Toggle button for fixed actions */}
-      <div className="flex items-center justify-center gap-2">
-        {showDetailsChip && (
-          <button
-            onClick={() => onOpenDetailsModal?.()}
-            disabled={disabled}
-            className="text-sm px-4 py-1.5 rounded-full border-2 transition-all whitespace-nowrap disabled:opacity-50 font-medium"
-            style={{ borderColor: themeColor, color: 'white', backgroundColor: themeColor }}
-          >
-            📋 השאר פרטים
-          </button>
-        )}
+    <div className="py-1 space-y-1">
+      {/* Master drawer toggle */}
+      <div className="flex justify-center">
         <button
-          onClick={() => setShowFixedActions(!showFixedActions)}
-          className="text-xs px-3 py-1.5 rounded-full border transition-all flex items-center gap-1 hover:shadow-sm"
-          style={{ borderColor: `${themeColor}30`, color: `${themeColor}90` }}
+          onClick={() => setDrawerOpen(!drawerOpen)}
+          className="text-[10px] px-2 py-0.5 rounded-full flex items-center gap-0.5 transition-all"
+          style={{ color: `${themeColor}90` }}
         >
-          <Grid3X3 className="w-3 h-3" />
-          פעולות מהירות
-          {showFixedActions ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          {drawerOpen ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />}
+          {drawerOpen ? 'הסתר הצעות' : 'הצג הצעות'}
         </button>
       </div>
 
-      {/* Collapsible fixed actions */}
-      {showFixedActions && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          className="flex flex-wrap justify-center gap-2 overflow-hidden"
-        >
-          {FIXED_ACTIONS.map((action, i) => (
+      {drawerOpen && (
+        <div className="space-y-2">
+          {/* Toggle button for fixed actions */}
+          <div className="flex items-center justify-center gap-2">
+            {showDetailsChip && (
+              <button
+                onClick={() => onOpenDetailsModal?.()}
+                disabled={disabled}
+                className="text-sm px-4 py-1.5 rounded-full border-2 transition-all whitespace-nowrap disabled:opacity-50 font-medium"
+                style={{ borderColor: themeColor, color: 'white', backgroundColor: themeColor }}
+              >
+                📋 השאר פרטים
+              </button>
+            )}
             <button
-              key={`action-${i}`}
-              onClick={() => handleChipClick(action.label)}
-              disabled={disabled}
-              className="text-sm px-3.5 py-1.5 rounded-full border transition-all whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5 hover:shadow-md bg-white/80 backdrop-blur-sm"
-              style={chipBaseStyle}
+              onClick={() => setShowFixedActions(!showFixedActions)}
+              className="text-xs px-3 py-1.5 rounded-full border transition-all flex items-center gap-1 hover:shadow-sm"
+              style={{ borderColor: `${themeColor}30`, color: `${themeColor}90` }}
             >
-              <action.icon className="w-3.5 h-3.5" />
-              {action.label}
-            </button>
-          ))}
-        </motion.div>
-      )}
-
-      {/* Follow-up suggestion chips */}
-      {loading ? (
-        <div className="flex justify-center py-1">
-          <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-        </div>
-      ) : followUpSuggestions.length > 0 && (
-        <div>
-          {/* Collapse/Expand toggle */}
-          <div className="flex justify-center mb-1.5">
-            <button
-              onClick={() => setExpandedChips(!expandedChips)}
-              className="text-[10px] px-2 py-0.5 rounded-full flex items-center gap-0.5 transition-all"
-              style={{ color: `${themeColor}90` }}
-            >
-              {expandedChips ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-              {expandedChips ? 'צמצם הצעות' : 'הרחב הצעות'}
+              <Grid3X3 className="w-3 h-3" />
+              פעולות מהירות
+              {showFixedActions ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
           </div>
-          <div className="overflow-x-auto pb-1" style={{ scrollbarWidth: 'thin', scrollbarColor: `${themeColor}40 transparent` }}>
-            <div className="flex gap-2 w-max">
-              {row1.map((text, i) => (
+
+          {/* Collapsible fixed actions */}
+          {showFixedActions && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="flex flex-wrap justify-center gap-2 overflow-hidden"
+            >
+              {FIXED_ACTIONS.map((action, i) => (
                 <button
-                  key={`s1-${i}`}
-                  onClick={() => handleChipClick(text)}
+                  key={`action-${i}`}
+                  onClick={() => handleChipClick(action.label)}
                   disabled={disabled}
-                  className="text-sm px-3 py-1.5 rounded-full border-[1.5px] transition-all whitespace-nowrap disabled:opacity-50 flex-shrink-0 shadow-sm hover:shadow-md"
-                  style={{ borderColor: `${themeColor}50`, color: themeColor, backgroundColor: `${themeColor}10` }}
-                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}20`; e.currentTarget.style.borderColor = `${themeColor}70`; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}10`; e.currentTarget.style.borderColor = `${themeColor}50`; }}
+                  className="text-sm px-3.5 py-1.5 rounded-full border transition-all whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5 hover:shadow-md bg-white/80 backdrop-blur-sm"
+                  style={chipBaseStyle}
                 >
-                  {text}
+                  <action.icon className="w-3.5 h-3.5" />
+                  {action.label}
                 </button>
               ))}
+            </motion.div>
+          )}
+
+          {/* Follow-up suggestion chips */}
+          {loading ? (
+            <div className="flex justify-center py-1">
+              <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
             </div>
-            {expandedChips && row2.length > 0 && (
-              <div className="flex gap-2 w-max mt-1.5">
-                {row2.map((text, i) => (
-                  <button
-                    key={`s2-${i}`}
-                    onClick={() => handleChipClick(text)}
-                    disabled={disabled}
-                    className="text-sm px-3 py-1.5 rounded-full border-[1.5px] transition-all whitespace-nowrap disabled:opacity-50 flex-shrink-0 shadow-sm hover:shadow-md"
-                    style={{ borderColor: `${themeColor}50`, color: themeColor, backgroundColor: `${themeColor}10` }}
-                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}20`; e.currentTarget.style.borderColor = `${themeColor}70`; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}10`; e.currentTarget.style.borderColor = `${themeColor}50`; }}
-                  >
-                    {text}
-                  </button>
-                ))}
+          ) : followUpSuggestions.length > 0 && (
+            <div>
+              {/* Collapse/Expand toggle */}
+              <div className="flex justify-center mb-1.5">
+                <button
+                  onClick={() => setExpandedChips(!expandedChips)}
+                  className="text-[10px] px-2 py-0.5 rounded-full flex items-center gap-0.5 transition-all"
+                  style={{ color: `${themeColor}90` }}
+                >
+                  {expandedChips ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                  {expandedChips ? 'צמצם הצעות' : 'הרחב הצעות'}
+                </button>
               </div>
-            )}
-          </div>
+              <div className="overflow-x-auto pb-1" style={{ scrollbarWidth: 'thin', scrollbarColor: `${themeColor}40 transparent` }}>
+                <div className="flex gap-2 w-max">
+                  {row1.map((text, i) => (
+                    <button
+                      key={`s1-${i}`}
+                      onClick={() => handleChipClick(text)}
+                      disabled={disabled}
+                      className="text-sm px-3 py-1.5 rounded-full border-[1.5px] transition-all whitespace-nowrap disabled:opacity-50 flex-shrink-0 shadow-sm hover:shadow-md"
+                      style={{ borderColor: `${themeColor}50`, color: themeColor, backgroundColor: `${themeColor}10` }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}20`; e.currentTarget.style.borderColor = `${themeColor}70`; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}10`; e.currentTarget.style.borderColor = `${themeColor}50`; }}
+                    >
+                      {text}
+                    </button>
+                  ))}
+                </div>
+                {expandedChips && row2.length > 0 && (
+                  <div className="flex gap-2 w-max mt-1.5">
+                    {row2.map((text, i) => (
+                      <button
+                        key={`s2-${i}`}
+                        onClick={() => handleChipClick(text)}
+                        disabled={disabled}
+                        className="text-sm px-3 py-1.5 rounded-full border-[1.5px] transition-all whitespace-nowrap disabled:opacity-50 flex-shrink-0 shadow-sm hover:shadow-md"
+                        style={{ borderColor: `${themeColor}50`, color: themeColor, backgroundColor: `${themeColor}10` }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}20`; e.currentTarget.style.borderColor = `${themeColor}70`; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}10`; e.currentTarget.style.borderColor = `${themeColor}50`; }}
+                      >
+                        {text}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
