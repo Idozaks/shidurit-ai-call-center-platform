@@ -277,7 +277,7 @@ Return exactly 10 suggestions.`,
       )}
 
       {/* Follow-up suggestion chips */}
-      {loading ? (
+      {!panelVisible ? null : loading ? (
         <div className="flex justify-center py-1">
           <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
         </div>
