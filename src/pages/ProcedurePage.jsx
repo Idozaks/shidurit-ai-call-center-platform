@@ -49,29 +49,33 @@ export default function ProcedurePage() {
     base44.integrations.Core.InvokeLLM({
       prompt: `תן מידע רפואי כללי על הפרוצדורה/טיפול: "${procedureName}".
 כתוב בעברית, בצורה ברורה ונגישה ללקוח שאינו רופא.
-
-כלול את הסעיפים הבאים בפורמט markdown:
-## תיאור כללי
-מהו הטיפול ומה מטרתו
-
-## למי זה מתאים
-אינדיקציות עיקריות
-
-## מהלך הטיפול
-מה קורה בזמן הטיפול
-
-## משך הטיפול
-כמה זמן לוקח בממוצע
-
-## תקופת החלמה
-מה צפוי אחרי
-
-## יתרונות עיקריים
-רשימה של יתרונות
-
-חשוב: זהו מידע כללי בלבד ואינו מהווה ייעוץ רפואי.`
+כתוב פסקאות מלאות ומפורטות עבור כל שדה. כל שדה צריך להכיל לפחות 2-3 משפטים.
+עבור שדה benefits, תן בדיוק 4-6 יתרונות קצרים וברורים.`,
+      response_json_schema: {
+        type: "object",
+        properties: {
+          description: { type: "string", description: "תיאור כללי - מהו הטיפול ומה מטרתו (2-3 משפטים)" },
+          suitable_for: { type: "string", description: "למי זה מתאים - אינדיקציות עיקריות (2-3 משפטים)" },
+          process: { type: "string", description: "מהלך הטיפול - מה קורה בזמן הטיפול (2-3 משפטים)" },
+          duration: { type: "string", description: "משך הטיפול - כמה זמן לוקח בממוצע (משפט אחד)" },
+          recovery: { type: "string", description: "תקופת החלמה - מה צפוי אחרי הטיפול (1-2 משפטים)" },
+          benefits: { type: "array", items: { type: "string" }, description: "4-6 יתרונות עיקריים קצרים" }
+        }
+      }
     }).then(res => {
-      setAiInfo(typeof res === 'string' ? res : (res?.text || res?.content || JSON.stringify(res)));
+      console.log("AI procedure raw response:", res);
+      let parsed = null;
+      if (res && typeof res === 'object') {
+        parsed = res.output || res.data || res;
+      } else if (typeof res === 'string') {
+        try { parsed = JSON.parse(res); } catch { parsed = null; }
+      }
+      // Validate we got at least one meaningful field
+      if (parsed && (parsed.description || parsed.suitable_for || parsed.process)) {
+        setAiInfo(parsed);
+      } else {
+        setAiInfo(null);
+      }
       setAiLoading(false);
     }).catch((err) => {
       console.error("AI procedure info error:", err);
