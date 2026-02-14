@@ -18,11 +18,15 @@ export default function DetailsInputModal({ open, onClose, onSubmit, themeColor 
     if (name.trim()) parts.push(`שמי ${name.trim()}`);
     if (phone.trim()) parts.push(`מספר הטלפון שלי ${phone.trim()}`);
     if (preferredTime.trim()) parts.push(`שעה נוחה: ${preferredTime.trim()}`);
+    if (city.trim()) parts.push(`עיר: ${city.trim()}`);
+    if (specialty.trim()) parts.push(`התמחות רפואית: ${specialty.trim()}`);
     if (parts.length > 0) {
       onSubmit(parts.join(', '));
       setName('');
       setPhone('');
       setPreferredTime('');
+      setCity('');
+      setSpecialty('');
       onClose();
     }
   };
