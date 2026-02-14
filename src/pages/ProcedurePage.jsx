@@ -142,56 +142,11 @@ export default function ProcedurePage() {
                       <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
                       <span className="text-sm">מייצר מידע על {procedureName}...</span>
                     </div>
-                  ) : aiInfo && (aiInfo.description || aiInfo.suitable_for || aiInfo.process) ? (
+                  ) : aiInfo ? (
                     <div className="space-y-5">
-                      {aiInfo.description && (
-                        <div>
-                          <h3 className="font-semibold text-slate-700 mb-1 flex items-center gap-2">
-                            <BookOpen className="w-4 h-4 text-indigo-500" />
-                            תיאור כללי
-                          </h3>
-                          <p className="text-sm text-slate-600 leading-relaxed">{aiInfo.description}</p>
-                        </div>
-                      )}
-                      {aiInfo.suitable_for && (
-                        <div>
-                          <h3 className="font-semibold text-slate-700 mb-1">למי זה מתאים?</h3>
-                          <p className="text-sm text-slate-600 leading-relaxed">{aiInfo.suitable_for}</p>
-                        </div>
-                      )}
-                      {aiInfo.process && (
-                        <div>
-                          <h3 className="font-semibold text-slate-700 mb-1">מהלך הטיפול</h3>
-                          <p className="text-sm text-slate-600 leading-relaxed">{aiInfo.process}</p>
-                        </div>
-                      )}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {aiInfo.duration && (
-                          <div className="p-3 rounded-lg bg-indigo-50">
-                            <p className="text-xs text-indigo-600 font-medium mb-1">משך הטיפול</p>
-                            <p className="text-sm text-slate-700">{aiInfo.duration}</p>
-                          </div>
-                        )}
-                        {aiInfo.recovery && (
-                          <div className="p-3 rounded-lg bg-violet-50">
-                            <p className="text-xs text-violet-600 font-medium mb-1">תקופת החלמה</p>
-                            <p className="text-sm text-slate-700">{aiInfo.recovery}</p>
-                          </div>
-                        )}
+                      <div className="prose prose-sm prose-slate max-w-none text-sm leading-relaxed">
+                        <ReactMarkdown>{aiInfo}</ReactMarkdown>
                       </div>
-                      {aiInfo.benefits?.length > 0 && (
-                        <div>
-                          <h3 className="font-semibold text-slate-700 mb-2">יתרונות עיקריים</h3>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {aiInfo.benefits.map((b, i) => (
-                              <div key={i} className="flex items-start gap-2 p-2 rounded-lg bg-green-50">
-                                <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-                                <span className="text-sm text-slate-700">{b}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
 
                       <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200 mt-4">
                         <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
