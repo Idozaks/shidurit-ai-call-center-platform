@@ -349,10 +349,13 @@ IMPORTANT: Adapt your judgment to the business category. For example:
       ? `\n\nפרטים שהלקוח כבר מסר (אל תבקש אותם שוב!):\n${detailsParts.join('\n')}` 
       : '';
 
-    // Build doctors context
-    const doctorsContext = doctors.length > 0
-      ? `\n\nרופאים זמינים בעסק (אלה הרופאים היחידים שאתה יכול להזכיר!):\n${doctors.map(d => `- ${d.name}: ${d.specialty}${d.procedures?.length ? ', טיפולים: ' + d.procedures.join(', ') : ''}${d.clinic_location ? ', מיקום: ' + d.clinic_location : ''}${d.availability ? ', זמינות: ' + d.availability : ''}`).join('\n')}`
-      : '';
+    // Build doctors context - pre-filter to only relevant doctors
+    const relevantDoctors = filterDoctorsForQuery(userMessage, doctors, 10);
+    const doctorsContext = relevantDoctors.length > 0
+      ? `\n\nרופאים רלוונטיים שנמצאו עבור הבקשה (אלה הרופאים היחידים שאתה יכול להזכיר!):\n${formatDoctorsForPrompt(relevantDoctors)}`
+      : doctors.length > 0
+        ? `\n\nלא נמצאו רופאים רלוונטיים לבקשה הספציפית. יש ברשותנו ${doctors.length} רופאים בתחומים אחרים. הצע ללקוח להשאיר פרטים או לשאול על תחום אחר.`
+        : '';
 
     return `אתה ${tenant?.ai_persona_name || 'נועה'}, נציג/ת שירות לקוחות של ${tenant?.company_name || 'העסק'}.
 
