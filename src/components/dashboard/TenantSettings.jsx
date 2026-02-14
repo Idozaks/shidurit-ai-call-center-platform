@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Settings, Sparkles, Palette, MessageSquare, 
   Save, Loader2, AlertTriangle, Trash2
@@ -23,6 +24,7 @@ export default function TenantSettings({ tenant }) {
   const [formData, setFormData] = useState({
     company_name: '',
     slug: '',
+    business_type: 'business',
     theme_color: '#6366f1',
     logo_url: '',
     ai_persona_name: 'נועה',
@@ -39,6 +41,7 @@ export default function TenantSettings({ tenant }) {
       setFormData({
         company_name: tenant.company_name || '',
         slug: tenant.slug || '',
+        business_type: tenant.business_type || 'business',
         theme_color: tenant.theme_color || '#6366f1',
         logo_url: tenant.logo_url || '',
         ai_persona_name: tenant.ai_persona_name || 'נועה',
@@ -104,6 +107,25 @@ export default function TenantSettings({ tenant }) {
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                   />
                 </div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>סוג עסק</Label>
+                <Select
+                  value={formData.business_type}
+                  onValueChange={(value) => setFormData({ ...formData, business_type: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="business">עסק</SelectItem>
+                    <SelectItem value="clinic">מרפאה</SelectItem>
+                    <SelectItem value="other">אחר</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

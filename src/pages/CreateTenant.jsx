@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   ArrowRight, Building2, Palette, Sparkles, MessageSquare, 
   Upload, Loader2, CheckCircle
@@ -23,6 +24,7 @@ export default function CreateTenant() {
   const [formData, setFormData] = useState({
     company_name: '',
     slug: '',
+    business_type: 'business',
     theme_color: '#6366f1',
     ai_persona_name: 'נועה',
     welcome_message: 'שלום! איך אוכל לעזור לך היום?',
@@ -111,18 +113,36 @@ export default function CreateTenant() {
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="slug">כתובת URL</Label>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-slate-500">/c/</span>
-                      <Input
-                        id="slug"
-                        value={formData.slug}
-                        onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                        placeholder="slug"
-                        required
-                        className="flex-1"
-                      />
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="slug">כתובת URL</Label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-slate-500">/c/</span>
+                        <Input
+                          id="slug"
+                          value={formData.slug}
+                          onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                          placeholder="slug"
+                          required
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>סוג עסק</Label>
+                      <Select
+                        value={formData.business_type}
+                        onValueChange={(value) => setFormData({ ...formData, business_type: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="business">עסק</SelectItem>
+                          <SelectItem value="clinic">מרפאה</SelectItem>
+                          <SelectItem value="other">אחר</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
 
