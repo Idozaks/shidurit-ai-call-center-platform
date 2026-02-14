@@ -96,9 +96,17 @@ export default function DoctorsCatalog() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">כל ההתמחויות</SelectItem>
-              {specialties.map(s => (
-                <SelectItem key={s} value={s}>{s}</SelectItem>
-              ))}
+              {specialties.map(s => {
+                const Icon = getSpecialtyIcon(s);
+                return (
+                  <SelectItem key={s} value={s}>
+                    <span className="flex items-center gap-2">
+                      <Icon className="w-4 h-4 text-slate-500 shrink-0" />
+                      {s}
+                    </span>
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
           <Select value={availabilityFilter} onValueChange={setAvailabilityFilter}>
