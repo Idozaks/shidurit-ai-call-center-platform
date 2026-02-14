@@ -9,6 +9,8 @@ export default function DetailsInputModal({ open, onClose, onSubmit, themeColor 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [preferredTime, setPreferredTime] = useState('');
+  const [city, setCity] = useState('');
+  const [specialty, setSpecialty] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
