@@ -154,19 +154,19 @@ export default function ProcedurePage() {
                             <BookOpen className="w-4 h-4 text-indigo-500" />
                             תיאור כללי
                           </h3>
-                          <p className="text-sm text-slate-600 leading-relaxed">{aiInfo.description}</p>
+                          <p className="text-base md:text-sm text-slate-600 leading-relaxed">{aiInfo.description}</p>
                         </div>
                       )}
                       {aiInfo.suitable_for && (
                         <div>
                           <h3 className="font-semibold text-slate-700 mb-1">למי זה מתאים?</h3>
-                          <p className="text-sm text-slate-600 leading-relaxed">{aiInfo.suitable_for}</p>
+                          <p className="text-base md:text-sm text-slate-600 leading-relaxed">{aiInfo.suitable_for}</p>
                         </div>
                       )}
                       {aiInfo.process && (
                         <div>
                           <h3 className="font-semibold text-slate-700 mb-1">מהלך הטיפול</h3>
-                          <p className="text-sm text-slate-600 leading-relaxed">{aiInfo.process}</p>
+                          <p className="text-base md:text-sm text-slate-600 leading-relaxed">{aiInfo.process}</p>
                         </div>
                       )}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -176,13 +176,13 @@ export default function ProcedurePage() {
                               <Clock className="w-3.5 h-3.5 text-indigo-600" />
                               <p className="text-xs text-indigo-600 font-medium">משך הטיפול</p>
                             </div>
-                            <p className="text-sm text-slate-700">{aiInfo.duration}</p>
+                            <p className="text-base md:text-sm text-slate-700">{aiInfo.duration}</p>
                           </div>
                         )}
                         {aiInfo.recovery && (
                           <div className="p-3 rounded-lg bg-violet-50">
                             <p className="text-xs text-violet-600 font-medium mb-1">תקופת החלמה</p>
-                            <p className="text-sm text-slate-700">{aiInfo.recovery}</p>
+                            <p className="text-base md:text-sm text-slate-700">{aiInfo.recovery}</p>
                           </div>
                         )}
                       </div>
@@ -193,7 +193,7 @@ export default function ProcedurePage() {
                             {aiInfo.benefits.map((b, i) => (
                               <div key={i} className="flex items-start gap-2 p-2 rounded-lg bg-green-50">
                                 <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-                                <span className="text-sm text-slate-700">{b}</span>
+                                <span className="text-base md:text-sm text-slate-700">{b}</span>
                               </div>
                             ))}
                           </div>
@@ -202,7 +202,7 @@ export default function ProcedurePage() {
 
                       <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200 mt-4">
                         <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                        <p className="text-xs text-amber-700">
+                        <p className="text-sm md:text-xs text-amber-700">
                           מידע זה נוצר באמצעות AI ומיועד למטרות מידע כלליות בלבד. אינו מהווה ייעוץ רפואי. יש להתייעץ עם רופא מומחה.
                         </p>
                       </div>
