@@ -151,7 +151,7 @@ export default function ProcedurePage() {
                       <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
                       <span className="text-sm">מייצר מידע על {procedureName}...</span>
                     </div>
-                  ) : aiInfo ? (
+                  ) : aiInfo && (aiInfo.description || aiInfo.suitable_for || aiInfo.process) ? (
                     <div className="space-y-5">
                       {aiInfo.description && (
                         <div>
