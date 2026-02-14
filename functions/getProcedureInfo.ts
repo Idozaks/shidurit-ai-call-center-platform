@@ -69,7 +69,9 @@ Return a JSON object with this structure:
     }
 
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    const result = JSON.parse(text);
+    // Clean up any markdown code fences or extra whitespace
+    const cleanText = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    const result = JSON.parse(cleanText);
     
     return Response.json(result);
   } catch (error) {
