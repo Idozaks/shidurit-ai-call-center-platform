@@ -383,13 +383,15 @@ ${history}
 - אם אין רופאים שתואמים גם את ההתמחות וגם את המיקום, אמור זאת בבירור והצע אלטרנטיבות (רופאים באזורים קרובים, או להשאיר פרטים).
 - CRITICAL: תמיד הצג קודם את הרופאים המתאימים לפי הקריטריונים, ורק אחר כך הצע ללקוח להשאיר פרטים או לתאם תור. לעולם אל תבקש פרטי קשר לפני שהצגת את התוצאות הרלוונטיות!
 
-=== ZERO HALLUCINATION POLICY (MOST IMPORTANT RULE) ===
-- ABSOLUTE RULE: You are STRICTLY FORBIDDEN from inventing, fabricating, or imagining ANY information that does not EXPLICITLY appear in the data above (business instructions, knowledge base, and doctor list).
-- DO NOT invent package names, service names, product names, prices, deals, promotions, locations, opening hours, features, or any other detail.
-- DO NOT combine or embellish existing information to create something new. For example, if the data mentions "בנג'י" and "טיפוס" separately, do NOT invent a package that combines them with BBQ or other things not in the data.
-- If a customer asks about something not covered in the data above (e.g., corporate events, specific packages, group deals that aren't listed), you MUST say: "אין לי מידע מדויק על כך. אשמח להעביר את הפנייה לצוות שלנו שיוכל לתת לך פרטים מדויקים." Then suggest leaving contact details.
-- NEVER guess or approximate. If the exact answer isn't in the data, say you don't have that information.
-- This rule applies to EVERYTHING: prices, services, packages, hours, locations, staff names, procedures, and any factual claim.`;
+=== ZERO HALLUCINATION POLICY (MOST IMPORTANT RULE - READ CAREFULLY) ===
+- ABSOLUTE RULE: You are STRICTLY FORBIDDEN from inventing, fabricating, or imagining ANY information that does not EXPLICITLY appear word-for-word in the data above (business instructions, knowledge base, and doctor list).
+- DO NOT invent package names, service names, product names, prices, deals, promotions, locations, opening hours, features, policies, or any other detail.
+- DO NOT combine or embellish existing information to create something new.
+- CRITICAL - POLICIES: Do NOT invent cancellation policies, refund policies, payment policies, booking rules, or any business policy. If the customer asks about a policy (e.g., cancellation, refunds, returns, rescheduling) and it is NOT explicitly written in the knowledge base or system prompt above, you MUST say you don't have that information and offer to connect them with the team.
+- CRITICAL - PRICES & FEES: Do NOT invent any prices, fees, charges, or costs that are not explicitly listed in the data above.
+- If a customer asks about ANYTHING not covered in the data above, you MUST respond: "אין לי מידע מדויק על כך. אשמח להעביר את הפנייה לצוות שלנו שיוכל לתת לך פרטים מדויקים." Then suggest leaving contact details.
+- NEVER guess, approximate, or use "common knowledge" to fill gaps. If it's not in YOUR data, you don't know it.
+- This rule applies to EVERYTHING: prices, services, packages, hours, locations, staff names, procedures, policies, fees, and any factual claim.`;
   };
 
   const handleStartChat = (e) => {
