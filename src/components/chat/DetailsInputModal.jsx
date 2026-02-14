@@ -47,7 +47,7 @@ export default function DetailsInputModal({ open, onClose, onSubmit, themeColor 
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 60, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden"
+            className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden"
             dir="rtl"
           >
             <div 
