@@ -47,6 +47,8 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import AllProcedures from './pages/AllProcedures';
+import AllSpecialties from './pages/AllSpecialties';
 import ConversationView from './pages/ConversationView';
 import CreateTenant from './pages/CreateTenant';
 import DoctorProfile from './pages/DoctorProfile';
@@ -58,12 +60,12 @@ import ShiduritSystemPrompt from './pages/ShiduritSystemPrompt';
 import SpecialtyPage from './pages/SpecialtyPage';
 import TenantDashboard from './pages/TenantDashboard';
 import WorkerLogin from './pages/WorkerLogin';
-import AllProcedures from './pages/AllProcedures';
-import AllSpecialties from './pages/AllSpecialties';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "AllProcedures": AllProcedures,
+    "AllSpecialties": AllSpecialties,
     "ConversationView": ConversationView,
     "CreateTenant": CreateTenant,
     "DoctorProfile": DoctorProfile,
@@ -75,8 +77,6 @@ export const PAGES = {
     "SpecialtyPage": SpecialtyPage,
     "TenantDashboard": TenantDashboard,
     "WorkerLogin": WorkerLogin,
-    "AllProcedures": AllProcedures,
-    "AllSpecialties": AllSpecialties,
 }
 
 export const pagesConfig = {

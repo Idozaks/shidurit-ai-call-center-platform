@@ -33,6 +33,7 @@ function categorize(procedureName) {
 export default function AllProcedures() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedSpecialty, setSelectedSpecialty] = useState('all');
   const [sortOrder, setSortOrder] = useState('asc'); // asc or desc
   const [viewMode, setViewMode] = useState('grid'); // grid or list
   const [selectedLetter, setSelectedLetter] = useState(null);
@@ -67,6 +68,13 @@ export default function AllProcedures() {
     return ['all', ...Array.from(cats).sort()];
   }, [proceduresData]);
 
+  // Get all specialties
+  const allSpecialties = useMemo(() => {
+    const specs = new Set();
+    proceduresData.forEach(p => p.specialties.forEach(s => specs.add(s)));
+    return ['all', ...Array.from(specs).sort((a, b) => a.localeCompare(b, 'he'))];
+  }, [proceduresData]);
+
   // Hebrew alphabet for filtering
   const hebrewLetters = 'אבגדהוזחטיכלמנסעפצקרשת'.split('');
 
@@ -85,6 +93,11 @@ export default function AllProcedures() {
       result = result.filter(p => p.category === selectedCategory);
     }
 
+    // Specialty filter
+    if (selectedSpecialty !== 'all') {
+      result = result.filter(p => p.specialties.includes(selectedSpecialty));
+    }
+
     // Letter filter
     if (selectedLetter) {
       result = result.filter(p => p.name.startsWith(selectedLetter));
@@ -97,7 +110,7 @@ export default function AllProcedures() {
     });
 
     return result;
-  }, [proceduresData, searchQuery, selectedCategory, sortOrder, selectedLetter]);
+  }, [proceduresData, searchQuery, selectedCategory, selectedSpecialty, sortOrder, selectedLetter]);
 
   if (isLoading) {
     return (
@@ -166,6 +179,50 @@ export default function AllProcedures() {
               </Button>
             ))}
 
+            {/* Specialty pills */}
+            <div className="flex flex-wrap items-center gap-2 w-full">
+              <Stethoscope className="w-4 h-4 text-slate-400 shrink-0" />
+              <div className="flex flex-wrap gap-1.5">
+                {allSpecialties.slice(0, selectedSpecialty !== 'all' ? allSpecialties.length : 8).map(spec => (
+                  <Button
+                    key={spec}
+                    variant={selectedSpecialty === spec ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedSpecialty(spec)}
+                    className={`text-xs h-7 ${selectedSpecialty === spec ? 'bg-teal-600 hover:bg-teal-700' : ''}`}
+                  >
+                    {spec === 'all' ? 'כל ההתמחויות' : spec}
+                  </Button>
+                ))}
+                {selectedSpecialty === 'all' && allSpecialties.length > 8 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs h-7 text-slate-500"
+                    onClick={() => {
+                      const el = document.getElementById('specialty-expand');
+                      if (el) el.classList.toggle('hidden');
+                    }}
+                  >
+                    +{allSpecialties.length - 8} עוד
+                  </Button>
+                )}
+              </div>
+              <div id="specialty-expand" className={`${selectedSpecialty === 'all' ? 'hidden' : ''} flex flex-wrap gap-1.5 w-full mt-1`}>
+                {selectedSpecialty === 'all' && allSpecialties.slice(8).map(spec => (
+                  <Button
+                    key={spec}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedSpecialty(spec)}
+                    className="text-xs h-7"
+                  >
+                    {spec}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
             <div className="mr-auto flex items-center gap-1">
               <Button
                 variant="ghost"
@@ -227,6 +284,7 @@ export default function AllProcedures() {
         <p className="text-sm text-slate-500 mb-4">
           {filteredProcedures.length} תוצאות
           {selectedCategory !== 'all' && ` בקטגוריית "${selectedCategory}"`}
+          {selectedSpecialty !== 'all' && ` בהתמחות "${selectedSpecialty}"`}
           {selectedLetter && ` באות "${selectedLetter}"`}
         </p>
 
