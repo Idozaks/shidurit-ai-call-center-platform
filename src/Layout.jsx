@@ -34,6 +34,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'DoctorsCatalog', label: 'קטלוג רופאים', icon: Users },
     { name: 'AllProcedures', label: 'כל הטיפולים', icon: Stethoscope },
     { name: 'AllSpecialties', label: 'כל ההתמחויות', icon: Heart },
+    { name: 'AppAudit', label: 'ביקורת אפליקציה', icon: Building2 },
   ];
 
   // Architect button is handled inside Home page, not as a nav item
