@@ -350,7 +350,9 @@ IMPORTANT: Adapt your judgment to the business category. For example:
       : '';
 
     // Build doctors context - pre-filter to only relevant doctors
-    const relevantDoctors = filterDoctorsForQuery(userMessage, doctors, 10);
+    // Also check conversation history for doctor names mentioned earlier
+    const fullConversation = messages.map(m => m.content).join(' ') + ' ' + userMessage;
+    const relevantDoctors = filterDoctorsForQuery(fullConversation, doctors, 10);
     const doctorsContext = relevantDoctors.length > 0
       ? `\n\nרופאים רלוונטיים שנמצאו עבור הבקשה (אלה הרופאים היחידים שאתה יכול להזכיר!):\n${formatDoctorsForPrompt(relevantDoctors)}`
       : doctors.length > 0
