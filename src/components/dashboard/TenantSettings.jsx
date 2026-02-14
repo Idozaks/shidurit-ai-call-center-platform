@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import DeleteTenantDialog from './DeleteTenantDialog';
 
 export default function TenantSettings({ tenant }) {
   const navigate = useNavigate();
