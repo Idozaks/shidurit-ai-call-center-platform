@@ -242,10 +242,19 @@ Return exactly 10 suggestions.`,
           פעולות מהירות
           {showFixedActions ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
         </button>
+        {/* Toggle to hide/show entire suggestions panel */}
+        <button
+          onClick={() => setPanelVisible(!panelVisible)}
+          className="text-[10px] px-2 py-1 rounded-full flex items-center gap-0.5 transition-all"
+          style={{ color: `${themeColor}90` }}
+        >
+          {panelVisible ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />}
+          {panelVisible ? 'סגור הצעות' : 'פתח הצעות'}
+        </button>
       </div>
 
       {/* Collapsible fixed actions */}
-      {showFixedActions && (
+      {panelVisible && showFixedActions && (
         <motion.div
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
