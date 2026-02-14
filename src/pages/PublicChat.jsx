@@ -205,6 +205,8 @@ Extract any NEW details found. If a field was already collected and hasn't chang
           phone: { type: "string", description: "Phone number if shared" },
           email: { type: "string", description: "Email if shared" },
           preferred_time: { type: "string", description: "Preferred meeting/call time if mentioned" },
+          city: { type: "string", description: "City/location if shared" },
+          specialty: { type: "string", description: "Medical specialty or area of interest if mentioned" },
           notes: { type: "string", description: "Any other personal details shared" }
         }
       }
