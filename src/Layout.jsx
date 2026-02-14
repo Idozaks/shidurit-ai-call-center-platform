@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { 
-  Building2, LayoutDashboard, LogOut, Menu, X, Sparkles, Users, Wand2
+  Building2, LayoutDashboard, LogOut, Menu, X, Sparkles, Users, Wand2, Stethoscope, Heart
 } from "lucide-react";
 
 export default function Layout({ children, currentPageName }) {
@@ -32,6 +32,8 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Home', label: 'בית', icon: LayoutDashboard },
     { name: 'CreateTenant', label: 'עסק חדש', icon: Building2 },
     { name: 'DoctorsCatalog', label: 'קטלוג רופאים', icon: Users },
+    { name: 'AllProcedures', label: 'כל הטיפולים', icon: Stethoscope },
+    { name: 'AllSpecialties', label: 'כל ההתמחויות', icon: Heart },
   ];
 
   // Architect button is handled inside Home page, not as a nav item
