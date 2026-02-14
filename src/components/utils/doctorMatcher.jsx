@@ -42,15 +42,26 @@ function extractSearchTerms(userMessage) {
   const msg = userMessage.toLowerCase();
   const terms = new Set();
 
-  // Check keyword map
+  // Check keyword map - use substring matching so inflected forms work
+  // e.g. "אורתופדים" contains "אורתופד", "נוירולוגים" contains "נוירולוג"
   for (const [trigger, searchTerms] of Object.entries(KEYWORD_MAP)) {
     if (msg.includes(trigger)) {
       searchTerms.forEach(t => terms.add(t));
     }
   }
 
-  // Also extract raw words (3+ chars) as fallback search terms
+  // Also check if any word in the message STARTS WITH a keyword trigger
+  // This catches cases where Hebrew suffixes change the word
   const words = msg.split(/[\s,.:;!?]+/).filter(w => w.length >= 3);
+  for (const word of words) {
+    for (const [trigger, searchTerms] of Object.entries(KEYWORD_MAP)) {
+      if (word.startsWith(trigger) || trigger.startsWith(word)) {
+        searchTerms.forEach(t => terms.add(t));
+      }
+    }
+  }
+
+  // Add raw words as fallback search terms
   words.forEach(w => terms.add(w));
 
   return [...terms];
