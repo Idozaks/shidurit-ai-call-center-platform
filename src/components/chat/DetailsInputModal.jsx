@@ -82,7 +82,7 @@ export default function DetailsInputModal({ open, onClose, onSubmit, themeColor 
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs text-slate-500 flex items-center gap-1">
-                  <Calendar className="w-3 h-3" /> שעה נוחה לפגישה
+                  <Calendar className="w-3 h-3" /> מועד נוח לתור (אופציונלי)
                 </Label>
                 <Input
                   value={preferredTime}
