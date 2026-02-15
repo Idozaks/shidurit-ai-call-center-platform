@@ -142,8 +142,26 @@ export default function PublicChat() {
         return null;
       }
 
-      // Get AI response
-      const llmRes = await publicApi({ action: 'invokeLLM', prompt: buildPrompt(content), response_json_schema: null });
+      // Search Rofim for doctor names mentioned by the user
+      let rofimResults = [];
+      // Check if user is asking about a doctor by name (contains doctor prefix or seems like a name search)
+      const hasDoctorPrefix = /ד"ר|דר'|דר |פרופ'|פרופ |רופא|רופאה|דוקטור/.test(content);
+      const words = content.split(/\s+/).filter(w => w.length >= 2);
+      
+      if (hasDoctorPrefix || words.length <= 4) {
+        // Extract a search term — remove common prefixes and filler words
+        let searchTerm = content
+          .replace(/^(אני מחפש|אני רוצה|תחפש לי|חפש|מכיר את|יש לכם את|מה עם)\s*/i, '')
+          .replace(/\?/g, '')
+          .trim();
+        if (searchTerm.length >= 2) {
+          const rofimRes = await publicApi({ action: 'searchRofim', term: searchTerm });
+          rofimResults = rofimRes.doctors || [];
+        }
+      }
+
+      // Get AI response with Rofim results injected into prompt
+      const llmRes = await publicApi({ action: 'invokeLLM', prompt: buildPrompt(content, rofimResults), response_json_schema: null });
       const aiResponse = llmRes.result;
 
       // Save AI response
@@ -154,11 +172,11 @@ export default function PublicChat() {
         await publicApi({ action: 'updateTenantUsage', tenant_id: tenant.id, usage_count: (tenant.usage_count || 0) + 1 });
       }
 
-      return aiResponse;
+      return { aiResponse, rofimResults };
     },
-    onSuccess: (response) => {
+    onSuccess: (result) => {
       // Run lead intelligence in background after each message exchange
-      if (response !== null) {
+      if (result !== null) {
         extractAndStoreDetails();
         analyzeAndManageLead();
       }
