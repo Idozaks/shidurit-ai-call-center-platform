@@ -519,15 +519,24 @@ ${history}
     setIsTyping(true);
 
     try {
-      const response = await sendMessageMutation.mutateAsync({ content: userMessage });
+      const result = await sendMessageMutation.mutateAsync({ content: userMessage });
       
       // Add AI response (only if bot responded, not when worker is active)
-      if (response) {
+      if (result) {
+        const aiMsgId = Date.now() + 1;
         setMessages(prev => [...prev, {
-          id: Date.now() + 1,
+          id: aiMsgId,
           role: 'assistant',
-          content: response
+          content: result.aiResponse
         }]);
+
+        // If we got Rofim doctor results from the search, attach them to this message
+        if (result.rofimResults && result.rofimResults.length > 0) {
+          setRofimDoctorsByMsgId(prev => ({ ...prev, [aiMsgId]: result.rofimResults }));
+        } else {
+          // Try to find doctor names mentioned in the AI response and search them
+          findAndAttachRofimDoctors(result.aiResponse, aiMsgId);
+        }
       }
     } catch (error) {
       console.error('Error sending message:', error);
