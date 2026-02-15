@@ -354,7 +354,60 @@ IMPORTANT: Adapt your judgment to the business category. For example:
     }
   };
 
-  const buildPrompt = (userMessage) => {
+  // Search Rofim API for doctors by name
+  const searchRofimDoctors = async (searchTerm) => {
+    if (!searchTerm || searchTerm.trim().length < 2) return [];
+    const res = await publicApi({ action: 'searchRofim', term: searchTerm });
+    return res.doctors || [];
+  };
+
+  // Extract doctor names mentioned in AI response and search them on Rofim
+  const findAndAttachRofimDoctors = async (aiResponse, msgId) => {
+    // Use LLM to extract doctor names from the AI response
+    const extractRes = await publicApi({
+      action: 'invokeLLM',
+      prompt: `Extract all doctor names mentioned in this Hebrew text. Return ONLY the names as an array.
+If no doctors are mentioned, return an empty array.
+
+Text:
+${aiResponse}`,
+      response_json_schema: {
+        type: "object",
+        properties: {
+          doctor_names: {
+            type: "array",
+            items: { type: "string" },
+            description: "Array of doctor names found in the text"
+          }
+        }
+      }
+    });
+
+    const names = extractRes.result?.doctor_names || [];
+    if (names.length === 0) return;
+
+    // Search each name on Rofim
+    const allFoundDoctors = [];
+    const seen = new Set();
+    for (const name of names.slice(0, 5)) {
+      // Clean the name - remove prefix for search
+      let cleanName = name.replace(/^(ד"ר|דר'|דר|פרופ'|פרופ)\s*/i, '').trim();
+      if (cleanName.length < 2) continue;
+      const results = await searchRofimDoctors(cleanName);
+      for (const doc of results) {
+        if (!seen.has(doc.name)) {
+          seen.add(doc.name);
+          allFoundDoctors.push(doc);
+        }
+      }
+    }
+
+    if (allFoundDoctors.length > 0) {
+      setRofimDoctorsByMsgId(prev => ({ ...prev, [msgId]: allFoundDoctors }));
+    }
+  };
+
+  const buildPrompt = (userMessage, rofimSearchResults) => {
     const history = messages.map(m => `${m.role === 'user' ? 'לקוח' : tenant?.ai_persona_name || 'נועה'}: ${m.content}`).join('\n');
     const isFirstMessage = messages.filter(m => m.role === 'user').length === 0;
     
@@ -371,20 +424,12 @@ IMPORTANT: Adapt your judgment to the business category. For example:
       ? `\n\nפרטים שהלקוח כבר מסר (אל תבקש אותם שוב!):\n${detailsParts.join('\n')}` 
       : '';
 
-    // Build doctors context - filter by CURRENT message keywords only
-    // Pass conversation history only for doctor name lookups
-    const fullConversation = messages.map(m => m.content).join(' ');
-    const relevantDoctors = filterDoctorsForQuery(userMessage, doctors, 10, fullConversation);
-    
-    // Build a summary of ALL tenant doctor specialties so the AI knows what's available
-    const allSpecialties = [...new Set(doctors.map(d => d.specialty).filter(Boolean))];
-    const specialtySummary = allSpecialties.length > 0 ? `\nהתמחויות זמינות אצלנו: ${allSpecialties.join(', ')}` : '';
-    
-    const doctorsContext = relevantDoctors.length > 0
-      ? `\n\nרופאים רלוונטיים שנמצאו עבור הבקשה (אלה הרופאים היחידים שאתה יכול להזכיר!):\n${formatDoctorsForPrompt(relevantDoctors)}${specialtySummary}`
-      : doctors.length > 0
-        ? `\n\nרשימת כל הרופאים שלנו (${doctors.length} רופאים):\n${formatDoctorsForPrompt(doctors)}${specialtySummary}\n\nחפש מתוך רשימה זו בלבד רופאים רלוונטיים לבקשת הלקוח. אם יש רופאים מתאימים - הצג אותם!`
-        : '';
+    // Build Rofim search results context
+    let rofimContext = '';
+    if (rofimSearchResults && rofimSearchResults.length > 0) {
+      const doctorLines = rofimSearchResults.map(d => `- ${d.name} (${d.specialty})`).join('\n');
+      rofimContext = `\n\n=== תוצאות חיפוש רופאים (ממאגר rofim.org.il) ===\n${doctorLines}\n\nאלו הרופאים שנמצאו במאגר. הזכר אותם בשמם המלא כולל תואר (ד"ר / פרופ') והתמחות.`;
+    }
 
     // Build clinic-specific rules
     const isClinic = tenant?.business_type === 'clinic';
@@ -403,7 +448,7 @@ ${tenant?.system_prompt || 'אין הנחיות מיוחדות.'}
 
 === מאגר הידע של העסק ===
 ${knowledgeBase || 'אין מידע נוסף.'}
-${doctorsContext}
+${rofimContext}
 ${detailsContext}
 ${clinicRules}
 
@@ -412,36 +457,26 @@ ${history}
 
 לקוח: ${userMessage}
 
+=== כללי חיפוש רופאים ===
+- כשהלקוח מבקש רופא לפי שם - אם יש תוצאות חיפוש רופאים למעלה, השתמש בהן.
+- כשהלקוח מבקש רופא לפי התמחות - המלץ על חיפוש שם ספציפי, או אם יש תוצאות חיפוש - הצג אותן.
+- הצג רופאים בשמם המלא עם תואר (ד"ר/פרופ') והתמחות.
+- CRITICAL: אל תמציא שמות רופאים! השתמש אך ורק ברופאים שמופיעים בתוצאות חיפוש למעלה.
+- אם אין תוצאות חיפוש רופאים בנתונים למעלה, אמור ללקוח שתחפש עבורו ובקש שם ספציפי או התמחות.
+
 === כללים קריטיים ===
 - CRITICAL: You MUST respond ONLY in Hebrew. Do NOT use any other language.
 - ענה בעברית בצורה ידידותית ומקצועית. היה תמציתי וענייני.
-- כאשר הלקוח מוסר פרטי קשר, אשר בצורה ברורה ונכונה דקדוקית. למשל: "קיבלתי את הפרטים שלך" או "תודה, אעביר את הפרטים לצוות שלנו". אל תשתמש בביטוי "נראה ששתה" או ניסוחים משובשים.
+- כאשר הלקוח מוסר פרטי קשר, אשר בצורה ברורה ונכונה דקדוקית.
 - ${isFirstMessage ? 'זו ההודעה הראשונה של הלקוח - הצג את עצמך בשמך פעם אחת בלבד.' : 'זו שיחה מתמשכת - אל תציג את עצמך שוב, אל תגיד שלום שוב, אל תחזור על שמך. פשוט המשך את השיחה ישירות וענה לשאלה.'}
 - אל תחזור על מידע שכבר אמרת בהיסטוריית השיחה.
-- CRITICAL: אם הלקוח כבר מסר פרטים (שם, טלפון, אימייל, זמן מועדף, עיר, התמחות רפואית) - אל תבקש אותם שוב! גם אל תציע ללקוח להשאיר פרטים שכבר מסר. אם הלקוח כבר השאיר פרטים מסוימים - ציין רק את הפרטים שעדיין חסרים כשאתה מציע להשאיר פרטים.
+- CRITICAL: אם הלקוח כבר מסר פרטים - אל תבקש אותם שוב!
 
-=== כללי רופאים (חשוב מאוד!) ===
-- CRITICAL: חפש בעצמך בתוך רשימת הרופאים שלמעלה. אם יש רופאים עם התמחות מתאימה - הצג אותם! אל תגיד "אין לנו" בלי לבדוק.
-- CRITICAL: הרשימה למעלה מכילה את כל הרופאים של העסק. חפש לפי התמחות, שם, טיפולים, או כל שדה אחר.
-- למשל: אם הלקוח מחפש אורתופד, חפש ברשימה רופאים עם התמחות שמכילה "אורתופד" או "אורטופד" או "orthop" או "עצמות".
-- CRITICAL - תסמינים: כאשר הלקוח מתאר תסמין או כאב (למשל "כואב לי בגב", "כאב ברך", "כאב ראש"), זהה את ההתמחות הרפואית הרלוונטית (למשל גב/ברך/כתף → אורתופדיה, כאב ראש → נוירולוגיה, כאב בטן → גסטרו) וחפש רופאים מתאימים ברשימה.
-- CRITICAL - מיקום לפני רופאים: אם הלקוח מבקש רופא (לפי התמחות או לפי תסמין) ואין לנו את העיר/מיקום שלו בפרטים שנאספו - שאל אותו קודם באיזה אזור/עיר הוא מחפש, ורק אחרי שיענה הצג רופאים מתאימים לפי מיקום. אם כבר יש לנו את העיר שלו - סנן ישירות לפי מיקום והצג.
-- הצג רופאים בשמם המלא עם פרטים רלוונטיים (התמחות, מיקום, זמינות).
-- כאשר הלקוח מציין מיקום גיאוגרפי, סנן מתוך הרופאים המוצגים גם לפי מיקום.
-- CRITICAL: תמיד הצג קודם את הרופאים המתאימים, ורק אחר כך הצע להשאיר פרטים או לתאם תור.
-- אסור להמציא רופאים שלא מופיעים ברשימה למעלה.
-- CRITICAL - שאלות על רופא ספציפי: כאשר הלקוח שואל על פרטים של רופא ספציפי (ניסיון, שעות פעילות, טיפולים, אודות, טלפון, כתובת, או כל מידע אישי אחר) - השתמש אך ורק בנתוני הרופא שמופיעים ברשימת הרופאים למעלה. אל תשלוף מידע ממאגר הידע הכללי של העסק עבור שאלות אלו. אם המידע המבוקש לא מופיע בנתוני הרופא - אמור שאין לך את המידע הזה והצע ללקוח ליצור קשר ישירות.
-- CRITICAL: השתמש אך ורק ברופאים מהרשימה למעלה. אלו הרופאים של העסק בלבד. לא להביא רופאים ממקורות אחרים.
-
-=== ZERO HALLUCINATION POLICY (MOST IMPORTANT RULE - READ CAREFULLY) ===
-- ABSOLUTE RULE: You are STRICTLY FORBIDDEN from inventing, fabricating, or imagining ANY information that does not EXPLICITLY appear word-for-word in the data above (business instructions, knowledge base, and doctor list).
-- DO NOT invent package names, service names, product names, prices, deals, promotions, locations, opening hours, features, policies, or any other detail.
-- DO NOT combine or embellish existing information to create something new.
-- CRITICAL - POLICIES: Do NOT invent cancellation policies, refund policies, payment policies, booking rules, or any business policy. If the customer asks about a policy (e.g., cancellation, refunds, returns, rescheduling) and it is NOT explicitly written in the knowledge base or system prompt above, you MUST say you don't have that information and offer to connect them with the team.
-- CRITICAL - PRICES & FEES: Do NOT invent any prices, fees, charges, or costs that are not explicitly listed in the data above.
-- If a customer asks about ANYTHING not covered in the data above, you MUST respond: "אין לי מידע מדויק על כך. אשמח להעביר את הפנייה לצוות שלנו שיוכל לתת לך פרטים מדויקים." Then suggest leaving contact details.
-- NEVER guess, approximate, or use "common knowledge" to fill gaps. If it's not in YOUR data, you don't know it.
-- This rule applies to EVERYTHING: prices, services, packages, hours, locations, staff names, procedures, policies, fees, and any factual claim.`;
+=== ZERO HALLUCINATION POLICY ===
+- ABSOLUTE RULE: You are STRICTLY FORBIDDEN from inventing ANY information not in the data above.
+- DO NOT invent prices, services, policies, doctor names, or any factual claim.
+- If asked about anything not covered above: "אין לי מידע מדויק על כך. אשמח להעביר את הפנייה לצוות שלנו."
+- This applies to EVERYTHING: prices, services, hours, locations, staff names, procedures, policies.`;
   };
 
   const handleStartChat = (e) => {
