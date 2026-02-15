@@ -155,7 +155,12 @@ export default function PublicChat() {
           .replace(/\?/g, '')
           .trim();
         if (searchTerm.length >= 2) {
-          rofimResults = await searchRofimDoctors(searchTerm);
+          try {
+            rofimResults = await searchRofimDoctors(searchTerm);
+          } catch (e) {
+            console.warn('Rofim search failed:', e.message);
+            rofimResults = [];
+          }
         }
       }
 
