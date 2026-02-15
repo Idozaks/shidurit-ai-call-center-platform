@@ -419,11 +419,10 @@ ${aiResponse}`,
     const names = extractRes.result?.doctor_names || [];
     if (names.length === 0) return;
 
-    // Search each name on Rofim
+    // Search each name on Rofim (client-side)
     const allFoundDoctors = [];
     const seen = new Set();
     for (const name of names.slice(0, 5)) {
-      // Clean the name - remove prefix for search
       let cleanName = name.replace(/^(ד"ר|דר'|דר|פרופ'|פרופ)\s*/i, '').trim();
       if (cleanName.length < 2) continue;
       const results = await searchRofimDoctors(cleanName);
