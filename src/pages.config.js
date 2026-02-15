@@ -49,6 +49,7 @@
  */
 import AllProcedures from './pages/AllProcedures';
 import AllSpecialties from './pages/AllSpecialties';
+import AppAudit from './pages/AppAudit';
 import ConversationView from './pages/ConversationView';
 import CreateTenant from './pages/CreateTenant';
 import DoctorProfile from './pages/DoctorProfile';
@@ -60,13 +61,13 @@ import ShiduritSystemPrompt from './pages/ShiduritSystemPrompt';
 import SpecialtyPage from './pages/SpecialtyPage';
 import TenantDashboard from './pages/TenantDashboard';
 import WorkerLogin from './pages/WorkerLogin';
-import AppAudit from './pages/AppAudit';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "AllProcedures": AllProcedures,
     "AllSpecialties": AllSpecialties,
+    "AppAudit": AppAudit,
     "ConversationView": ConversationView,
     "CreateTenant": CreateTenant,
     "DoctorProfile": DoctorProfile,
@@ -78,7 +79,6 @@ export const PAGES = {
     "SpecialtyPage": SpecialtyPage,
     "TenantDashboard": TenantDashboard,
     "WorkerLogin": WorkerLogin,
-    "AppAudit": AppAudit,
 }
 
 export const pagesConfig = {

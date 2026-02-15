@@ -14,8 +14,7 @@ import VoiceChat from '../components/chat/VoiceChat';
 import SuggestionChips from '../components/chat/SuggestionChips';
 import PublicChatMenu from '../components/chat/PublicChatMenu';
 import DetailsInputModal from '../components/chat/DetailsInputModal';
-import DoctorCards, { useTenantDoctors } from '../components/chat/DoctorCards';
-import { filterDoctorsForQuery, formatDoctorsForPrompt } from '../components/utils/doctorMatcher';
+import RofimDoctorCards from '../components/chat/RofimDoctorCards';
 
 // Helper to call the public backend function (supports both auth and non-auth)
 const publicApi = async (payload) => {
