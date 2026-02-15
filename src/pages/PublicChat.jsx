@@ -155,8 +155,7 @@ export default function PublicChat() {
           .replace(/\?/g, '')
           .trim();
         if (searchTerm.length >= 2) {
-          const rofimRes = await publicApi({ action: 'searchRofim', term: searchTerm });
-          rofimResults = rofimRes.doctors || [];
+          rofimResults = await searchRofimDoctors(searchTerm);
         }
       }
 
