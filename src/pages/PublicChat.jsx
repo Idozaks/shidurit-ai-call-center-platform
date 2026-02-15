@@ -371,27 +371,11 @@ IMPORTANT: Adapt your judgment to the business category. For example:
     }
   };
 
-  // Search Rofim API for doctors by name (client-side, since API blocks server calls)
+  // Search Rofim API for doctors by name (via backend proxy to avoid CORS)
   const searchRofimDoctors = async (searchTerm) => {
     if (!searchTerm || searchTerm.trim().length < 2) return [];
-    const encoded = encodeURIComponent(searchTerm.trim());
-    const url = `https://www.rofim.org.il/handlers/SearchSuggest.ashx?term=${encoded}`;
-    const res = await fetch(url);
-    if (!res.ok) return [];
-    const data = await res.json();
-    // Filter to doctors only (info is not "procedure" and not "profession")
-    return data
-      .filter(item => {
-        const info = (item.info || '').trim().toLowerCase();
-        return info !== 'procedure' && info !== 'profession';
-      })
-      .map(item => ({
-        type: 'doctor',
-        name: item.label,
-        specialty: item.info,
-        image: item.image,
-        query: item.query
-      }));
+    const res = await publicApi({ action: 'searchRofim', term: searchTerm });
+    return res.doctors || [];
   };
 
   // Extract doctor names mentioned in AI response and search them on Rofim
