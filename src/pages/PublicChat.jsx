@@ -408,18 +408,22 @@ ${aiResponse}`,
     const names = extractRes.result?.doctor_names || [];
     if (names.length === 0) return;
 
-    // Search each name on Rofim (client-side)
+    // Search each name on Rofim (via backend proxy)
     const allFoundDoctors = [];
     const seen = new Set();
     for (const name of names.slice(0, 5)) {
       let cleanName = name.replace(/^(ד"ר|דר'|דר|פרופ'|פרופ)\s*/i, '').trim();
       if (cleanName.length < 2) continue;
-      const results = await searchRofimDoctors(cleanName);
-      for (const doc of results) {
-        if (!seen.has(doc.name)) {
-          seen.add(doc.name);
-          allFoundDoctors.push(doc);
+      try {
+        const results = await searchRofimDoctors(cleanName);
+        for (const doc of results) {
+          if (!seen.has(doc.name)) {
+            seen.add(doc.name);
+            allFoundDoctors.push(doc);
+          }
         }
+      } catch (e) {
+        console.warn('Rofim search failed for', cleanName, e.message);
       }
     }
 
