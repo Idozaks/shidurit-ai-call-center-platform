@@ -98,54 +98,6 @@ Deno.serve(async (req) => {
       return Response.json({ result });
     }
 
-    if (action === 'searchRofim') {
-      const { term } = body;
-      if (!term || term.trim().length === 0) {
-        return Response.json({ results: [] });
-      }
-      const encoded = encodeURIComponent(term.trim());
-      const url = `https://www.rofim.org.il/handlers/SearchSuggest.ashx?term=${encoded}`;
-      const res = await fetch(url);
-      if (!res.ok) {
-        return Response.json({ results: [], error: `Rofim API returned ${res.status}` });
-      }
-      const data = await res.json();
-      
-      // Parse into three categories: doctors, procedures, professions
-      const doctors = [];
-      const procedures = [];
-      const professions = [];
-      
-      for (const item of data) {
-        const info = (item.info || '').trim().toLowerCase();
-        if (info === 'procedure') {
-          procedures.push({
-            type: 'procedure',
-            label: item.label,
-            image: item.image,
-            amount: item.amount
-          });
-        } else if (info === 'profession') {
-          professions.push({
-            type: 'profession',
-            label: item.label,
-            image: item.image
-          });
-        } else {
-          // It's a doctor — info contains the specialty name
-          doctors.push({
-            type: 'doctor',
-            name: item.label,
-            specialty: item.info,
-            image: item.image,
-            query: item.query
-          });
-        }
-      }
-      
-      return Response.json({ results: data, doctors, procedures, professions });
-    }
-
     return Response.json({ error: 'Unknown action' }, { status: 400 });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
