@@ -789,10 +789,9 @@ ${history}
                           {message.content}
                         </ReactMarkdown>
                       </div>
-                      {message.role === 'assistant' && doctors.length > 0 && (
-                        <DoctorCards
-                          messageContent={message.content}
-                          doctors={doctors}
+                      {message.role === 'assistant' && rofimDoctorsByMsgId[message.id] && (
+                        <RofimDoctorCards
+                          rofimDoctors={rofimDoctorsByMsgId[message.id]}
                           themeColor={themeColor}
                         />
                       )}
