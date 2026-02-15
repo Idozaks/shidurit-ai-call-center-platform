@@ -65,7 +65,8 @@ export default function PublicChat() {
     enabled: !!slug
   });
 
-  const { data: doctors = [] } = useTenantDoctors(tenant?.id);
+  // Store rofim doctor results per message
+  const [rofimDoctorsByMsgId, setRofimDoctorsByMsgId] = useState({});
 
   // Fetch knowledge base once tenant is loaded
   useEffect(() => {
