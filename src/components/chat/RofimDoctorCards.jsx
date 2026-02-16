@@ -91,9 +91,8 @@ function RofimDetailModal({ doctor, open, onClose, themeColor }) {
   if (!doctor) return null;
 
   const hasImage = !isBlankImage(doctor.image);
-  const rofimUrl = doctor.query 
-    ? `https://www.rofim.org.il/${doctor.query}`
-    : 'https://www.rofim.org.il';
+  const rofimUrl = doctor.doctor_url 
+    || (doctor.query ? `https://www.rofim.org.il/minisite/${doctor.query}` : 'https://www.rofim.org.il');
 
   return (
     <Dialog open={open} onOpenChange={onClose}>

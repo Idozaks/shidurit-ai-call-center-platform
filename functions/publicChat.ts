@@ -99,43 +99,47 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'searchRofim') {
-      const { term } = body;
+      const { term, location, kupatHolim } = body;
       if (!term || term.trim().length === 0) {
         return Response.json({ results: [], doctors: [], procedures: [], professions: [] });
       }
-      const encoded = encodeURIComponent(term.trim());
-      const url = `https://www.rofim.org.il/handlers/SearchSuggest.ashx?term=${encoded}`;
+      
+      // Build URL for the custom SearchDoctorProxy.ashx handler on rofim.org.il
+      const params = new URLSearchParams();
+      params.set('medicalSearchTerm', term.trim());
+      if (location) params.set('location', location);
+      if (kupatHolim) params.set('kupatHolim', kupatHolim);
+      
+      const url = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?${params.toString()}`;
       const res = await fetch(url, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'application/json, text/javascript, */*; q=0.01',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+          'Accept': 'application/json, text/plain, */*',
           'Accept-Language': 'he-IL,he;q=0.9,en-US;q=0.8,en;q=0.7',
           'Referer': 'https://www.rofim.org.il/',
           'X-Requested-With': 'XMLHttpRequest'
         }
       });
       if (!res.ok) {
-        console.log('Rofim API status:', res.status);
+        console.log('Rofim SearchDoctorProxy status:', res.status);
         return Response.json({ results: [], doctors: [], procedures: [], professions: [] });
       }
       const data = await res.json();
       
+      // Map the response: value=name, info=specialty, image=image, query=profile slug
       const doctors = [];
-      const procedures = [];
-      const professions = [];
-      
       for (const item of data) {
-        const info = (item.info || '').trim().toLowerCase();
-        if (info === 'procedure') {
-          procedures.push({ type: 'procedure', label: item.label, image: item.image, amount: item.amount });
-        } else if (info === 'profession') {
-          professions.push({ type: 'profession', label: item.label, image: item.image });
-        } else {
-          doctors.push({ type: 'doctor', name: item.label, specialty: item.info, image: item.image, query: item.query });
-        }
+        doctors.push({
+          type: 'doctor',
+          name: item.value || item.label,
+          specialty: item.info || '',
+          image: item.image || '',
+          query: item.query || '',
+          doctor_url: item.query ? `https://www.rofim.org.il/minisite/${item.query}` : 'https://www.rofim.org.il'
+        });
       }
       
-      return Response.json({ results: data, doctors, procedures, professions });
+      return Response.json({ results: data, doctors, procedures: [], professions: [] });
     }
 
     return Response.json({ error: 'Unknown action' }, { status: 400 });
