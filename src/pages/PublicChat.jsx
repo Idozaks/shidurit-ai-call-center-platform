@@ -142,34 +142,45 @@ export default function PublicChat() {
         return null;
       }
 
-      // Use LLM to decide if user wants a doctor search, and extract clean search params
+      // Use LLM to extract doctor search params from the ENTIRE conversation + current message
       let rofimResults = [];
-      const isMedicalRelated = /רופא|רופאה|ד"ר|דר'|דר |פרופ'|פרופ |דוקטור|התמחות|מומחה|ניתוח|טיפול|בדיקה|אורולוג|קרדיולוג|אורתופד|גינקולוג|עור|עיניים|אף אוזן|נוירולוג|פנימי|ילדים|משפחה/.test(content);
+      const isMedicalRelated = /רופא|רופאה|ד"ר|דר'|דר |פרופ'|פרופ |דוקטור|התמחות|מומחה|ניתוח|טיפול|בדיקה|אורולוג|קרדיולוג|אורתופד|גינקולוג|עור|עיניים|אף אוזן|נוירולוג|פנימי|ילדים|משפחה|קופת חולים|מכבי|כללית|מאוחדת|לאומית/.test(content);
       
       if (isMedicalRelated) {
         try {
-          // Ask LLM to extract clean search parameters from the user's message
+          const conversationSoFar = messages.map(m => `${m.role === 'user' ? 'לקוח' : 'נציג'}: ${m.content}`).join('\n');
+          
           const extractRes = await publicApi({
             action: 'invokeLLM',
-            prompt: `The user sent this message in a medical chat: "${content}"
+            prompt: `You are analyzing a medical chat conversation to decide if we have enough info to search for doctors.
 
-Extract a CLEAN medical search term to send to a doctor search API.
-The API accepts: medicalSearchTerm (specialty, procedure, or doctor name), location (city), kupatHolim (health fund).
+=== FULL CONVERSATION SO FAR ===
+${conversationSoFar}
+לקוח: ${content}
+
+=== TASK ===
+Extract ALL THREE mandatory fields needed to search for a doctor. Look through the ENTIRE conversation, not just the last message.
+
+The 3 MANDATORY fields are:
+1. medicalSearchTerm - the medical specialty, procedure, or doctor name (e.g. "אורולוגיה", "ד\"ר כהן", "ניתוח ברך")
+2. location - the city or area in Israel (e.g. "חיפה", "תל אביב", "ירושלים", "באר שבע")
+3. kupatHolim - the health fund (must be one of: "כללית", "מכבי", "מאוחדת", "לאומית", or "פרטי" for private)
 
 Rules:
-- medicalSearchTerm should be a SHORT Hebrew term like: "אורולוגיה", "ד\"ר כהן", "ניתוח ברך", "קרדיולוגיה", "עור ומין"
-- Do NOT include conversational words like "אני מחפש", "תמצא לי", "יש לכם"
-- If the user mentions a specific city, extract it to location
-- If the user mentions a kupat holim (מכבי, כללית, מאוחדת, לאומית), extract it to kupatHolim
-- If the user is NOT asking about a doctor/specialty/procedure, return should_search=false
-- If the message is too vague to search, return should_search=false`,
+- Search through ALL messages to find these fields - they may have been mentioned earlier
+- medicalSearchTerm should be a SHORT clean Hebrew term, no conversational words
+- location must be a real Israeli city/area name
+- kupatHolim must be a recognized health fund name
+- ready_to_search should be TRUE only if ALL 3 fields are filled with real values
+- If any field is missing, set ready_to_search=false and list what's missing in missing_fields`,
             response_json_schema: {
               type: "object",
               properties: {
-                should_search: { type: "boolean", description: "Whether this message warrants a doctor search" },
-                medicalSearchTerm: { type: "string", description: "Clean medical search term in Hebrew" },
-                location: { type: "string", description: "City/area if mentioned, empty string if not" },
-                kupatHolim: { type: "string", description: "Health fund if mentioned, empty string if not" }
+                ready_to_search: { type: "boolean", description: "True only if all 3 mandatory fields are present" },
+                medicalSearchTerm: { type: "string", description: "Clean medical search term in Hebrew, empty if not found" },
+                location: { type: "string", description: "City/area in Israel, empty if not found" },
+                kupatHolim: { type: "string", description: "Health fund name, empty if not found" },
+                missing_fields: { type: "array", items: { type: "string" }, description: "List of missing fields in Hebrew, e.g. ['עיר', 'קופת חולים']" }
               }
             }
           });
@@ -177,10 +188,12 @@ Rules:
           const searchParams = extractRes.result;
           console.log('[Rofim Search] LLM extracted params:', JSON.stringify(searchParams));
 
-          if (searchParams.should_search && searchParams.medicalSearchTerm && searchParams.medicalSearchTerm.length >= 2) {
-            console.log(`[Rofim Search] Querying handler with: term="${searchParams.medicalSearchTerm}", location="${searchParams.location || ''}", kupatHolim="${searchParams.kupatHolim || ''}"`);
+          if (searchParams.ready_to_search && searchParams.medicalSearchTerm && searchParams.location && searchParams.kupatHolim) {
+            console.log(`[Rofim Search] Querying handler with: term="${searchParams.medicalSearchTerm}", location="${searchParams.location}", kupatHolim="${searchParams.kupatHolim}"`);
             rofimResults = await searchRofimDoctors(searchParams.medicalSearchTerm, searchParams.location, searchParams.kupatHolim);
             console.log(`[Rofim Search] Got ${rofimResults.length} results`);
+          } else {
+            console.log(`[Rofim Search] Not ready - missing: ${(searchParams.missing_fields || []).join(', ')}`);
           }
         } catch (e) {
           console.warn('Rofim search failed:', e.message);
@@ -511,11 +524,11 @@ ${history}
 לקוח: ${userMessage}
 
 === כללי חיפוש רופאים ===
-- כשהלקוח מבקש רופא לפי שם - אם יש תוצאות חיפוש רופאים למעלה, השתמש בהן.
-- כשהלקוח מבקש רופא לפי התמחות - המלץ על חיפוש שם ספציפי, או אם יש תוצאות חיפוש - הצג אותן.
-- הצג רופאים בשמם המלא עם תואר (ד"ר/פרופ') והתמחות.
+- כדי לחפש רופא, חייבים 3 פרטים: (1) תחום רפואי/התמחות, (2) עיר/אזור, (3) קופת חולים (כללית/מכבי/מאוחדת/לאומית/פרטי).
+- CRITICAL: אם הלקוח מבקש רופא אבל חסר אחד או יותר מ-3 הפרטים האלה - שאל אותו בנימוס את מה שחסר. אל תחפש בלי כל 3 הפרטים!
+- כשכל 3 הפרטים קיימים ויש תוצאות חיפוש למעלה - הצג את הרופאים בשמם המלא עם תואר (ד"ר/פרופ') והתמחות.
 - CRITICAL: אל תמציא שמות רופאים! השתמש אך ורק ברופאים שמופיעים בתוצאות חיפוש למעלה.
-- אם אין תוצאות חיפוש רופאים בנתונים למעלה, אמור ללקוח שתחפש עבורו ובקש שם ספציפי או התמחות.
+- אם אין תוצאות חיפוש רופאים בנתונים למעלה ואכן כל 3 הפרטים סופקו, אמור ללקוח שלא נמצאו רופאים מתאימים והצע לנסות התמחות או אזור אחר.
 
 === כללים קריטיים ===
 - CRITICAL: You MUST respond ONLY in Hebrew. Do NOT use any other language.
