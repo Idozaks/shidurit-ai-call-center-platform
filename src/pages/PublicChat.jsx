@@ -170,7 +170,7 @@ The 3 MANDATORY fields are:
 
 Rules:
 - Search through ALL messages to find these fields - they may have been mentioned earlier
-- medicalSearchTerm should be a SHORT clean Hebrew term, no conversational words
+- medicalSearchTerm should be the FULL Hebrew specialty name ending in יה/ית (e.g. "אורולוגיה" not "אורולוג", "קרדיולוגיה" not "קרדיולוג", "אורתופדיה" not "אורתופד"). No conversational words.
 - location must be a real Israeli city/area name
 - kupatHolim must be a recognized health fund name
 - ready_to_search should be TRUE only if ALL 3 fields are filled with real values
