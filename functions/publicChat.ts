@@ -126,7 +126,19 @@ Deno.serve(async (req) => {
         console.log('Rofim SearchDoctorProxy status:', res.status);
         return Response.json({ results: [], doctors: [], procedures: [], professions: [] });
       }
-      const data = await res.json();
+      const rawText = await res.text();
+      console.log('[Rofim Backend] Raw response length:', rawText.length);
+      console.log('[Rofim Backend] Raw response preview:', rawText.substring(0, 500));
+      
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch (e) {
+        console.log('[Rofim Backend] Failed to parse JSON:', e.message);
+        return Response.json({ results: [], doctors: [], procedures: [], professions: [] });
+      }
+      
+      console.log('[Rofim Backend] Parsed items count:', Array.isArray(data) ? data.length : 'not array');
       
       // Map the response: value=name, info=specialty, image=image, query=profile slug
       const doctors = [];
