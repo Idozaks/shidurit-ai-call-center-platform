@@ -104,52 +104,42 @@ Deno.serve(async (req) => {
         return Response.json({ results: [], doctors: [], procedures: [], professions: [] });
       }
       
-      // Helper to fetch from Rofim autocomplete proxy
+      // The SearchDoctorProxy.ashx endpoint ONLY supports the medicalSearchTerm parameter.
+      // location and kupatHolim are NOT supported by this autocomplete endpoint.
       const fetchRofim = async (searchTerm) => {
-        const params = new URLSearchParams();
-        params.set('medicalSearchTerm', searchTerm);
-        const url = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?${params.toString()}`;
-        console.log('[Rofim Backend] Fetching URL:', url);
+        const url = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?medicalSearchTerm=${encodeURIComponent(searchTerm)}`;
+        console.log('[Rofim Backend] Fetching:', url);
         const res = await fetch(url, {
           headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             'Accept': 'application/json, text/plain, */*',
-            'Accept-Language': 'he-IL,he;q=0.9,en-US;q=0.8,en;q=0.7',
             'Referer': 'https://www.rofim.org.il/',
             'X-Requested-With': 'XMLHttpRequest'
           }
         });
-        if (!res.ok) {
-          console.log('[Rofim Backend] Status:', res.status);
-          return [];
-        }
+        if (!res.ok) return [];
         const rawText = await res.text();
-        console.log('[Rofim Backend] Response length:', rawText.length, 'preview:', rawText.substring(0, 300));
+        console.log('[Rofim Backend] Response length:', rawText.length);
         try {
           const data = JSON.parse(rawText);
           return Array.isArray(data) ? data : [];
         } catch (e) {
-          console.log('[Rofim Backend] JSON parse failed:', e.message);
           return [];
         }
       };
 
-      // Common Hebrew specialty suffixes to try if short form returns nothing
-      const specialtySuffixes = ['יה', 'ית', 'יא'];
-      
+      // Try the exact term first
       let data = await fetchRofim(term.trim());
       
-      // If no results, try adding common suffixes (e.g. "אורולוג" -> "אורולוגיה")
+      // If no results, try adding common Hebrew specialty suffixes (e.g. "אורולוג" -> "אורולוגיה")
       if (data.length === 0) {
-        for (const suffix of specialtySuffixes) {
-          const expanded = term.trim() + suffix;
-          console.log('[Rofim Backend] Retrying with expanded term:', expanded);
-          data = await fetchRofim(expanded);
+        for (const suffix of ['יה', 'ית', 'יא']) {
+          data = await fetchRofim(term.trim() + suffix);
           if (data.length > 0) break;
         }
       }
       
-      console.log('[Rofim Backend] Final items count:', data.length);
+      console.log('[Rofim Backend] Final results:', data.length);
       
       // Map the response: value=name, info=specialty, image=image, query=profile slug
       const doctors = [];
