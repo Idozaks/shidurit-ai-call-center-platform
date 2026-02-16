@@ -144,7 +144,9 @@ export default function PublicChat() {
 
       // Use LLM to extract doctor search params from the ENTIRE conversation + current message
       let rofimResults = [];
-      const isMedicalRelated = /רופא|רופאה|ד"ר|דר'|דר |פרופ'|פרופ |דוקטור|התמחות|מומחה|ניתוח|טיפול|בדיקה|אורולוג|קרדיולוג|אורתופד|גינקולוג|עור|עיניים|אף אוזן|נוירולוג|פנימי|ילדים|משפחה|קופת חולים|מכבי|כללית|מאוחדת|לאומית/.test(content);
+      const medicalRegex = /רופא|רופאה|ד"ר|דר'|דר |פרופ'|פרופ |דוקטור|התמחות|מומחה|ניתוח|טיפול|בדיקה|אורולוג|קרדיולוג|אורתופד|גינקולוג|עור|עיניים|אף אוזן|נוירולוג|פנימי|ילדים|משפחה|קופת חולים|מכבי|כללית|מאוחדת|לאומית/;
+      const conversationText = messages.map(m => m.content).join(' ');
+      const isMedicalRelated = medicalRegex.test(content) || medicalRegex.test(conversationText);
       
       if (isMedicalRelated) {
         try {
