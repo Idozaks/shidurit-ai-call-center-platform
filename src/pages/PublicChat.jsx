@@ -203,7 +203,9 @@ CRITICAL RULES:
           const searchParams = extractRes.result;
           console.log('[Rofim Search] LLM extracted params:', JSON.stringify(searchParams));
 
-          if (searchParams.ready_to_search && searchParams.medicalSearchTerm && searchParams.location && searchParams.kupatHolim) {
+          // Don't trust ready_to_search from LLM — check actual field values
+          const hasAllFields = searchParams.medicalSearchTerm?.trim() && searchParams.location?.trim() && searchParams.kupatHolim?.trim();
+          if (hasAllFields) {
             console.log(`[Rofim Search] Querying handler with: term="${searchParams.medicalSearchTerm}", location="${searchParams.location}", kupatHolim="${searchParams.kupatHolim}"`);
             rofimResults = await searchRofimDoctors(searchParams.medicalSearchTerm, searchParams.location, searchParams.kupatHolim);
             console.log(`[Rofim Search] Got ${rofimResults.length} results`);
