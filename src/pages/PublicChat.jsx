@@ -495,8 +495,9 @@ ${aiResponse}`,
     // Build Rofim search results context
     let rofimContext = '';
     if (rofimSearchResults && rofimSearchResults.length > 0) {
-      const doctorLines = rofimSearchResults.map(d => `- ${d.name} (${d.specialty})`).join('\n');
-      rofimContext = `\n\n=== תוצאות חיפוש רופאים (ממאגר rofim.org.il) ===\n${doctorLines}\n\nאלו הרופאים שנמצאו במאגר. הזכר אותם בשמם המלא כולל תואר (ד"ר / פרופ') והתמחות.`;
+      rofimContext = `\n\n=== תוצאות חיפוש רופאים (ממאגר rofim.org.il) - נמצאו ${rofimSearchResults.length} רופאים ===\nהכרטיסיות של הרופאים מוצגות אוטומטית מתחת להודעה שלך. אל תפרט את שמותיהם.`;
+    } else {
+      rofimContext = `\n\n=== חיפוש רופאים: לא בוצע חיפוש או לא נמצאו תוצאות ===\nCRITICAL: אל תטען שמצאת רופאים אם אין תוצאות חיפוש כאן! אם הלקוח מבקש רופא ועדיין חסרים פרטים - בקש אותם.`;
     }
 
     // Build clinic-specific rules
