@@ -111,6 +111,8 @@ Deno.serve(async (req) => {
       if (kupatHolim) params.set('kupatHolim', kupatHolim);
       
       const url = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?${params.toString()}`;
+      console.log('[Rofim Backend] Full URL:', url);
+      console.log('[Rofim Backend] Params:', JSON.stringify({ term: term.trim(), location, kupatHolim }));
       const res = await fetch(url, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
