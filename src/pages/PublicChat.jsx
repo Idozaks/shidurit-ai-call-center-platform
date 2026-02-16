@@ -154,32 +154,40 @@ export default function PublicChat() {
           const conversationSoFar = messages.map(m => `${m.role === 'user' ? 'לקוח' : 'נציג'}: ${m.content}`).join('\n');
           
           const specialtiesList = ROFIM_SPECIALTIES.join(', ');
+          
+          // Build a summary of previously extracted fields to help the LLM retain context
+          const prevDetailsParts = [];
+          if (collectedDetails.specialty) prevDetailsParts.push(`התמחות: ${collectedDetails.specialty}`);
+          if (collectedDetails.city) prevDetailsParts.push(`עיר: ${collectedDetails.city}`);
+          const prevDetailsStr = prevDetailsParts.length > 0 ? prevDetailsParts.join(', ') : 'אין';
+          
           const extractRes = await publicApi({
             action: 'invokeLLM',
-            prompt: `You are analyzing a medical chat conversation to decide if we have enough info to search for doctors.
+            prompt: `You are extracting doctor search parameters from a Hebrew medical chat conversation.
 
-=== FULL CONVERSATION SO FAR ===
+=== FULL CONVERSATION ===
 ${conversationSoFar}
 לקוח: ${content}
 
-=== AVAILABLE MEDICAL SPECIALTIES ===
+=== PREVIOUSLY IDENTIFIED FIELDS ===
+${prevDetailsStr}
+
+=== AVAILABLE MEDICAL SPECIALTIES (use exact names) ===
 ${specialtiesList}
 
 === TASK ===
-Extract ALL THREE mandatory fields needed to search for a doctor. Look through the ENTIRE conversation, not just the last message.
+Extract these 3 fields by scanning the ENTIRE conversation history above:
 
-The 3 MANDATORY fields are:
-1. medicalSearchTerm - MUST be one of the exact specialty names from the list above. Match the user's intent to the closest specialty. For example: "אורולוג" → "אורולוגיה", "עיניים" → "עיניים", "לב" → "קרדיולוגיה", "עור" → "עור ומין", "אורתופד" → "אורתופדיה". If the user mentions a doctor name (e.g. "ד\"ר כהן"), use that name as-is.
-2. location - the city or area in Israel (e.g. "חיפה", "תל אביב", "ירושלים", "באר שבע")
-3. kupatHolim - the health fund (must be one of: "כללית", "מכבי", "מאוחדת", "לאומית", or "פרטי" for private)
+1. medicalSearchTerm - MUST be one of the exact specialty names from the list above. Map user's words to the closest match: "אורולוג"→"אורולוגיה", "עיניים"→"עיניים", "לב"→"קרדיולוגיה", "עור"→"עור ומין", "אורתופד"→"אורתופדיה". If user mentions a doctor name, use it as-is.
+2. location - Israeli city/area (e.g. "חיפה", "תל אביב", "ירושלים")
+3. kupatHolim - health fund: "כללית", "מכבי", "מאוחדת", "לאומית", or "פרטי"
 
-Rules:
-- Search through ALL messages to find these fields - they may have been mentioned earlier
-- medicalSearchTerm MUST match exactly one of the specialties from the list above, or be a specific doctor name
-- location must be a real Israeli city/area name
-- kupatHolim must be a recognized health fund name
-- ready_to_search should be TRUE only if ALL 3 fields are filled with real values
-- If any field is missing, set ready_to_search=false and list what's missing in missing_fields`,
+CRITICAL RULES:
+- Fields mentioned ANYWHERE in the conversation are valid — not just the last message
+- If a field was identified in "PREVIOUSLY IDENTIFIED FIELDS" and the user did NOT explicitly change it, KEEP the previous value
+- If the user provides a NEW value for a field (e.g. changes city from חיפה to תל אביב), use the NEW value
+- ready_to_search = true ONLY when all 3 fields have non-empty real values
+- missing_fields should list only truly missing fields (empty strings = missing)`,
             response_json_schema: {
               type: "object",
               properties: {
