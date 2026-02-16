@@ -128,18 +128,8 @@ Deno.serve(async (req) => {
         }
       };
 
-      // Try the exact term first
-      let data = await fetchRofim(term.trim());
-      
-      // If no results, try adding common Hebrew specialty suffixes (e.g. "אורולוג" -> "אורולוגיה")
-      if (data.length === 0) {
-        for (const suffix of ['יה', 'ית', 'יא']) {
-          data = await fetchRofim(term.trim() + suffix);
-          if (data.length > 0) break;
-        }
-      }
-      
-      console.log('[Rofim Backend] Final results:', data.length);
+      const data = await fetchRofim(term.trim());
+      console.log('[Rofim Backend] Results:', data.length);
       
       // Map the response: value=name, info=specialty, image=image, query=profile slug
       const doctors = [];

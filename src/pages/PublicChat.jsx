@@ -15,6 +15,7 @@ import SuggestionChips from '../components/chat/SuggestionChips';
 import PublicChatMenu from '../components/chat/PublicChatMenu';
 import DetailsInputModal from '../components/chat/DetailsInputModal';
 import RofimDoctorCards from '../components/chat/RofimDoctorCards';
+import ROFIM_SPECIALTIES from '../components/data/rofimSpecialties';
 
 // Helper to call the public backend function (supports both auth and non-auth)
 const publicApi = async (payload) => {
@@ -152,6 +153,7 @@ export default function PublicChat() {
         try {
           const conversationSoFar = messages.map(m => `${m.role === 'user' ? 'לקוח' : 'נציג'}: ${m.content}`).join('\n');
           
+          const specialtiesList = ROFIM_SPECIALTIES.join(', ');
           const extractRes = await publicApi({
             action: 'invokeLLM',
             prompt: `You are analyzing a medical chat conversation to decide if we have enough info to search for doctors.
@@ -160,17 +162,20 @@ export default function PublicChat() {
 ${conversationSoFar}
 לקוח: ${content}
 
+=== AVAILABLE MEDICAL SPECIALTIES ===
+${specialtiesList}
+
 === TASK ===
 Extract ALL THREE mandatory fields needed to search for a doctor. Look through the ENTIRE conversation, not just the last message.
 
 The 3 MANDATORY fields are:
-1. medicalSearchTerm - the medical specialty, procedure, or doctor name (e.g. "אורולוגיה", "ד\"ר כהן", "ניתוח ברך")
+1. medicalSearchTerm - MUST be one of the exact specialty names from the list above. Match the user's intent to the closest specialty. For example: "אורולוג" → "אורולוגיה", "עיניים" → "עיניים", "לב" → "קרדיולוגיה", "עור" → "עור ומין", "אורתופד" → "אורתופדיה". If the user mentions a doctor name (e.g. "ד\"ר כהן"), use that name as-is.
 2. location - the city or area in Israel (e.g. "חיפה", "תל אביב", "ירושלים", "באר שבע")
 3. kupatHolim - the health fund (must be one of: "כללית", "מכבי", "מאוחדת", "לאומית", or "פרטי" for private)
 
 Rules:
 - Search through ALL messages to find these fields - they may have been mentioned earlier
-- medicalSearchTerm should be the FULL Hebrew specialty name ending in יה/ית (e.g. "אורולוגיה" not "אורולוג", "קרדיולוגיה" not "קרדיולוג", "אורתופדיה" not "אורתופד"). No conversational words.
+- medicalSearchTerm MUST match exactly one of the specialties from the list above, or be a specific doctor name
 - location must be a real Israeli city/area name
 - kupatHolim must be a recognized health fund name
 - ready_to_search should be TRUE only if ALL 3 fields are filled with real values
