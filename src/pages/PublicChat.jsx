@@ -583,10 +583,8 @@ ${history}
         // If we got Rofim doctor results from the search, attach them to this message
         if (result.rofimResults && result.rofimResults.length > 0) {
           setRofimDoctorsByMsgId(prev => ({ ...prev, [aiMsgId]: result.rofimResults }));
-        } else {
-          // Try to find doctor names mentioned in the AI response and search them
-          findAndAttachRofimDoctors(result.aiResponse, aiMsgId);
         }
+        // Removed findAndAttachRofimDoctors fallback - it was searching for hallucinated doctor names
       }
     } catch (error) {
       console.error('Error sending message:', error);
