@@ -104,41 +104,52 @@ Deno.serve(async (req) => {
         return Response.json({ results: [], doctors: [], procedures: [], professions: [] });
       }
       
-      // Build URL for the custom SearchDoctorProxy.ashx handler on rofim.org.il
-      const params = new URLSearchParams();
-      params.set('medicalSearchTerm', term.trim());
-      if (location) params.set('location', location);
-      if (kupatHolim) params.set('kupatHolim', kupatHolim);
-      
-      const url = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?${params.toString()}`;
-      console.log('[Rofim Backend] Full URL:', url);
-      console.log('[Rofim Backend] Params:', JSON.stringify({ term: term.trim(), location, kupatHolim }));
-      const res = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-          'Accept': 'application/json, text/plain, */*',
-          'Accept-Language': 'he-IL,he;q=0.9,en-US;q=0.8,en;q=0.7',
-          'Referer': 'https://www.rofim.org.il/',
-          'X-Requested-With': 'XMLHttpRequest'
+      // Helper to fetch from Rofim autocomplete proxy
+      const fetchRofim = async (searchTerm) => {
+        const params = new URLSearchParams();
+        params.set('medicalSearchTerm', searchTerm);
+        const url = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?${params.toString()}`;
+        console.log('[Rofim Backend] Fetching URL:', url);
+        const res = await fetch(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Language': 'he-IL,he;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Referer': 'https://www.rofim.org.il/',
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
+        if (!res.ok) {
+          console.log('[Rofim Backend] Status:', res.status);
+          return [];
         }
-      });
-      if (!res.ok) {
-        console.log('Rofim SearchDoctorProxy status:', res.status);
-        return Response.json({ results: [], doctors: [], procedures: [], professions: [] });
-      }
-      const rawText = await res.text();
-      console.log('[Rofim Backend] Raw response length:', rawText.length);
-      console.log('[Rofim Backend] Raw response preview:', rawText.substring(0, 500));
+        const rawText = await res.text();
+        console.log('[Rofim Backend] Response length:', rawText.length, 'preview:', rawText.substring(0, 300));
+        try {
+          const data = JSON.parse(rawText);
+          return Array.isArray(data) ? data : [];
+        } catch (e) {
+          console.log('[Rofim Backend] JSON parse failed:', e.message);
+          return [];
+        }
+      };
+
+      // Common Hebrew specialty suffixes to try if short form returns nothing
+      const specialtySuffixes = ['יה', 'ית', 'יא'];
       
-      let data;
-      try {
-        data = JSON.parse(rawText);
-      } catch (e) {
-        console.log('[Rofim Backend] Failed to parse JSON:', e.message);
-        return Response.json({ results: [], doctors: [], procedures: [], professions: [] });
+      let data = await fetchRofim(term.trim());
+      
+      // If no results, try adding common suffixes (e.g. "אורולוג" -> "אורולוגיה")
+      if (data.length === 0) {
+        for (const suffix of specialtySuffixes) {
+          const expanded = term.trim() + suffix;
+          console.log('[Rofim Backend] Retrying with expanded term:', expanded);
+          data = await fetchRofim(expanded);
+          if (data.length > 0) break;
+        }
       }
       
-      console.log('[Rofim Backend] Parsed items count:', Array.isArray(data) ? data.length : 'not array');
+      console.log('[Rofim Backend] Final items count:', data.length);
       
       // Map the response: value=name, info=specialty, image=image, query=profile slug
       const doctors = [];
