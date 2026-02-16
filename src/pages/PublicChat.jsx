@@ -142,25 +142,49 @@ export default function PublicChat() {
         return null;
       }
 
-      // Search Rofim for doctor names mentioned by the user
+      // Use LLM to decide if user wants a doctor search, and extract clean search params
       let rofimResults = [];
-      // Check if user is asking about a doctor by name (contains doctor prefix or seems like a name search)
-      const hasDoctorPrefix = /ד"ר|דר'|דר |פרופ'|פרופ |רופא|רופאה|דוקטור/.test(content);
-      const words = content.split(/\s+/).filter(w => w.length >= 2);
+      const isMedicalRelated = /רופא|רופאה|ד"ר|דר'|דר |פרופ'|פרופ |דוקטור|התמחות|מומחה|ניתוח|טיפול|בדיקה|אורולוג|קרדיולוג|אורתופד|גינקולוג|עור|עיניים|אף אוזן|נוירולוג|פנימי|ילדים|משפחה/.test(content);
       
-      if (hasDoctorPrefix || words.length <= 4) {
-        // Extract a search term — remove common prefixes and filler words
-        let searchTerm = content
-          .replace(/^(אני מחפש|אני רוצה|תחפש לי|חפש|מכיר את|יש לכם את|מה עם)\s*/i, '')
-          .replace(/\?/g, '')
-          .trim();
-        if (searchTerm.length >= 2) {
-          try {
-            rofimResults = await searchRofimDoctors(searchTerm);
-          } catch (e) {
-            console.warn('Rofim search failed:', e.message);
-            rofimResults = [];
+      if (isMedicalRelated) {
+        try {
+          // Ask LLM to extract clean search parameters from the user's message
+          const extractRes = await publicApi({
+            action: 'invokeLLM',
+            prompt: `The user sent this message in a medical chat: "${content}"
+
+Extract a CLEAN medical search term to send to a doctor search API.
+The API accepts: medicalSearchTerm (specialty, procedure, or doctor name), location (city), kupatHolim (health fund).
+
+Rules:
+- medicalSearchTerm should be a SHORT Hebrew term like: "אורולוגיה", "ד\"ר כהן", "ניתוח ברך", "קרדיולוגיה", "עור ומין"
+- Do NOT include conversational words like "אני מחפש", "תמצא לי", "יש לכם"
+- If the user mentions a specific city, extract it to location
+- If the user mentions a kupat holim (מכבי, כללית, מאוחדת, לאומית), extract it to kupatHolim
+- If the user is NOT asking about a doctor/specialty/procedure, return should_search=false
+- If the message is too vague to search, return should_search=false`,
+            response_json_schema: {
+              type: "object",
+              properties: {
+                should_search: { type: "boolean", description: "Whether this message warrants a doctor search" },
+                medicalSearchTerm: { type: "string", description: "Clean medical search term in Hebrew" },
+                location: { type: "string", description: "City/area if mentioned, empty string if not" },
+                kupatHolim: { type: "string", description: "Health fund if mentioned, empty string if not" }
+              }
+            }
+          });
+
+          const searchParams = extractRes.result;
+          console.log('[Rofim Search] LLM extracted params:', JSON.stringify(searchParams));
+
+          if (searchParams.should_search && searchParams.medicalSearchTerm && searchParams.medicalSearchTerm.length >= 2) {
+            console.log(`[Rofim Search] Querying handler with: term="${searchParams.medicalSearchTerm}", location="${searchParams.location || ''}", kupatHolim="${searchParams.kupatHolim || ''}"`);
+            rofimResults = await searchRofimDoctors(searchParams.medicalSearchTerm, searchParams.location, searchParams.kupatHolim);
+            console.log(`[Rofim Search] Got ${rofimResults.length} results`);
           }
+        } catch (e) {
+          console.warn('Rofim search failed:', e.message);
+          rofimResults = [];
         }
       }
 
@@ -376,10 +400,14 @@ IMPORTANT: Adapt your judgment to the business category. For example:
     }
   };
 
-  // Search Rofim API for doctors by name (via backend proxy to avoid CORS)
-  const searchRofimDoctors = async (searchTerm) => {
+  // Search Rofim API for doctors (via backend proxy to avoid CORS)
+  const searchRofimDoctors = async (searchTerm, location, kupatHolim) => {
     if (!searchTerm || searchTerm.trim().length < 2) return [];
-    const res = await publicApi({ action: 'searchRofim', term: searchTerm });
+    const payload = { action: 'searchRofim', term: searchTerm };
+    if (location) payload.location = location;
+    if (kupatHolim) payload.kupatHolim = kupatHolim;
+    console.log('[Rofim Search] Sending to backend:', JSON.stringify(payload));
+    const res = await publicApi(payload);
     return res.doctors || [];
   };
 
