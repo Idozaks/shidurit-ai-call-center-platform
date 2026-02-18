@@ -74,7 +74,7 @@ function RofimMiniCard({ doctor, themeColor, onClick }) {
           {doctor.cities && (
             <p className="text-[10px] text-slate-400 truncate flex items-center gap-0.5 mt-0.5">
               <MapPin className="w-2.5 h-2.5 shrink-0" />
-              {doctor.cities}
+              {doctor.cities.split(',').map(c => c.trim()).join(', ')}
             </p>
           )}
         </div>
