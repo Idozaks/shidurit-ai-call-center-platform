@@ -664,31 +664,31 @@ ${history}
       className="h-[100dvh] flex flex-col overflow-hidden"
       dir="rtl"
       style={{ 
-        background: `linear-gradient(135deg, ${themeColor}10 0%, white 50%, ${themeColor}05 100%)` 
+        background: `linear-gradient(160deg, #e8f4f8 0%, #f0f7ff 25%, #ffffff 50%, #f5faff 75%, #eaf6fb 100%)` 
       }}
     >
       {/* Header */}
       <header 
-        className="sticky top-0 z-10 backdrop-blur-lg border-b"
+        className="sticky top-0 z-10 border-b border-white/30"
         style={{ 
-          backgroundColor: `${themeColor}f5`,
-          borderColor: `${themeColor}30`
+          background: `linear-gradient(135deg, #0099cc, #0077b3, #005f8f)`,
+          boxShadow: '0 4px 30px rgba(0, 119, 179, 0.15)'
         }}
       >
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4">
+        <div className="max-w-3xl mx-auto px-4 py-3.5 flex items-center gap-4">
           <div 
-            className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold shadow-lg"
-            style={{ backgroundColor: themeColor }}
+            className="w-11 h-11 rounded-2xl flex items-center justify-center text-white font-bold shadow-lg ring-2 ring-white/30 overflow-hidden"
+            style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)' }}
           >
             {tenant.logo_url ? (
-              <img src={tenant.logo_url} alt="" className="w-full h-full object-cover rounded-xl" />
+              <img src={tenant.logo_url} alt="" className="w-full h-full object-cover" />
             ) : (
-              <Sparkles className="w-6 h-6" />
+              <Sparkles className="w-5 h-5" />
             )}
           </div>
           <div className="flex-1">
-            <h1 className="text-white font-bold text-lg">{tenant.company_name}</h1>
-            <p className="text-white/80 text-sm flex items-center gap-1">
+            <h1 className="text-white font-bold text-lg tracking-tight">{tenant.company_name}</h1>
+            <p className="text-white/70 text-xs flex items-center gap-1">
               <Sparkles className="w-3 h-3" />
               {tenant.ai_persona_name || 'נועה'} - עוזרת וירטואלית
             </p>
@@ -705,59 +705,60 @@ ${history}
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center justify-center h-full"
           >
-            <Card className="p-8 w-full max-w-md shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-              <div className="text-center mb-6">
-                <div 
-                  className="w-20 h-20 mx-auto rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg"
-                  style={{ backgroundColor: themeColor }}
-                >
-                  <MessageCircle className="w-10 h-10" />
+            <div className="p-8 w-full max-w-md shadow-2xl border border-white/40 rounded-3xl"
+                  style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+                  <div className="text-center mb-6">
+                    <div 
+                      className="w-20 h-20 mx-auto rounded-3xl flex items-center justify-center text-white mb-4 shadow-xl"
+                      style={{ background: 'linear-gradient(135deg, #0099cc, #0077b3)' }}
+                    >
+                      <MessageCircle className="w-10 h-10" />
+                    </div>
+                    <h2 className="text-2xl font-bold mb-2 text-slate-800">שלום! 👋</h2>
+                    <p className="text-slate-500">
+                      אני {tenant.ai_persona_name || 'נועה'}, העוזרת הוירטואלית של {tenant.company_name}
+                    </p>
+                  </div>
+                  <form onSubmit={handleStartChat} className="space-y-4">
+                    <div>
+                      <Input
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        placeholder="מה השם שלך?"
+                        className="text-center text-lg h-12 rounded-xl border-slate-200/60 bg-white/70 backdrop-blur-sm focus:ring-2 focus:ring-sky-300"
+                        required
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        type="submit" 
+                        className="flex-1 h-12 text-lg rounded-xl text-white shadow-lg hover:shadow-xl transition-all"
+                        style={{ background: 'linear-gradient(135deg, #0099cc, #0077b3)' }}
+                        disabled={createSessionMutation.isPending}
+                        onClick={() => setChatMode('text')}
+                      >
+                        {createSessionMutation.isPending && chatMode === 'text' ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <><Keyboard className="w-5 h-5 ml-2" /> צ'אט</>
+                        )}
+                      </Button>
+                      <Button 
+                        type="submit"
+                        className="flex-1 h-12 text-lg rounded-xl text-white shadow-lg hover:shadow-xl transition-all"
+                        style={{ background: 'linear-gradient(135deg, #0099cc, #0077b3)' }}
+                        disabled={createSessionMutation.isPending}
+                        onClick={() => setChatMode('voice')}
+                      >
+                        {createSessionMutation.isPending && chatMode === 'voice' ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <><Phone className="w-5 h-5 ml-2" /> שיחה קולית</>
+                        )}
+                      </Button>
+                    </div>
+                  </form>
                 </div>
-                <h2 className="text-2xl font-bold mb-2">שלום! 👋</h2>
-                <p className="text-slate-600">
-                  אני {tenant.ai_persona_name || 'נועה'}, העוזרת הוירטואלית של {tenant.company_name}
-                </p>
-              </div>
-              <form onSubmit={handleStartChat} className="space-y-4">
-                <div>
-                  <Input
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="מה השם שלך?"
-                    className="text-center text-lg h-12"
-                    required
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button 
-                    type="submit" 
-                    className="flex-1 h-12 text-lg"
-                    style={{ backgroundColor: themeColor }}
-                    disabled={createSessionMutation.isPending}
-                    onClick={() => setChatMode('text')}
-                  >
-                    {createSessionMutation.isPending && chatMode === 'text' ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      <><Keyboard className="w-5 h-5 ml-2" /> צ'אט</>
-                    )}
-                  </Button>
-                  <Button 
-                    type="submit"
-                    className="flex-1 h-12 text-lg"
-                    style={{ backgroundColor: themeColor }}
-                    disabled={createSessionMutation.isPending}
-                    onClick={() => setChatMode('voice')}
-                  >
-                    {createSessionMutation.isPending && chatMode === 'voice' ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      <><Phone className="w-5 h-5 ml-2" /> שיחה קולית</>
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </Card>
           </motion.div>
         ) : chatMode === 'voice' ? (
           <div className="flex-1 flex flex-col items-center justify-center py-12 gap-6">
@@ -838,8 +839,8 @@ ${history}
                     <Avatar className="w-10 h-10 shrink-0">
                       <AvatarFallback 
                         style={{ 
-                          backgroundColor: message.role === 'user' ? '#e2e8f0' : themeColor,
-                          color: message.role === 'user' ? '#64748b' : 'white'
+                          background: message.role === 'user' ? 'linear-gradient(135deg, #e0f0f8, #cce6f0)' : 'linear-gradient(135deg, #0099cc, #0077b3)',
+                          color: message.role === 'user' ? '#0077b3' : 'white'
                         }}
                       >
                         {message.role === 'user' ? <User className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
@@ -847,13 +848,17 @@ ${history}
                     </Avatar>
                     <div className={`max-w-[80%] ${message.role === 'user' ? '' : ''}`}>
                       <div 
-                        className={`rounded-2xl px-4 py-3 shadow-sm ${
+                        className={`rounded-2xl px-4 py-3 ${
                           message.role === 'user' 
-                            ? 'bg-slate-200 dark:bg-slate-700 rounded-tr-sm' 
-                            : 'bg-white dark:bg-slate-800 rounded-tl-sm border'
+                            ? 'rounded-tr-sm text-white shadow-lg' 
+                            : 'rounded-tl-sm border border-white/50 shadow-md'
                         }`}
+                        style={message.role === 'user' 
+                          ? { background: 'linear-gradient(135deg, #0099cc, #0077b3)' }
+                          : { background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }
+                        }
                       >
-                        <ReactMarkdown className="prose prose-sm dark:prose-invert max-w-none">
+                        <ReactMarkdown className={`prose prose-sm max-w-none ${message.role === 'user' ? 'prose-invert' : ''}`}>
                           {message.content}
                         </ReactMarkdown>
                       </div>
@@ -876,11 +881,11 @@ ${history}
                   className="flex gap-3"
                 >
                   <Avatar className="w-10 h-10">
-                    <AvatarFallback style={{ backgroundColor: themeColor, color: 'white' }}>
+                    <AvatarFallback style={{ background: 'linear-gradient(135deg, #0099cc, #0077b3)', color: 'white' }}>
                       <Sparkles className="w-5 h-5" />
                     </AvatarFallback>
                   </Avatar>
-                  <div className="bg-white dark:bg-slate-800 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm border">
+                  <div className="rounded-2xl rounded-tl-sm px-4 py-3 shadow-md border border-white/50" style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(12px)' }}>
                     <div className="flex gap-1">
                       <span className="w-2 h-2 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
                       <span className="w-2 h-2 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -910,7 +915,7 @@ ${history}
 
       {/* Input */}
       {!showNameInput && chatMode === 'text' && (
-        <div className="flex-shrink-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-t px-4 pt-2 pb-4">
+        <div className="flex-shrink-0 border-t border-white/40 px-4 pt-2 pb-4" style={{ background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
           <div className="max-w-3xl mx-auto">
             <SuggestionChips
                   tenantId={tenant?.id}
@@ -927,14 +932,14 @@ ${history}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="הקלד הודעה..."
-              className="flex-1 h-12"
+              className="flex-1 h-12 rounded-xl border-slate-200/60 bg-white/70 backdrop-blur-sm focus:ring-2 focus:ring-sky-300"
               disabled={isTyping}
             />
             <Button 
               type="submit" 
               size="icon" 
-              className="h-12 w-12"
-              style={{ backgroundColor: themeColor }}
+              className="h-12 w-12 rounded-xl text-white shadow-lg hover:shadow-xl transition-all"
+              style={{ background: 'linear-gradient(135deg, #0099cc, #0077b3)' }}
               disabled={!inputValue.trim() || isTyping}
             >
               <Send className="w-5 h-5" />
