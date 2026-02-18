@@ -145,9 +145,9 @@ function RofimDetailModal({ doctor, open, onClose, themeColor }) {
           <div className="absolute -bottom-14 right-6">
             <div className="w-32 h-32 rounded-full ring-4 ring-white shadow-lg" style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
                   <Avatar className="w-full h-full">
-                    {hasImage ? (
-                      <AvatarImage src={doctor.image} />
-                    ) : null}
+                          {hasImage ? (
+                            <AvatarImage src={doctor.image} className="object-cover" />
+                          ) : null}
                     <AvatarFallback
                       className="text-white font-bold text-3xl"
                       style={{ backgroundColor: themeColor }}
