@@ -130,8 +130,10 @@ Deno.serve(async (req) => {
         }
       };
 
-      const actualUrl = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?medicalSearchTerm=${encodeURIComponent(term.trim())}`;
-      const data = await fetchRofim(term.trim());
+      let actualUrl = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?medicalSearchTerm=${encodeURIComponent(term.trim())}`;
+      if (location) actualUrl += `&location=${encodeURIComponent(location)}`;
+      if (kupatHolim) actualUrl += `&kupatHolim=${encodeURIComponent(kupatHolim)}`;
+      const data = await fetchRofim(term.trim(), location, kupatHolim);
       console.log('[Rofim Backend] Results:', data.length);
       
       // Map the response: value=name, info=specialty, image=image, query=profile slug
