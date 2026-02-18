@@ -54,7 +54,8 @@ function RofimMiniCard({ doctor, themeColor, onClick }) {
   
   return (
     <Card
-      className="flex-shrink-0 w-52 cursor-pointer hover:shadow-md transition-shadow border bg-white/90 backdrop-blur-sm overflow-hidden"
+      className="flex-shrink-0 w-52 cursor-pointer hover:shadow-lg transition-all border border-white/50 overflow-hidden rounded-2xl"
+      style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
       onClick={onClick}
     >
       <div className="p-3 flex items-center gap-3">
@@ -103,7 +104,7 @@ function RofimDetailModal({ doctor, open, onClose, themeColor }) {
         {/* Header banner */}
         <div
           className="h-20 relative"
-          style={{ background: `linear-gradient(135deg, ${themeColor}, ${themeColor}cc)` }}
+          style={{ background: 'linear-gradient(135deg, #0099cc, #0077b3, #005f8f)' }}
         >
           <div className="absolute -bottom-8 right-6">
             <Avatar className="w-16 h-16 ring-4 ring-white shadow-lg">
@@ -161,8 +162,8 @@ function RofimDetailModal({ doctor, open, onClose, themeColor }) {
           </div>
 
           <Button
-            className="w-full gap-2 text-white"
-            style={{ backgroundColor: themeColor }}
+            className="w-full gap-2 text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
+            style={{ background: 'linear-gradient(135deg, #0099cc, #0077b3)' }}
             onClick={() => window.open(rofimUrl, '_blank')}
           >
             <ExternalLink className="w-4 h-4" />

@@ -47,12 +47,13 @@ export default function DetailsInputModal({ open, onClose, onSubmit, themeColor 
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 60, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden"
+            className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-white/40"
+            style={{ background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
             dir="rtl"
           >
             <div 
               className="flex items-center justify-between px-4 py-3"
-              style={{ backgroundColor: themeColor }}
+              style={{ background: 'linear-gradient(135deg, #0099cc, #0077b3)' }}
             >
               <span className="text-white font-medium text-sm">השאר פרטים</span>
               <button onClick={onClose} className="text-white/80 hover:text-white">
@@ -129,8 +130,8 @@ export default function DetailsInputModal({ open, onClose, onSubmit, themeColor 
               </div>
               <Button
                 type="submit"
-                className="w-full h-11 text-white gap-2 mt-4"
-                style={{ backgroundColor: themeColor }}
+                className="w-full h-11 text-white gap-2 mt-4 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                style={{ background: 'linear-gradient(135deg, #0099cc, #0077b3)' }}
                 disabled={!name.trim() && !phone.trim()}
               >
                 <Send className="w-4 h-4" />

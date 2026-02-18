@@ -30,9 +30,9 @@ export default function PublicChatMenu({ tenant, themeColor }) {
       {open && (
         <div className="fixed inset-0 z-[100]" dir="rtl">
           <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
-          <div className="absolute top-0 right-0 bottom-0 w-72 bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-200">
+          <div className="absolute top-0 right-0 bottom-0 w-72 shadow-2xl flex flex-col animate-in slide-in-from-right duration-200 border-l border-white/30" style={{ background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
             {/* Header */}
-            <div className="p-4 border-b flex items-center justify-between" style={{ backgroundColor: `${themeColor}10` }}>
+            <div className="p-4 border-b border-white/30 flex items-center justify-between" style={{ background: 'rgba(0,153,204,0.08)' }}>
               <div className="flex items-center gap-2">
                 {tenant?.logo_url ? (
                   <img src={tenant.logo_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
@@ -54,7 +54,7 @@ export default function PublicChatMenu({ tenant, themeColor }) {
                 <a
                   key={item.page}
                   href={createPageUrl(item.page)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-white/60 transition-colors"
                 >
                   <item.icon className="w-5 h-5 text-slate-500" />
                   <span className="font-medium text-sm">{item.label}</span>
