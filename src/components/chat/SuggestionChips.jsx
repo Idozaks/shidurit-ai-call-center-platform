@@ -43,30 +43,14 @@ export default function SuggestionChips({ tenantId, messages, onSelect, themeCol
   const isAskingForDetails = detailsKeywords.some(kw => lastAssistantMessage.includes(kw));
   const showDetailsChip = !detailsSubmitted && !isFirstInteraction && (isAskingForDetails || userMessageCount >= 2);
 
-  const chipBaseStyle = {
-    borderColor: `${themeColor}30`,
-    color: themeColor === '#ffffff' || themeColor === '#fff' ? '#334155' : themeColor,
-  };
-
   const handleChipClick = (text) => {
     onSelect(text);
     setShowFixedActions(false);
-    setFollowUpSuggestions([]);
   };
 
-  // ==========================================
-  // BEFORE first user message: show initial view
-  // ==========================================
   if (isFirstInteraction) {
     return null;
   }
-
-  // ==========================================
-  // AFTER first user message: show follow-up suggestions
-  // ==========================================
-  const midpoint = Math.ceil(followUpSuggestions.length / 2);
-  const row1 = followUpSuggestions.slice(0, midpoint);
-  const row2 = followUpSuggestions.slice(midpoint);
 
   return (
     <div className="py-1 space-y-1">
