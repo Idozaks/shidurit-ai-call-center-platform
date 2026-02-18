@@ -48,18 +48,8 @@ export default function PublicChatMenu({ tenant, themeColor }) {
               </Button>
             </div>
 
-            {/* Navigation items */}
+            {/* Navigation items - placeholder for future menu items */}
             <nav className="flex-1 p-3 space-y-1">
-              {menuItems.map(item => (
-                <a
-                  key={item.page}
-                  href={createPageUrl(item.page)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-white/60 transition-colors"
-                >
-                  <item.icon className="w-5 h-5 text-slate-500" />
-                  <span className="font-medium text-sm">{item.label}</span>
-                </a>
-              ))}
             </nav>
 
             {/* Footer */}
