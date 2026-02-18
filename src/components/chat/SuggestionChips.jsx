@@ -164,52 +164,7 @@ Return exactly 10 suggestions.`,
   // BEFORE first user message: show initial view
   // ==========================================
   if (isFirstInteraction) {
-    return (
-      <div className="py-2 space-y-3">
-        {/* Fixed quick actions */}
-        <div className="flex flex-wrap justify-center gap-2">
-          {FIXED_ACTIONS.map((action, i) => (
-            <button
-              key={`action-${i}`}
-              onClick={() => handleChipClick(action.label)}
-              disabled={disabled}
-              className="text-sm px-3.5 py-2 rounded-full border border-white/50 transition-all whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5 hover:shadow-lg shadow-sm"
-              style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', color: '#0077b3' }}
-            >
-              <action.icon className="w-3.5 h-3.5" />
-              {action.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Popular topics */}
-        <div>
-          <p className="text-center text-xs text-slate-400 mb-2">נושאים פופולריים</p>
-          {loading ? (
-            <div className="flex justify-center py-1">
-              <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-            </div>
-          ) : (
-            <div className="flex flex-wrap justify-center gap-2">
-              {initialTopics.map((topic, i) => (
-                <motion.button
-                  key={`topic-${i}`}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.05 }}
-                  onClick={() => handleChipClick(topic)}
-                  disabled={disabled}
-                  className="text-sm px-3.5 py-2 rounded-full border border-white/50 transition-all whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5 hover:shadow-lg shadow-sm"
-                  style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', color: '#0077b3' }}
-                >
-                  {topic}
-                </motion.button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    );
+    return null;
   }
 
   // ==========================================
