@@ -964,6 +964,7 @@ ${history}
           </div>
           <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto flex gap-2">
             <Input
+              ref={chatInputRef}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="הקלד הודעה..."
