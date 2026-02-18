@@ -227,8 +227,8 @@ CRITICAL RULES:
       }
 
       // Get AI response with Rofim results injected into prompt
-      const searchWasAttempted = isMedicalRelated && rofimResults !== undefined;
-      const llmRes = await publicApi({ action: 'invokeLLM', prompt: buildPrompt(content, rofimResults, searchWasAttempted), response_json_schema: null });
+      // searchWasAttempted = true ONLY if we actually queried the Rofim API (all 3 fields present + specific city)
+      const llmRes = await publicApi({ action: 'invokeLLM', prompt: buildPrompt(content, rofimResults, searchActuallyPerformed, extractedSearchParams), response_json_schema: null });
       const aiResponse = llmRes.result;
 
       // Save AI response
