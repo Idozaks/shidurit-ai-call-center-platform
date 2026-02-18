@@ -71,6 +71,12 @@ function RofimMiniCard({ doctor, themeColor, onClick }) {
         <div className="min-w-0 flex-1">
           <p className="font-semibold text-sm text-slate-800 truncate">{doctor.name}</p>
           <p className="text-xs text-slate-500 truncate">{doctor.specialty}</p>
+          {doctor.cities && (
+            <p className="text-[10px] text-slate-400 truncate flex items-center gap-0.5 mt-0.5">
+              <MapPin className="w-2.5 h-2.5 shrink-0" />
+              {doctor.cities}
+            </p>
+          )}
         </div>
       </div>
       <div className="px-3 pb-2.5 flex items-center justify-between">
@@ -131,6 +137,27 @@ function RofimDetailModal({ doctor, open, onClose, themeColor }) {
             <p>
               <span className="font-medium text-slate-700">התמחות:</span> {doctor.specialty}
             </p>
+            {doctor.cities && (
+              <p className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span className="font-medium text-slate-700">מיקום:</span> {doctor.cities}
+              </p>
+            )}
+            {doctor.kupot && (
+              <div>
+                <p className="flex items-center gap-1.5 mb-1.5">
+                  <Heart className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <span className="font-medium text-slate-700">קופות חולים:</span>
+                </p>
+                <div className="flex flex-wrap gap-1 mr-5">
+                  {doctor.kupot.split(',').map((kupa, i) => (
+                    <Badge key={i} variant="outline" className="text-xs px-2 py-0.5 border-indigo-200 text-indigo-600">
+                      {kupa.trim()}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
             <p className="text-xs text-slate-400">
               מידע נוסף על הרופא/ה זמין באתר rofim.org.il
             </p>
