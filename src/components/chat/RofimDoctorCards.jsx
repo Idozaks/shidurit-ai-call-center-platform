@@ -107,24 +107,24 @@ function RofimDetailModal({ doctor, open, onClose, themeColor }) {
           className="h-20 relative"
           style={{ background: 'linear-gradient(135deg, #0099cc, #0077b3, #005f8f)' }}
         >
-          <div className="absolute -bottom-8 right-6">
-            <div className="w-16 h-16 rounded-full ring-4 ring-white shadow-lg" style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
+          <div className="absolute -bottom-14 right-6">
+            <div className="w-32 h-32 rounded-full ring-4 ring-white shadow-lg" style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
                   <Avatar className="w-full h-full">
                     {hasImage ? (
                       <AvatarImage src={doctor.image} />
                     ) : null}
                     <AvatarFallback
-                      className="text-white font-bold text-xl"
+                      className="text-white font-bold text-3xl"
                       style={{ backgroundColor: themeColor }}
                     >
-                      <User className="w-8 h-8" />
+                      <User className="w-14 h-14" />
                     </AvatarFallback>
                   </Avatar>
                 </div>
           </div>
         </div>
 
-        <div className="px-6 pt-10 pb-6 space-y-4">
+        <div className="px-6 pt-16 pb-6 space-y-4">
           <DialogHeader className="text-right items-end sm:text-right">
             <DialogTitle className="text-xl text-right w-full">{doctor.name}</DialogTitle>
             <Badge className="w-fit text-white mt-1 mr-auto" style={{ backgroundColor: themeColor }}>
