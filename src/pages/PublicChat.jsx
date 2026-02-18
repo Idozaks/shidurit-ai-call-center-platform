@@ -230,7 +230,7 @@ CRITICAL RULES:
         await publicApi({ action: 'updateTenantUsage', tenant_id: tenant.id, usage_count: (tenant.usage_count || 0) + 1 });
       }
 
-      return { aiResponse, rofimResults };
+      return { aiResponse, rofimResults, rofimSearchAttempted: isMedicalRelated && rofimResults !== undefined };
     },
     onSuccess: (result) => {
       // Run lead intelligence in background after each message exchange
