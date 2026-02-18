@@ -759,6 +759,7 @@ ${history}
                         placeholder="מה השם שלך?"
                         className="text-center text-lg h-12 rounded-xl border-slate-200/60 bg-white/70 backdrop-blur-sm focus:ring-2 focus:ring-sky-300"
                         required
+                        autoFocus
                       />
                     </div>
                     <div className="flex gap-2">
