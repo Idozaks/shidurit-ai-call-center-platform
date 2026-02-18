@@ -438,6 +438,10 @@ IMPORTANT: Adapt your judgment to the business category. For example:
     if (kupatHolim) payload.kupatHolim = kupatHolim;
     console.log('[Rofim Search] Sending to backend:', JSON.stringify(payload));
     const res = await publicApi(payload);
+    if (res._debug) {
+      console.log('[Rofim Search] Actual Rofim URL hit:', res._debug.actualRofimUrl);
+      console.log('[Rofim Search] Debug info:', JSON.stringify(res._debug));
+    }
     return res.doctors || [];
   };
 
