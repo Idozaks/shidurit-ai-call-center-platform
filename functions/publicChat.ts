@@ -128,28 +128,12 @@ Deno.serve(async (req) => {
         }
       };
 
-      // Support pipe-separated terms for procedure synonym matching
-      const terms = term.trim().split('|').map(t => t.trim()).filter(Boolean);
-      let data = [];
-      let matchedTerm = terms[0];
-      
-      // Try each synonym term until we get results
-      for (const t of terms) {
-        console.log(`[Rofim Backend] Trying term: "${t}"`);
-        const results = await fetchRofim(t, location, kupatHolim);
-        if (results.length > 0) {
-          data = results;
-          matchedTerm = t;
-          console.log(`[Rofim Backend] Got ${results.length} results with term: "${t}"`);
-          break;
-        }
-      }
-      
-      if (data.length === 0) {
-        console.log(`[Rofim Backend] No results from any of ${terms.length} synonym terms`);
-      }
+      // Pass the full term (including pipe-separated synonyms) directly to the handler
+      const fullTerm = term.trim();
+      const data = await fetchRofim(fullTerm, location, kupatHolim);
+      console.log('[Rofim Backend] Results:', data.length);
 
-      let actualUrl = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?medicalSearchTerm=${encodeURIComponent(matchedTerm)}`;
+      let actualUrl = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?medicalSearchTerm=${encodeURIComponent(fullTerm)}`;
       if (location) actualUrl += `&location=${encodeURIComponent(location)}`;
       if (kupatHolim) actualUrl += `&kupatHolim=${encodeURIComponent(kupatHolim)}`;
       
