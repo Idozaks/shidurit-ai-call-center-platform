@@ -100,7 +100,8 @@ Deno.serve(async (req) => {
 
     if (action === 'searchRofim') {
       const { term, location, kupatHolim } = body;
-      if (!term || term.trim().length === 0) {
+      const termStr = (typeof term === 'string') ? term.trim() : '';
+      if (!termStr || termStr.length === 0) {
         return Response.json({ results: [], doctors: [], procedures: [], professions: [] });
       }
       
@@ -129,11 +130,10 @@ Deno.serve(async (req) => {
       };
 
       // Pass the full term (including pipe-separated synonyms) directly to the handler
-      const fullTerm = term.trim();
-      const data = await fetchRofim(fullTerm, location, kupatHolim);
+      const data = await fetchRofim(termStr, location, kupatHolim);
       console.log('[Rofim Backend] Results:', data.length);
 
-      let actualUrl = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?medicalSearchTerm=${encodeURIComponent(fullTerm)}`;
+      let actualUrl = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?medicalSearchTerm=${encodeURIComponent(termStr)}`;
       if (location) actualUrl += `&location=${encodeURIComponent(location)}`;
       if (kupatHolim) actualUrl += `&kupatHolim=${encodeURIComponent(kupatHolim)}`;
       
@@ -152,7 +152,7 @@ Deno.serve(async (req) => {
         });
       }
       
-      return Response.json({ results: data, doctors, procedures: [], professions: [], _debug: { actualRofimUrl: actualUrl, termSent: fullTerm, locationReceived: location || null, kupatHolimReceived: kupatHolim || null } });
+      return Response.json({ results: data, doctors, procedures: [], professions: [], _debug: { actualRofimUrl: actualUrl, termSent: termStr, locationReceived: location || null, kupatHolimReceived: kupatHolim || null } });
     }
 
     return Response.json({ error: 'Unknown action' }, { status: 400 });
