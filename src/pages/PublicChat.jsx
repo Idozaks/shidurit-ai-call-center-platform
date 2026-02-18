@@ -179,23 +179,26 @@ ${specialtiesList}
 Extract these 3 fields by scanning the ENTIRE conversation history above:
 
 1. medicalSearchTerm - MUST be one of the exact specialty names from the list above. Map user's words to the closest match: "אורולוג"→"אורולוגיה", "עיניים"→"עיניים", "לב"→"קרדיולוגיה", "עור"→"עור ומין", "אורתופד"→"אורתופדיה". If user mentions a doctor name, use it as-is.
-2. location - Israeli city/area (e.g. "חיפה", "תל אביב", "ירושלים")
+2. location - MUST be a specific Israeli CITY name (e.g. "חיפה", "תל אביב", "ירושלים", "באר שבע", "נצרת", "פתח תקווה", "ראשון לציון", "נתניה", "אשדוד", "חדרה", "רמת גן").
+   CRITICAL: Generalized regions/areas are NOT valid cities. The following are NOT specific cities and must be REJECTED: "מרכז", "צפון", "דרום", "שרון", "שפלה", "נגב", "גליל", "גוש דן", "השרון", "עמק יזרעאל", "אזור המרכז", "אזור הצפון", "אזור הדרום", "אזור ירושלים", "אזור תל אביב", "המשולש", "עוטף עזה".
+   If the user gave a region/area instead of a city, set location to empty string and add "עיר ספציפית (לא אזור)" to missing_fields. Set location_is_region=true.
 3. kupatHolim - health fund: "כללית", "מכבי", "מאוחדת", "לאומית", or "פרטי"
 
 CRITICAL RULES:
 - Fields mentioned ANYWHERE in the conversation are valid — not just the last message
 - If a field was identified in "PREVIOUSLY IDENTIFIED FIELDS" and the user did NOT explicitly change it, KEEP the previous value
 - If the user provides a NEW value for a field (e.g. changes city from חיפה to תל אביב), use the NEW value
-- ready_to_search = true ONLY when all 3 fields have non-empty real values
+- ready_to_search = true ONLY when all 3 fields have non-empty real values AND location is a specific city (not a region)
 - missing_fields should list only truly missing fields (empty strings = missing)`,
             response_json_schema: {
               type: "object",
               properties: {
-                ready_to_search: { type: "boolean", description: "True only if all 3 mandatory fields are present" },
+                ready_to_search: { type: "boolean", description: "True only if all 3 mandatory fields are present and location is a specific city" },
                 medicalSearchTerm: { type: "string", description: "Clean medical search term in Hebrew, empty if not found" },
-                location: { type: "string", description: "City/area in Israel, empty if not found" },
+                location: { type: "string", description: "Specific city name in Israel, empty if region/area was given or not found" },
+                location_is_region: { type: "boolean", description: "True if user gave a general region/area instead of a specific city" },
                 kupatHolim: { type: "string", description: "Health fund name, empty if not found" },
-                missing_fields: { type: "array", items: { type: "string" }, description: "List of missing fields in Hebrew, e.g. ['עיר', 'קופת חולים']" }
+                missing_fields: { type: "array", items: { type: "string" }, description: "List of missing fields in Hebrew" }
               }
             }
           });

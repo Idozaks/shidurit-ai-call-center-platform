@@ -135,9 +135,6 @@ function RofimDetailModal({ doctor, open, onClose, themeColor }) {
           <Separator />
 
           <div className="text-sm text-slate-600 space-y-2">
-            <p>
-              <span className="font-medium text-slate-700">התמחות:</span> {doctor.specialty}
-            </p>
             {doctor.cities && (
               <p className="flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
