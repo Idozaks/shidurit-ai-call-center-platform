@@ -97,15 +97,15 @@ function RofimMiniCard({ doctor, themeColor, onClick }) {
       <div className="p-3 flex items-center gap-3">
         <Avatar className="w-10 h-10 shrink-0">
           {hasImage ? (
-            <AvatarImage src={doctor.image} />
-          ) : null}
-          <AvatarFallback
-            className="text-white font-bold text-sm"
-            style={{ backgroundColor: themeColor }}
-          >
-            <User className="w-5 h-5" />
-          </AvatarFallback>
-        </Avatar>
+              <AvatarImage src={doctor.image} className="object-cover" />
+            ) : null}
+            <AvatarFallback
+              className="text-white font-bold text-sm"
+              style={{ backgroundColor: themeColor }}
+            >
+              <User className="w-5 h-5" />
+            </AvatarFallback>
+          </Avatar>
         <div className="min-w-0 flex-1">
           <p className="font-semibold text-sm text-slate-800 truncate">{doctor.name}</p>
           <p className="text-xs text-slate-500 truncate">{doctor.specialty}</p>
