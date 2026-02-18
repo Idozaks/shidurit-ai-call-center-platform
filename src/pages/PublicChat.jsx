@@ -886,7 +886,7 @@ ${history}
                         className={`rounded-2xl px-4 py-3 ${
                           message.role === 'user' 
                             ? 'rounded-tl-sm text-white shadow-lg' 
-                            : 'rounded-tl-sm border border-white/50 shadow-md'
+                            : 'rounded-tr-sm border border-white/50 shadow-md'
                         }`}
                         style={message.role === 'user' 
                           ? { background: 'linear-gradient(135deg, #0099cc, #0077b3)' }
