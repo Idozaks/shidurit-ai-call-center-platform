@@ -95,6 +95,7 @@ export default function PublicChat() {
       setSessionId(session.id);
       setSessionStatus(session.status || 'active');
       setShowNameInput(false);
+      setTimeout(() => chatInputRef.current?.focus(), 100);
       if (tenant?.welcome_message) {
         setMessages([{
           id: 'welcome',
