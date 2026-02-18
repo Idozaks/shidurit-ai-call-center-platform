@@ -152,7 +152,7 @@ Deno.serve(async (req) => {
         });
       }
       
-      return Response.json({ results: data, doctors, procedures: [], professions: [], _debug: { actualRofimUrl: actualUrl, matchedTerm, allTermsTried: terms, locationReceived: location || null, kupatHolimReceived: kupatHolim || null } });
+      return Response.json({ results: data, doctors, procedures: [], professions: [], _debug: { actualRofimUrl: actualUrl, termSent: fullTerm, locationReceived: location || null, kupatHolimReceived: kupatHolim || null } });
     }
 
     return Response.json({ error: 'Unknown action' }, { status: 400 });
