@@ -212,6 +212,7 @@ CRITICAL RULES:
                 ready_to_search: { type: "boolean", description: "True only if all 3 mandatory fields are present and location is a specific city" },
                 medicalSearchTerm: { type: "string", description: "Clean medical search term in Hebrew - specialty name, procedure name, or doctor name" },
                 search_type: { type: "string", enum: ["specialty", "procedure", "doctor_name"], description: "Type of search term" },
+                procedure_synonyms: { type: "array", items: { type: "string" }, description: "ONLY when search_type is procedure: 10 alternative Hebrew names/phrasings for the same procedure that might match in a medical database. Include variations with/without 'ניתוח', shorter forms, medical terms, colloquial names. E.g. for 'ניתוח הסרת שקדים': ['הסרת שקדים','כריתת שקדים','ניתוח שקדים','טונסילקטומיה','הוצאת שקדים','הסרת שקד שלישי','כריתת שקד שלישי','ניתוח הסרת שקד','שקדים','הסרת שקד']. Empty array if search_type is not procedure." },
                 location: { type: "string", description: "Specific city name in Israel, empty if region/area was given or not found" },
                 location_is_region: { type: "boolean", description: "True if user gave a general region/area instead of a specific city" },
                 kupatHolim: { type: "string", description: "Health fund name, empty if not found" },
