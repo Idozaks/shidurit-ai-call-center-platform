@@ -503,7 +503,7 @@ ${aiResponse}`,
     }
   };
 
-  const buildPrompt = (userMessage, rofimSearchResults, searchWasAttempted = false) => {
+  const buildPrompt = (userMessage, rofimSearchResults, searchActuallyPerformed = false, extractedParams = null) => {
     const history = messages.map(m => `${m.role === 'user' ? 'לקוח' : tenant?.ai_persona_name || 'נועה'}: ${m.content}`).join('\n');
     const isFirstMessage = messages.filter(m => m.role === 'user').length === 0;
     
@@ -522,10 +522,26 @@ ${aiResponse}`,
 
     // Build Rofim search results context
     let rofimContext = '';
-    if (rofimSearchResults && rofimSearchResults.length > 0) {
+    if (searchActuallyPerformed && rofimSearchResults && rofimSearchResults.length > 0) {
       rofimContext = `\n\n=== תוצאות חיפוש רופאים (ממאגר rofim.org.il) - נמצאו ${rofimSearchResults.length} רופאים ===\nהכרטיסיות של הרופאים מוצגות אוטומטית מתחת להודעה שלך. אל תפרט את שמותיהם.`;
-    } else if (searchWasAttempted && rofimSearchResults && rofimSearchResults.length === 0) {
+    } else if (searchActuallyPerformed && rofimSearchResults && rofimSearchResults.length === 0) {
       rofimContext = `\n\n=== חיפוש רופאים: בוצע חיפוש אך לא נמצאו תוצאות (0 רופאים) ===\nCRITICAL: החיפוש בוצע עם כל 3 הפרטים אך לא נמצאו רופאים מתאימים. ספר ללקוח שלא נמצאו רופאים מתאימים לקריטריונים שביקש, והצע לשנות את ההתמחות, האזור, או קופת החולים ולנסות שוב.`;
+    } else if (extractedParams) {
+      // Search was NOT performed — tell the AI exactly what was detected and what's missing
+      const detected = [];
+      if (extractedParams.medicalSearchTerm) detected.push(`התמחות: ${extractedParams.medicalSearchTerm}`);
+      if (extractedParams.kupatHolim) detected.push(`קופת חולים: ${extractedParams.kupatHolim}`);
+      if (extractedParams.location && !extractedParams.location_is_region) detected.push(`עיר: ${extractedParams.location}`);
+      
+      const missingParts = extractedParams.missing_fields || [];
+      const regionWarning = extractedParams.location_is_region 
+        ? `\nCRITICAL: הלקוח נתן אזור כללי במקום עיר ספציפית. בקש ממנו עיר מדויקה (למשל "חיפה", "נצרת", "טבריה") ולא אזור כמו "צפון" או "מרכז".`
+        : '';
+      
+      rofimContext = `\n\n=== חיפוש רופאים: לא בוצע חיפוש (חסרים פרטים) ===
+פרטים שזוהו עד כה: ${detected.length > 0 ? detected.join(', ') : 'אין'}
+פרטים חסרים: ${missingParts.length > 0 ? missingParts.join(', ') : 'אין'}${regionWarning}
+CRITICAL: אל תטען שמצאת רופאים! לא בוצע חיפוש. בקש מהלקוח בנימוס את הפרטים החסרים בלבד. אל תבקש פרטים שכבר זוהו!`;
     } else {
       rofimContext = `\n\n=== חיפוש רופאים: לא בוצע חיפוש ===\nCRITICAL: אל תטען שמצאת רופאים אם אין תוצאות חיפוש כאן! אם הלקוח מבקש רופא ועדיין חסרים פרטים - בקש אותם.`;
     }
