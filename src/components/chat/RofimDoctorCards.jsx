@@ -10,6 +10,7 @@ import {
   Stethoscope, ChevronLeft, ExternalLink, User, MapPin, Heart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import KupaLogo from './KupaLogo';
 
 const BLANK_FACE = 'https://www.rofim.org.il/FilesManagers/Doctors/ZZ_blank_face.gif';
 
@@ -149,11 +150,11 @@ function RofimDetailModal({ doctor, open, onClose, themeColor }) {
                   <Heart className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   <span className="font-medium text-slate-700">קופות חולים:</span>
                 </p>
-                <div className="flex flex-wrap gap-1 mr-5">
+                <div className="flex flex-wrap gap-2 mr-5 items-center">
                   {doctor.kupot.split(',').map((kupa, i) => (
-                    <Badge key={i} variant="outline" className="text-xs px-2 py-0.5 border-indigo-200 text-indigo-600">
-                      {kupa.trim()}
-                    </Badge>
+                    <div key={i} className="border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50">
+                      <KupaLogo name={kupa.trim()} className="h-5" />
+                    </div>
                   ))}
                 </div>
               </div>
