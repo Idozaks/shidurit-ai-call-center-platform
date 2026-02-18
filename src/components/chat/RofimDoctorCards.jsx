@@ -140,7 +140,7 @@ function RofimDetailModal({ doctor, open, onClose, themeColor }) {
             {doctor.cities && (
               <p className="flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                <span className="font-medium text-slate-700">מיקום:</span> {doctor.cities}
+                <span className="font-medium text-slate-700">מיקום:</span> {doctor.cities.split(',').map(c => c.trim()).join(', ')}
               </p>
             )}
             {doctor.kupot && (
