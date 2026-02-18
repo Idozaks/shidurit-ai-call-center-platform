@@ -7,7 +7,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle
 } from "@/components/ui/dialog";
 import {
-  Stethoscope, ChevronLeft, ExternalLink, User
+  Stethoscope, ChevronLeft, ExternalLink, User, MapPin, Heart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

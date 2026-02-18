@@ -145,6 +145,8 @@ Deno.serve(async (req) => {
           specialty: item.info || '',
           image: item.image || '',
           query: item.query || '',
+          cities: item.cities || '',
+          kupot: item.kupot || '',
           doctor_url: item.query ? `https://www.rofim.org.il/minisite/${item.query}` : 'https://www.rofim.org.il'
         });
       }
