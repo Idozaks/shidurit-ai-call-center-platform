@@ -173,8 +173,8 @@ Return exactly 10 suggestions.`,
               key={`action-${i}`}
               onClick={() => handleChipClick(action.label)}
               disabled={disabled}
-              className="text-sm px-3.5 py-2 rounded-full border transition-all whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5 hover:shadow-md bg-white/80 backdrop-blur-sm"
-              style={chipBaseStyle}
+              className="text-sm px-3.5 py-2 rounded-full border border-white/50 transition-all whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5 hover:shadow-lg shadow-sm"
+              style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', color: '#0077b3' }}
             >
               <action.icon className="w-3.5 h-3.5" />
               {action.label}
@@ -199,8 +199,8 @@ Return exactly 10 suggestions.`,
                   transition={{ delay: i * 0.05 }}
                   onClick={() => handleChipClick(topic)}
                   disabled={disabled}
-                  className="text-sm px-3.5 py-2 rounded-full border transition-all whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5 hover:shadow-md bg-white/80 backdrop-blur-sm"
-                  style={chipBaseStyle}
+                  className="text-sm px-3.5 py-2 rounded-full border border-white/50 transition-all whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5 hover:shadow-lg shadow-sm"
+                  style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', color: '#0077b3' }}
                 >
                   {topic}
                 </motion.button>
@@ -242,15 +242,15 @@ Return exactly 10 suggestions.`,
                 onClick={() => onOpenDetailsModal?.()}
                 disabled={disabled}
                 className="text-sm px-4 py-1.5 rounded-full border-2 transition-all whitespace-nowrap disabled:opacity-50 font-medium"
-                style={{ borderColor: themeColor, color: 'white', backgroundColor: themeColor }}
+                style={{ borderColor: '#0099cc', color: 'white', background: 'linear-gradient(135deg, #0099cc, #0077b3)' }}
               >
                 📋 השאר פרטים
               </button>
             )}
             <button
               onClick={() => setShowFixedActions(!showFixedActions)}
-              className="text-xs px-3 py-1.5 rounded-full border transition-all flex items-center gap-1 hover:shadow-sm"
-              style={{ borderColor: `${themeColor}30`, color: `${themeColor}90` }}
+              className="text-xs px-3 py-1.5 rounded-full border border-white/50 transition-all flex items-center gap-1 hover:shadow-sm"
+              style={{ background: 'rgba(255,255,255,0.5)', color: '#0077b3' }}
             >
               <Grid3X3 className="w-3 h-3" />
               פעולות מהירות
@@ -271,8 +271,8 @@ Return exactly 10 suggestions.`,
                   key={`action-${i}`}
                   onClick={() => handleChipClick(action.label)}
                   disabled={disabled}
-                  className="text-sm px-3.5 py-1.5 rounded-full border transition-all whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5 hover:shadow-md bg-white/80 backdrop-blur-sm"
-                  style={chipBaseStyle}
+                  className="text-sm px-3.5 py-1.5 rounded-full border border-white/50 transition-all whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5 hover:shadow-lg shadow-sm"
+                  style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', color: '#0077b3' }}
                 >
                   <action.icon className="w-3.5 h-3.5" />
                   {action.label}
@@ -306,10 +306,10 @@ Return exactly 10 suggestions.`,
                       key={`s1-${i}`}
                       onClick={() => handleChipClick(text)}
                       disabled={disabled}
-                      className="text-sm px-3 py-1.5 rounded-full border-[1.5px] transition-all whitespace-nowrap disabled:opacity-50 flex-shrink-0 shadow-sm hover:shadow-md"
-                      style={{ borderColor: `${themeColor}50`, color: themeColor, backgroundColor: `${themeColor}10` }}
-                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}20`; e.currentTarget.style.borderColor = `${themeColor}70`; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}10`; e.currentTarget.style.borderColor = `${themeColor}50`; }}
+                      className="text-sm px-3 py-1.5 rounded-full border border-white/50 transition-all whitespace-nowrap disabled:opacity-50 flex-shrink-0 shadow-sm hover:shadow-lg"
+                      style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', color: '#0077b3' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.85)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.6)'; }}
                     >
                       {text}
                     </button>

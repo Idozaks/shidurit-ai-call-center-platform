@@ -763,9 +763,9 @@ ${history}
         ) : chatMode === 'voice' ? (
           <div className="flex-1 flex flex-col items-center justify-center py-12 gap-6">
             <div 
-              className="w-24 h-24 rounded-full flex items-center justify-center text-white shadow-xl"
-              style={{ backgroundColor: themeColor }}
-            >
+                  className="w-24 h-24 rounded-full flex items-center justify-center text-white shadow-xl"
+                  style={{ background: 'linear-gradient(135deg, #0099cc, #0077b3)' }}
+                >
               {tenant.logo_url ? (
                 <img src={tenant.logo_url} alt="" className="w-full h-full object-cover rounded-full" />
               ) : (
