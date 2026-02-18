@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import KupaLogo from './KupaLogo';
-import { getSpecialtyIcon } from './SpecialtyIconMap';
+
 
 const BLANK_FACE = 'https://www.rofim.org.il/FilesManagers/Doctors/ZZ_blank_face.gif';
 
