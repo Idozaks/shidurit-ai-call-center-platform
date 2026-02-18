@@ -80,11 +80,7 @@ function RofimMiniCard({ doctor, themeColor, onClick }) {
           )}
         </div>
       </div>
-      <div className="px-3 pb-2.5 flex items-center justify-between">
-        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-blue-200 text-blue-600 gap-0.5">
-          <Stethoscope className="w-2.5 h-2.5" />
-          rofim.org.il
-        </Badge>
+      <div className="px-3 pb-2.5 flex items-center justify-end">
         <span className="text-[10px] text-slate-400 flex items-center gap-0.5">
           פרטים
           <ChevronLeft className="w-3 h-3" />
