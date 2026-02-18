@@ -230,8 +230,15 @@ CRITICAL RULES:
           const hasAllFields = searchParams.medicalSearchTerm?.trim() && searchParams.location?.trim() && searchParams.kupatHolim?.trim() && !searchParams.location_is_region;
           if (hasAllFields) {
             searchActuallyPerformed = true;
-            console.log(`[Rofim Search] Querying handler with: term="${searchParams.medicalSearchTerm}", location="${searchParams.location}", kupatHolim="${searchParams.kupatHolim}"`);
-            rofimResults = await searchRofimDoctors(searchParams.medicalSearchTerm, searchParams.location, searchParams.kupatHolim);
+            // For procedures, build a pipe-separated term with synonyms
+            let finalSearchTerm = searchParams.medicalSearchTerm;
+            if (searchParams.search_type === 'procedure' && searchParams.procedure_synonyms?.length > 0) {
+              const allTerms = [searchParams.medicalSearchTerm, ...searchParams.procedure_synonyms.filter(s => s && s !== searchParams.medicalSearchTerm)];
+              finalSearchTerm = allTerms.join('|');
+              console.log(`[Rofim Search] Procedure with synonyms: "${finalSearchTerm}"`);
+            }
+            console.log(`[Rofim Search] Querying handler with: term="${finalSearchTerm}", location="${searchParams.location}", kupatHolim="${searchParams.kupatHolim}"`);
+            rofimResults = await searchRofimDoctors(finalSearchTerm, searchParams.location, searchParams.kupatHolim);
             console.log(`[Rofim Search] Got ${rofimResults.length} results`);
           } else {
             console.log(`[Rofim Search] Not ready - missing: ${(searchParams.missing_fields || []).join(', ')}`);
