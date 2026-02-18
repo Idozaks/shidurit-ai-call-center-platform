@@ -495,7 +495,7 @@ ${aiResponse}`,
     }
   };
 
-  const buildPrompt = (userMessage, rofimSearchResults) => {
+  const buildPrompt = (userMessage, rofimSearchResults, searchWasAttempted = false) => {
     const history = messages.map(m => `${m.role === 'user' ? 'לקוח' : tenant?.ai_persona_name || 'נועה'}: ${m.content}`).join('\n');
     const isFirstMessage = messages.filter(m => m.role === 'user').length === 0;
     
