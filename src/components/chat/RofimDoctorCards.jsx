@@ -125,7 +125,7 @@ function RofimDetailModal({ doctor, open, onClose, themeColor }) {
 
         <div className="px-6 pt-10 pb-6 space-y-4">
           <DialogHeader className="text-right items-end sm:text-right">
-            <DialogTitle className="text-xl">{doctor.name}</DialogTitle>
+            <DialogTitle className="text-xl text-right w-full">{doctor.name}</DialogTitle>
             <Badge className="w-fit text-white mt-1" style={{ backgroundColor: themeColor }}>
               {doctor.specialty}
             </Badge>
