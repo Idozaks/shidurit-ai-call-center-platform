@@ -516,8 +516,10 @@ ${aiResponse}`,
     let rofimContext = '';
     if (rofimSearchResults && rofimSearchResults.length > 0) {
       rofimContext = `\n\n=== תוצאות חיפוש רופאים (ממאגר rofim.org.il) - נמצאו ${rofimSearchResults.length} רופאים ===\nהכרטיסיות של הרופאים מוצגות אוטומטית מתחת להודעה שלך. אל תפרט את שמותיהם.`;
+    } else if (searchWasAttempted && rofimSearchResults && rofimSearchResults.length === 0) {
+      rofimContext = `\n\n=== חיפוש רופאים: בוצע חיפוש אך לא נמצאו תוצאות (0 רופאים) ===\nCRITICAL: החיפוש בוצע עם כל 3 הפרטים אך לא נמצאו רופאים מתאימים. ספר ללקוח שלא נמצאו רופאים מתאימים לקריטריונים שביקש, והצע לשנות את ההתמחות, האזור, או קופת החולים ולנסות שוב.`;
     } else {
-      rofimContext = `\n\n=== חיפוש רופאים: לא בוצע חיפוש או לא נמצאו תוצאות ===\nCRITICAL: אל תטען שמצאת רופאים אם אין תוצאות חיפוש כאן! אם הלקוח מבקש רופא ועדיין חסרים פרטים - בקש אותם.`;
+      rofimContext = `\n\n=== חיפוש רופאים: לא בוצע חיפוש ===\nCRITICAL: אל תטען שמצאת רופאים אם אין תוצאות חיפוש כאן! אם הלקוח מבקש רופא ועדיין חסרים פרטים - בקש אותם.`;
     }
 
     // Build clinic-specific rules
