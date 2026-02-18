@@ -19,6 +19,41 @@ function isBlankImage(url) {
   return !url || url.includes('ZZ_blank_face');
 }
 
+const KUPA_PARENT_MAP = {
+  'מכבי': 'מכבי',
+  'מכבי שלי': 'מכבי',
+  'מכבי זהב': 'מכבי',
+  'מכבי כסף': 'מכבי',
+  'מכבי מגן': 'מכבי',
+  'מאוחדת': 'מאוחדת',
+  'מאוחדת עדיף': 'מאוחדת',
+  'מאוחדת שיא': 'מאוחדת',
+  'לאומית': 'מאוחדת',
+  'לאומית זהב': 'מאוחדת',
+  'לאומית כסף': 'מאוחדת',
+  'כללית': 'כללית',
+  'כללית מושלם': 'כללית',
+  'כללית פלטינום': 'כללית',
+  'כללית זהב': 'כללית',
+  'כללית כסף': 'כללית',
+  'פרטי': 'פרטי',
+};
+
+function deduplicateKupot(kupotStr) {
+  if (!kupotStr) return [];
+  const kupotArr = kupotStr.split(',').map(k => k.trim()).filter(Boolean);
+  const seen = new Set();
+  const result = [];
+  for (const kupa of kupotArr) {
+    const parent = KUPA_PARENT_MAP[kupa] || kupa;
+    if (!seen.has(parent)) {
+      seen.add(parent);
+      result.push(parent);
+    }
+  }
+  return result;
+}
+
 /**
  * Displays Rofim doctor cards below an AI message.
  * rofimDoctors: array of { name, specialty, image, query }
