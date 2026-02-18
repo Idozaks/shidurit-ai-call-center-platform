@@ -464,7 +464,7 @@ IMPORTANT: Adapt your judgment to the business category. For example:
 
   // Search Rofim API for doctors (via backend proxy to avoid CORS)
   const searchRofimDoctors = async (searchTerm, location, kupatHolim) => {
-    if (!searchTerm || searchTerm.trim().length < 2) return [];
+    if (!searchTerm || (typeof searchTerm !== 'string') || searchTerm.trim().length < 2) return [];
     const payload = { action: 'searchRofim', term: searchTerm };
     if (location) payload.location = location;
     if (kupatHolim) payload.kupatHolim = kupatHolim;
