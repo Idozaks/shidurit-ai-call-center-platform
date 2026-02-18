@@ -183,9 +183,9 @@ function RofimDetailModal({ doctor, open, onClose, themeColor }) {
                   <span className="font-medium text-slate-700">קופות חולים:</span>
                 </p>
                 <div className="flex flex-wrap gap-2 mr-5 items-center">
-                  {doctor.kupot.split(',').map((kupa, i) => (
+                  {deduplicateKupot(doctor.kupot).map((kupa, i) => (
                     <div key={i} className="border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50">
-                      <KupaLogo name={kupa.trim()} className="h-5" />
+                      <KupaLogo name={kupa} className="h-5" />
                     </div>
                   ))}
                 </div>
