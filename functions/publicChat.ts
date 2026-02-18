@@ -106,8 +106,10 @@ Deno.serve(async (req) => {
       
       // The SearchDoctorProxy.ashx endpoint ONLY supports the medicalSearchTerm parameter.
       // location and kupatHolim are NOT supported by this autocomplete endpoint.
-      const fetchRofim = async (searchTerm) => {
-        const url = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?medicalSearchTerm=${encodeURIComponent(searchTerm)}`;
+      const fetchRofim = async (searchTerm, loc, kupa) => {
+        let url = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?medicalSearchTerm=${encodeURIComponent(searchTerm)}`;
+        if (loc) url += `&location=${encodeURIComponent(loc)}`;
+        if (kupa) url += `&kupatHolim=${encodeURIComponent(kupa)}`;
         console.log('[Rofim Backend] Fetching:', url);
         const res = await fetch(url, {
           headers: {
