@@ -182,7 +182,19 @@ ${specialtiesList}
 === TASK ===
 Extract these 3 fields by scanning the ENTIRE conversation history above:
 
-1. medicalSearchTerm - MUST be one of the exact specialty names from the list above. Map user's words to the closest match: "אורולוג"→"אורולוגיה", "עיניים"→"עיניים", "לב"→"קרדיולוגיה", "עור"→"עור ומין", "אורתופד"→"אורתופדיה". If user mentions a doctor name, use it as-is.
+1. medicalSearchTerm - This is what will be sent to the Rofim doctor search API. It can be ONE of these:
+   a) A SPECIALTY from the list above: Map user's words to the closest match: "אורולוג"→"אורולוגיה", "עיניים"→"עיניים", "לב"→"קרדיולוגיה", "עור"→"עור ומין", "אורתופד"→"אורתופדיה".
+   b) A PROCEDURE/TREATMENT name: If the user mentions a specific procedure (e.g. "הסרת שקד שלישי", "ניתוח קטרקט", "החלפת מפרק ברך", "ביופסיה", "אנדוסקופיה"), use the procedure name AS-IS. Do NOT convert it to a specialty name.
+   c) A doctor name: If user mentions a specific doctor name, use it as-is.
+   
+   CRITICAL: Distinguish between specialties and procedures! Examples:
+   - "אני מחפש אורולוג" → specialty → "אורולוגיה"
+   - "אני צריך הסרת שקד שלישי" → procedure → "הסרת שקד שלישי"  
+   - "אני רוצה ניתוח קטרקט" → procedure → "ניתוח קטרקט"
+   - "אני מחפש רופא עיניים" → specialty → "עיניים"
+   
+   Set search_type to "specialty", "procedure", or "doctor_name" accordingly.
+
 2. location - MUST be a specific Israeli CITY name (e.g. "חיפה", "תל אביב", "ירושלים", "באר שבע", "נצרת", "פתח תקווה", "ראשון לציון", "נתניה", "אשדוד", "חדרה", "רמת גן").
    CRITICAL: Generalized regions/areas are NOT valid cities. The following are NOT specific cities and must be REJECTED: "מרכז", "צפון", "דרום", "שרון", "שפלה", "נגב", "גליל", "גוש דן", "השרון", "עמק יזרעאל", "אזור המרכז", "אזור הצפון", "אזור הדרום", "אזור ירושלים", "אזור תל אביב", "המשולש", "עוטף עזה".
    If the user gave a region/area instead of a city, set location to empty string and add "עיר ספציפית (לא אזור)" to missing_fields. Set location_is_region=true.
@@ -198,7 +210,8 @@ CRITICAL RULES:
               type: "object",
               properties: {
                 ready_to_search: { type: "boolean", description: "True only if all 3 mandatory fields are present and location is a specific city" },
-                medicalSearchTerm: { type: "string", description: "Clean medical search term in Hebrew, empty if not found" },
+                medicalSearchTerm: { type: "string", description: "Clean medical search term in Hebrew - specialty name, procedure name, or doctor name" },
+                search_type: { type: "string", enum: ["specialty", "procedure", "doctor_name"], description: "Type of search term" },
                 location: { type: "string", description: "Specific city name in Israel, empty if region/area was given or not found" },
                 location_is_region: { type: "boolean", description: "True if user gave a general region/area instead of a specific city" },
                 kupatHolim: { type: "string", description: "Health fund name, empty if not found" },
