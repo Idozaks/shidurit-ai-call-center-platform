@@ -31,7 +31,7 @@ export default function SuggestionChips({ tenantId, messages, onSelect, themeCol
   const [followUpSuggestions, setFollowUpSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showFixedActions, setShowFixedActions] = useState(false);
-  const [expandedChips, setExpandedChips] = useState(true);
+  const [expandedChips, setExpandedChips] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(true);
   const prevMsgCountRef = useRef(0);
 
@@ -288,17 +288,6 @@ Return exactly 10 suggestions.`,
             </div>
           ) : followUpSuggestions.length > 0 && (
             <div>
-              {/* Collapse/Expand toggle */}
-              <div className="flex justify-center mb-1.5">
-                <button
-                  onClick={() => setExpandedChips(!expandedChips)}
-                  className="text-[10px] px-2 py-0.5 rounded-full flex items-center gap-0.5 transition-all"
-                  style={{ color: `${themeColor}90` }}
-                >
-                  {expandedChips ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                  {expandedChips ? 'צמצם הצעות' : 'הרחב הצעות'}
-                </button>
-              </div>
               <div className="overflow-x-auto pb-1" style={{ scrollbarWidth: 'thin', scrollbarColor: `${themeColor}40 transparent` }}>
                 <div className="flex gap-2 w-max">
                   {row1.map((text, i) => (
@@ -322,10 +311,10 @@ Return exactly 10 suggestions.`,
                         key={`s2-${i}`}
                         onClick={() => handleChipClick(text)}
                         disabled={disabled}
-                        className="text-sm px-3 py-1.5 rounded-full border-[1.5px] transition-all whitespace-nowrap disabled:opacity-50 flex-shrink-0 shadow-sm hover:shadow-md"
-                        style={{ borderColor: `${themeColor}50`, color: themeColor, backgroundColor: `${themeColor}10` }}
-                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}20`; e.currentTarget.style.borderColor = `${themeColor}70`; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}10`; e.currentTarget.style.borderColor = `${themeColor}50`; }}
+                        className="text-sm px-3 py-1.5 rounded-full border border-white/50 transition-all whitespace-nowrap disabled:opacity-50 flex-shrink-0 shadow-sm hover:shadow-lg"
+                        style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', color: '#0077b3' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.85)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.6)'; }}
                       >
                         {text}
                       </button>
@@ -333,6 +322,18 @@ Return exactly 10 suggestions.`,
                   </div>
                 )}
               </div>
+              {row2.length > 0 && (
+                <div className="flex justify-center mt-1">
+                  <button
+                    onClick={() => setExpandedChips(!expandedChips)}
+                    className="text-[10px] px-2 py-0.5 rounded-full flex items-center gap-0.5 transition-all"
+                    style={{ color: '#0077b3' }}
+                  >
+                    {expandedChips ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                    {expandedChips ? 'פחות הצעות' : 'עוד הצעות'}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
