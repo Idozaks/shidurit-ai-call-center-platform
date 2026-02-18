@@ -27,32 +27,11 @@ const FIXED_ACTIONS = [
 ];
 
 export default function SuggestionChips({ tenantId, messages, onSelect, themeColor, disabled, onOpenDetailsModal, detailsSubmitted }) {
-  const [initialTopics, setInitialTopics] = useState([]);
-  const [followUpSuggestions, setFollowUpSuggestions] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [showFixedActions, setShowFixedActions] = useState(false);
-  const [expandedChips, setExpandedChips] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(true);
-  const prevMsgCountRef = useRef(0);
 
   const userMessageCount = messages.filter(m => m.role === 'user').length;
   const isFirstInteraction = userMessageCount === 0;
-
-  // Generate initial topics once on mount
-  useEffect(() => {
-    if (!tenantId) return;
-    generateInitialTopics();
-  }, [tenantId]);
-
-  // Generate follow-up suggestions after conversation progresses
-  useEffect(() => {
-    if (!tenantId || isFirstInteraction) return;
-    // Only regenerate when message count actually changes
-    if (messages.length !== prevMsgCountRef.current) {
-      prevMsgCountRef.current = messages.length;
-      generateFollowUps();
-    }
-  }, [messages.length]);
 
   const generateInitialTopics = async () => {
     setLoading(true);
