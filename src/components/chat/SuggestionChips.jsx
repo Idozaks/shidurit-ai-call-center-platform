@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Loader2, Phone, Clock, Info, CalendarCheck, HelpCircle, ChevronDown, ChevronUp, Grid3X3 } from 'lucide-react';
+import { Phone, Clock, Info, CalendarCheck, HelpCircle, ChevronDown, ChevronUp, Grid3X3 } from 'lucide-react';
 
 const publicApi = async (payload) => {
   try {
