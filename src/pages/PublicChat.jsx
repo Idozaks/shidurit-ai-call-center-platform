@@ -53,6 +53,7 @@ export default function PublicChat() {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [detailsSubmitted, setDetailsSubmitted] = useState(false);
   const messagesEndRef = useRef(null);
+  const chatInputRef = useRef(null);
   const [sessionStatus, setSessionStatus] = useState('active');
   const [collectedDetails, setCollectedDetails] = useState({});
   const [knowledgeBase, setKnowledgeBase] = useState('');
