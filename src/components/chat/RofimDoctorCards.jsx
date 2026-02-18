@@ -100,7 +100,7 @@ function RofimDetailModal({ doctor, open, onClose, themeColor }) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md p-0 overflow-hidden" dir="rtl">
+      <DialogContent className="max-w-md p-0 overflow-hidden" dir="rtl" style={{ textAlign: 'right' }}>
         {/* Header banner */}
         <div
           className="h-20 relative"
