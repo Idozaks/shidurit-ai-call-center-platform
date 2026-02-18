@@ -104,8 +104,6 @@ Deno.serve(async (req) => {
         return Response.json({ results: [], doctors: [], procedures: [], professions: [] });
       }
       
-      // The SearchDoctorProxy.ashx endpoint ONLY supports the medicalSearchTerm parameter.
-      // location and kupatHolim are NOT supported by this autocomplete endpoint.
       const fetchRofim = async (searchTerm, loc, kupa) => {
         let url = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?medicalSearchTerm=${encodeURIComponent(searchTerm)}`;
         if (loc) url += `&location=${encodeURIComponent(loc)}`;
@@ -130,13 +128,32 @@ Deno.serve(async (req) => {
         }
       };
 
-      let actualUrl = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?medicalSearchTerm=${encodeURIComponent(term.trim())}`;
+      // Support pipe-separated terms for procedure synonym matching
+      const terms = term.trim().split('|').map(t => t.trim()).filter(Boolean);
+      let data = [];
+      let matchedTerm = terms[0];
+      
+      // Try each synonym term until we get results
+      for (const t of terms) {
+        console.log(`[Rofim Backend] Trying term: "${t}"`);
+        const results = await fetchRofim(t, location, kupatHolim);
+        if (results.length > 0) {
+          data = results;
+          matchedTerm = t;
+          console.log(`[Rofim Backend] Got ${results.length} results with term: "${t}"`);
+          break;
+        }
+      }
+      
+      if (data.length === 0) {
+        console.log(`[Rofim Backend] No results from any of ${terms.length} synonym terms`);
+      }
+
+      let actualUrl = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?medicalSearchTerm=${encodeURIComponent(matchedTerm)}`;
       if (location) actualUrl += `&location=${encodeURIComponent(location)}`;
       if (kupatHolim) actualUrl += `&kupatHolim=${encodeURIComponent(kupatHolim)}`;
-      const data = await fetchRofim(term.trim(), location, kupatHolim);
-      console.log('[Rofim Backend] Results:', data.length);
       
-      // Map the response: value=name, info=specialty, image=image, query=profile slug
+      // Map the response
       const doctors = [];
       for (const item of data) {
         doctors.push({
@@ -151,7 +168,7 @@ Deno.serve(async (req) => {
         });
       }
       
-      return Response.json({ results: data, doctors, procedures: [], professions: [], _debug: { actualRofimUrl: actualUrl, termSent: term.trim(), locationReceived: location || null, kupatHolimReceived: kupatHolim || null } });
+      return Response.json({ results: data, doctors, procedures: [], professions: [], _debug: { actualRofimUrl: actualUrl, matchedTerm, allTermsTried: terms, locationReceived: location || null, kupatHolimReceived: kupatHolim || null } });
     }
 
     return Response.json({ error: 'Unknown action' }, { status: 400 });
