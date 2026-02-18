@@ -114,61 +114,7 @@ export default function SuggestionChips({ tenantId, messages, onSelect, themeCol
             </motion.div>
           )}
 
-          {/* Follow-up suggestion chips */}
-          {loading ? (
-            <div className="flex justify-center py-1">
-              <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-            </div>
-          ) : followUpSuggestions.length > 0 && (
-            <div>
-              <div className="overflow-x-auto pb-1" style={{ scrollbarWidth: 'thin', scrollbarColor: `${themeColor}40 transparent` }}>
-                <div className="flex gap-2 w-max">
-                  {row1.map((text, i) => (
-                    <button
-                      key={`s1-${i}`}
-                      onClick={() => handleChipClick(text)}
-                      disabled={disabled}
-                      className="text-sm px-3 py-1.5 rounded-full border border-white/50 transition-all whitespace-nowrap disabled:opacity-50 flex-shrink-0 shadow-sm hover:shadow-lg"
-                      style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', color: '#0077b3' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.85)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.6)'; }}
-                    >
-                      {text}
-                    </button>
-                  ))}
-                </div>
-                {expandedChips && row2.length > 0 && (
-                  <div className="flex gap-2 w-max mt-1.5">
-                    {row2.map((text, i) => (
-                      <button
-                        key={`s2-${i}`}
-                        onClick={() => handleChipClick(text)}
-                        disabled={disabled}
-                        className="text-sm px-3 py-1.5 rounded-full border border-white/50 transition-all whitespace-nowrap disabled:opacity-50 flex-shrink-0 shadow-sm hover:shadow-lg"
-                        style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', color: '#0077b3' }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.85)'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.6)'; }}
-                      >
-                        {text}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              {row2.length > 0 && (
-                <div className="flex justify-center mt-1">
-                  <button
-                    onClick={() => setExpandedChips(!expandedChips)}
-                    className="text-[10px] px-2 py-0.5 rounded-full flex items-center gap-0.5 transition-all"
-                    style={{ color: '#0077b3' }}
-                  >
-                    {expandedChips ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                    {expandedChips ? 'פחות הצעות' : 'עוד הצעות'}
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+
         </div>
       )}
     </div>
