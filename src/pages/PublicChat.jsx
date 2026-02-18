@@ -206,12 +206,14 @@ CRITICAL RULES:
           });
 
           const searchParams = extractRes.result;
+          extractedSearchParams = searchParams;
           console.log('[Rofim Search] LLM extracted params:', JSON.stringify(searchParams));
 
           // Don't trust ready_to_search from LLM — check actual field values
           // Also reject if location is flagged as a region instead of a specific city
           const hasAllFields = searchParams.medicalSearchTerm?.trim() && searchParams.location?.trim() && searchParams.kupatHolim?.trim() && !searchParams.location_is_region;
           if (hasAllFields) {
+            searchActuallyPerformed = true;
             console.log(`[Rofim Search] Querying handler with: term="${searchParams.medicalSearchTerm}", location="${searchParams.location}", kupatHolim="${searchParams.kupatHolim}"`);
             rofimResults = await searchRofimDoctors(searchParams.medicalSearchTerm, searchParams.location, searchParams.kupatHolim);
             console.log(`[Rofim Search] Got ${rofimResults.length} results`);
