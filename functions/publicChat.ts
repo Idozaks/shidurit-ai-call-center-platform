@@ -128,6 +128,7 @@ Deno.serve(async (req) => {
         }
       };
 
+      const actualUrl = `https://www.rofim.org.il/handlers/SearchDoctorProxy.ashx?medicalSearchTerm=${encodeURIComponent(term.trim())}`;
       const data = await fetchRofim(term.trim());
       console.log('[Rofim Backend] Results:', data.length);
       
@@ -144,7 +145,7 @@ Deno.serve(async (req) => {
         });
       }
       
-      return Response.json({ results: data, doctors, procedures: [], professions: [] });
+      return Response.json({ results: data, doctors, procedures: [], professions: [], _debug: { actualRofimUrl: actualUrl, termSent: term.trim(), locationReceived: location || null, kupatHolimReceived: kupatHolim || null } });
     }
 
     return Response.json({ error: 'Unknown action' }, { status: 400 });
