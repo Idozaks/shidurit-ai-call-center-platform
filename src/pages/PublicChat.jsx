@@ -893,7 +893,7 @@ ${history}
         ) : (
           <>
             {/* Messages */}
-            <div className="space-y-4 pb-4">
+            <div className="space-y-4 pb-4 flex flex-col justify-end min-h-full">
               <AnimatePresence>
                 {messages.map((message) => (
                   <motion.div
