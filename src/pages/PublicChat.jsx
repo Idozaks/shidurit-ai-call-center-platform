@@ -1002,6 +1002,11 @@ ${history}
               placeholder="הקלד הודעה..."
               className="flex-1 h-12 rounded-xl border-slate-200/60 bg-white/70 backdrop-blur-sm focus:ring-2 focus:ring-sky-300"
               disabled={isTyping}
+              onFocus={() => {
+                setTimeout(() => {
+                  messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+                }, 300);
+              }}
             />
             <Button 
               type="submit" 
