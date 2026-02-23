@@ -202,7 +202,8 @@ Extract these 3 fields by scanning the ENTIRE conversation history above:
 
 CRITICAL RULES:
 - Fields mentioned ANYWHERE in the conversation are valid — not just the last message
-- If a field was identified in "PREVIOUSLY IDENTIFIED FIELDS" and the user did NOT explicitly change it, KEEP the previous value
+- If a field was identified in "PREVIOUSLY IDENTIFIED FIELDS" and the user did NOT explicitly change it, KEEP the previous value EXACTLY as-is. Do NOT modify, rephrase, or replace it with a similar-sounding term.
+- ESPECIALLY for medicalSearchTerm: if the user only changes city or kupatHolim, the medicalSearchTerm MUST remain EXACTLY the same as before. For example if previously "אורתופדיה" was identified, and the user now says "בעצם בחיפה", the medicalSearchTerm stays "אורתופדיה" — do NOT change it to "אורתודנטיה" or any other specialty.
 - If the user provides a NEW value for a field (e.g. changes city from חיפה to תל אביב), use the NEW value
 - ready_to_search = true ONLY when all 3 fields have non-empty real values AND location is a specific city (not a region)
 - missing_fields should list only truly missing fields (empty strings = missing)`,
