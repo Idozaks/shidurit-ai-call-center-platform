@@ -46,8 +46,8 @@ export default function PublicChat() {
   const [isTyping, setIsTyping] = useState(false);
   const [sessionId, setSessionId] = useState(null);
   const [leadId, setLeadId] = useState(null);
-  const [customerName, setCustomerName] = useState('');
-  const [showNameInput, setShowNameInput] = useState(true);
+  const [customerName, setCustomerName] = useState('אורח');
+  const [showNameInput, setShowNameInput] = useState(false);
   const leadIdRef = useRef(null);
   const [chatMode, setChatMode] = useState('voice'); // 'text' or 'voice'
   const [showDetailsModal, setShowDetailsModal] = useState(false);
