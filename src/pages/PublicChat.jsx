@@ -67,6 +67,16 @@ export default function PublicChat() {
     enabled: !!slug
   });
 
+  // Auto-start chat for specific tenants (skip name input)
+  const autoStartSlugs = ['rofim'];
+  useEffect(() => {
+    if (tenant && autoStartSlugs.includes(slug) && showNameInput && !sessionId && !createSessionMutation.isPending) {
+      setCustomerName('אורח');
+      setChatMode('text');
+      createSessionMutation.mutate({ name: 'אורח' });
+    }
+  }, [tenant, slug, showNameInput, sessionId]);
+
   // Store rofim doctor results per message
   const [rofimDoctorsByMsgId, setRofimDoctorsByMsgId] = useState({});
 
