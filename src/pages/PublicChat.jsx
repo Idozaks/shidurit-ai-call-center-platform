@@ -170,6 +170,10 @@ export default function PublicChat() {
         try {
           const conversationSoFar = messages.map(m => `${m.role === 'user' ? 'לקוח' : 'נציג'}: ${m.content}`).join('\n');
           
+          // Filter out predefined suggestion messages from conversation to avoid confusing the LLM
+          const predefinedLabels = new Set(Object.keys(PREDEFINED_RESPONSES));
+          const filteredMessages = messages.filter(m => !(m.role === 'user' && predefinedLabels.has(m.content)));
+          
           const specialtiesList = ROFIM_SPECIALTIES.join(', ');
           
           // Build a summary of previously extracted fields to help the LLM retain context
