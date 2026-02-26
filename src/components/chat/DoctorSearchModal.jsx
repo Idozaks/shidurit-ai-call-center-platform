@@ -190,8 +190,7 @@ function KupaDropdown({ value, onChange }) {
                     value === kupa ? 'bg-sky-50 text-sky-700 font-medium ring-1 ring-sky-300' : 'text-slate-700'
                   }`}
                 >
-                  {logo && <img src={logo} alt="" className="h-6 object-contain" />}
-                  <span>{kupa}</span>
+                  {logo ? <img src={logo} alt={kupa} className="h-7 object-contain" /> : <span>{kupa}</span>}
                 </button>
               );
             })}
@@ -202,7 +201,15 @@ function KupaDropdown({ value, onChange }) {
   );
 }
 
+// Preload kupa logos
+const KUPA_LOGO_URLS = KUPOT.map(k => getKupaLogo(k)).filter(Boolean);
+
 export default function DoctorSearchModal({ open, onClose, onSubmit }) {
+  useEffect(() => {
+    if (open) {
+      KUPA_LOGO_URLS.forEach(url => { const img = new Image(); img.src = url; });
+    }
+  }, [open]);
   const [specialty, setSpecialty] = useState('');
   const [procedure, setProcedure] = useState('');
   const [city, setCity] = useState('');
