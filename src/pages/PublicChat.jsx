@@ -15,6 +15,7 @@ import SuggestionChips from '../components/chat/SuggestionChips';
 import PublicChatMenu from '../components/chat/PublicChatMenu';
 import DetailsInputModal from '../components/chat/DetailsInputModal';
 import RofimDoctorCards from '../components/chat/RofimDoctorCards';
+import ThinkingIndicator from '../components/chat/ThinkingIndicator';
 import ROFIM_SPECIALTIES from '../components/data/rofimSpecialties';
 
 // Helper to call the public backend function (supports both auth and non-auth)
@@ -44,6 +45,7 @@ export default function PublicChat() {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [thinkingStatus, setThinkingStatus] = useState(null);
   const [sessionId, setSessionId] = useState(null);
   const [leadId, setLeadId] = useState(null);
   const [customerName, setCustomerName] = useState('');
@@ -148,6 +150,7 @@ export default function PublicChat() {
   const sendMessageMutation = useMutation({
     mutationFn: async ({ content }) => {
       // Save user message
+      setThinkingStatus({ step: 'analyzing', text: 'מנתח את הבקשה...' });
       await publicApi({ action: 'sendMessage', session_id: sessionId, role: 'user', content });
 
       // If a worker has taken control, don't generate AI response
@@ -175,6 +178,7 @@ export default function PublicChat() {
           if (collectedDetails.city) prevDetailsParts.push(`עיר: ${collectedDetails.city}`);
           const prevDetailsStr = prevDetailsParts.length > 0 ? prevDetailsParts.join(', ') : 'אין';
           
+          setThinkingStatus({ step: 'analyzing', text: 'מזהה פרטי חיפוש...' });
           const extractRes = await publicApi({
             action: 'invokeLLM',
             prompt: `You are extracting doctor search parameters from a Hebrew medical chat conversation.
@@ -256,6 +260,7 @@ CRITICAL RULES:
               // If the extraction LLM didn't generate synonyms, make a dedicated call
               if (synonyms.length === 0) {
                 console.log(`[Rofim Search] No synonyms from extraction LLM, generating separately for: "${searchParams.medicalSearchTerm}"`);
+                setThinkingStatus({ step: 'generating_synonyms', text: 'מחפש מונחים רפואיים דומים...' });
                 const synRes = await publicApi({
                   action: 'invokeLLM',
                   prompt: `Generate 10 alternative Hebrew names/phrasings for the medical procedure or condition: "${searchParams.medicalSearchTerm}".
@@ -287,6 +292,7 @@ RULES:
               }
             }
             console.log(`[Rofim Search] Querying handler with: term="${finalSearchTerm}", location="${searchParams.location}", kupatHolim="${searchParams.kupatHolim}"`);
+            setThinkingStatus({ step: 'searching', text: 'מחפש רופאים במאגר...' });
             rofimResults = await searchRofimDoctors(finalSearchTerm, searchParams.location, searchParams.kupatHolim);
             console.log(`[Rofim Search] Got ${rofimResults.length} results`);
           } else {
@@ -314,6 +320,7 @@ RULES:
       }
 
       // Get AI response with Rofim results injected into prompt
+      setThinkingStatus({ step: 'building_response', text: 'מכין תשובה...' });
       const llmRes = await publicApi({ action: 'invokeLLM', prompt: buildPrompt(content, rofimResults, searchActuallyPerformed, extractedSearchParams), response_json_schema: null });
       let aiResponse = llmRes.result;
       // Ensure aiResponse is a string (LLM may return object when response_json_schema is null)
@@ -737,6 +744,7 @@ ${history}
       }]);
     } finally {
       setIsTyping(false);
+      setThinkingStatus(null);
     }
   };
 
@@ -1007,27 +1015,10 @@ ${history}
                 ))}
               </AnimatePresence>
 
-              {/* Typing indicator */}
-              {isTyping && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex gap-3"
-                >
-                  <Avatar className="w-10 h-10">
-                    <AvatarFallback style={{ background: 'linear-gradient(135deg, #0099cc, #0077b3)', color: 'white' }}>
-                      <Sparkles className="w-5 h-5" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="rounded-2xl rounded-tl-sm px-4 py-3 shadow-md border border-white/50" style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(12px)' }}>
-                    <div className="flex gap-1">
-                      <span className="w-2 h-2 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-2 h-2 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-2 h-2 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '300ms' }} />
-                    </div>
-                  </div>
-                </motion.div>
-              )}
+              {/* Thinking indicator */}
+              <AnimatePresence>
+                {isTyping && <ThinkingIndicator status={thinkingStatus} />}
+              </AnimatePresence>
               <div ref={messagesEndRef} />
             </div>
           </>
