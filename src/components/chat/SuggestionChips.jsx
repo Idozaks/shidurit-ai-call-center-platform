@@ -11,6 +11,9 @@ export const INITIAL_SUGGESTIONS = [
 
 export const PREDEFINED_RESPONSES = {
   'מידע על שירותים': `פורטל בריאות מתקדם לזימון תורים מאפשר לך למצוא ולתאם תורים לרופאים מומחים בצורה מהירה, נוחה ופשוטה. ניתן לחפש רופא לפי הליך רפואי, תחום מומחיות או סוג טיפול.\n\nהמערכת נותנת מענה לחברי קופות החולים, מבוטחי ביטוחים משלימים, וגם ללקוחות פרטיים. הפורטל מאפשר הזמנת תור ראשון זמין לכל הצרכים הרפואיים שלך.`,
+  'קביעת תור': `בשמחה! כדי שאוכל למצוא עבורך את הרופא המתאים, אצטרך ממך 3 פרטים:\n\n1. **תחום רפואי** - באיזה תחום אתה מחפש רופא? (למשל: אורתופדיה, עיניים, אורולוגיה...)\n2. **עיר** - באיזו עיר נוח לך? (למשל: תל אביב, חיפה, ירושלים...)\n3. **קופת חולים** - באיזו קופה אתה חבר? (כללית / מכבי / מאוחדת / לאומית / פרטי)`,
+  'יצירת קשר': `ניתן ליצור איתנו קשר בדרכים הבאות:\n\n📧 **אימייל:** info@rofim.org.il\n🌐 **אתר:** www.rofim.org.il\n\nלחלופין, השאר כאן את פרטי הקשר שלך ונציג מהצוות שלנו יחזור אליך בהקדם.`,
+  'הצטרפות לפורטל ROFIM': `פורטל ROFIM מאפשר לך לנהל את התורים הרפואיים שלך בצורה נוחה ומרוכזת.\n\nלהצטרפות לפורטל, בקר באתר **www.rofim.org.il** והירשם בחינם.\n\nלאחר ההרשמה תוכל לחפש רופאים, לקבוע תורים ולנהל את ההיסטוריה הרפואית שלך.`,
 };
 
 export default function SuggestionChips({ tenantId, messages, onSelect, themeColor, disabled, onOpenDetailsModal, detailsSubmitted }) {
