@@ -57,7 +57,6 @@ function SpecialtyDropdown({ value, onChange, disabled }) {
               onChange={(e) => setSearch(e.target.value)}
               placeholder="חיפוש התמחות..."
               className="h-8 text-sm"
-              autoFocus
             />
           </div>
           <div className="overflow-y-auto max-h-48">
