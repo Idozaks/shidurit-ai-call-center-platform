@@ -862,8 +862,12 @@ ${history}
   };
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    // Small delay to let the DOM render new messages before scrolling
+    const t = setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 50);
+    return () => clearTimeout(t);
+  }, [messages, isTyping]);
 
   // Keep messages scrolled to bottom when mobile keyboard opens/closes
   useEffect(() => {
