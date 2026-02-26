@@ -163,8 +163,15 @@ export default function PublicChat() {
       }
 
       // Detect if user is asking for INFO about a specialty/procedure (not booking)
-      const infoIntentRegex = /מידע על|מה זה|מהו|מהי|ספר לי על|תסביר|הסבר|מה כולל|מה עושים ב|מה עושה|על מה מדבר|פרטים על|אני רוצה לדעת|מה ההבדל|מה התחום/;
-      const isInfoRequest = infoIntentRegex.test(content);
+      const infoIntentRegex = /מידע על|מה זה|מהו|מהי|ספר לי על|תסביר|הסבר|מה כולל|מה עושים ב|מה עושה|על מה מדבר|פרטים על|אני רוצה לדעת|מה ההבדל|מה התחום|עכשיו על|ועל |ומה עם|מה לגבי|לגבי /;
+      const isExplicitInfo = infoIntentRegex.test(content);
+      // Check if the previous bot message was an info response (continuation of info flow)
+      const lastBotMsg = [...messages].reverse().find(m => m.role === 'assistant')?.content || '';
+      const wasInfoResponse = lastBotMsg.includes('אוכל לעזור לך למצוא רופא') || lastBotMsg.includes('תחום רפואי');
+      // If previous response was info AND user mentions a procedure/specialty without booking words → also info
+      const procedureTerms = /ניתוח|טיפול|בדיקה|הליך|אורתופד|קרדיולוג|אורולוג|גינקולוג|עיניים|עור|נוירולוג|אף.?אוזן|פנימי|גסטרו|קיצור קיבה|בריאטר|פלסטי|שיקום|פיזיותרפ|אונקולוג|ריאות|אנדוקרינולוג|ראומטולוג|נפרולוג|המטולוג/;
+      const isJustProcedureMention = procedureTerms.test(content) && wasInfoResponse;
+      const isInfoRequest = isExplicitInfo || isJustProcedureMention;
       // Check that user is NOT also asking for a doctor/appointment in the same message
       const bookingSignals = /רופא|רופאה|ד"ר|תור|קביעת|מומחה|דוקטור|קופת חולים|מכבי|כללית|מאוחדת|לאומית/;
       const hasBookingSignal = bookingSignals.test(content);
