@@ -162,6 +162,41 @@ export default function PublicChat() {
         return null;
       }
 
+      // Detect if user is asking for INFO about a specialty/procedure (not booking)
+      const infoIntentRegex = /מידע על|מה זה|מהו|מהי|ספר לי על|תסביר|הסבר|מה כולל|מה עושים ב|מה עושה|על מה מדבר|פרטים על|אני רוצה לדעת|מה ההבדל|מה התחום/;
+      const isInfoRequest = infoIntentRegex.test(content);
+      // Check that user is NOT also asking for a doctor/appointment in the same message
+      const bookingSignals = /רופא|רופאה|ד"ר|תור|קביעת|מומחה|דוקטור|קופת חולים|מכבי|כללית|מאוחדת|לאומית/;
+      const hasBookingSignal = bookingSignals.test(content);
+
+      if (isInfoRequest && !hasBookingSignal) {
+        // Lightweight LLM call for informational response
+        setThinkingStatus({ step: 'building_response', text: 'מכין תשובה...' });
+        const infoRes = await publicApi({
+          action: 'invokeLLM',
+          prompt: `אתה רותם, עוזרת וירטואלית של פורטל Rofim לזימון תורים רפואיים.
+הלקוח שואל שאלת מידע כללית. תן תשובה קצרה ומועילה בעברית (3-5 משפטים).
+
+היסטוריית שיחה:
+${messages.map(m => `${m.role === 'user' ? 'לקוח' : 'רותם'}: ${m.content}`).join('\n')}
+
+לקוח: ${content}
+
+ענה בעברית בלבד. תן מידע כללי קצר על הנושא. בסוף התשובה, הצע ללקוח: "אם תרצה, אוכל לעזור לך למצוא רופא מתאים בתחום הזה."
+אל תציג את עצמך שוב אם כבר הצגת קודם בהיסטוריה.`,
+          response_json_schema: null
+        });
+        let infoResponse = infoRes.result;
+        if (typeof infoResponse !== 'string') {
+          infoResponse = infoResponse?.text || infoResponse?.content || JSON.stringify(infoResponse);
+        }
+        await publicApi({ action: 'sendMessage', session_id: sessionId, role: 'assistant', content: infoResponse });
+        if (tenant) {
+          await publicApi({ action: 'updateTenantUsage', tenant_id: tenant.id, usage_count: (tenant.usage_count || 0) + 1 });
+        }
+        return { aiResponse: infoResponse, rofimResults: [] };
+      }
+
       // Use LLM to extract doctor search params from the ENTIRE conversation + current message
       let rofimResults = [];
       let searchActuallyPerformed = false;
