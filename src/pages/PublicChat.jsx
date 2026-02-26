@@ -738,15 +738,22 @@ ${history}
     const userMessage = text.trim();
     setInputValue('');
     
-    // Check for predefined responses
-    if (PREDEFINED_RESPONSES[userMessage]) {
+    // Check for predefined responses — exact match or keyword match
+    let predefinedKey = PREDEFINED_RESPONSES[userMessage] ? userMessage : null;
+    if (!predefinedKey) {
+      const trimmed = userMessage.trim();
+      const appointmentKeywords = ['תור', 'קביעת', 'קביעה', 'לקבוע תור', 'קביעת תור'];
+      if (appointmentKeywords.some(kw => trimmed === kw || trimmed === kw + ' ')) {
+        predefinedKey = 'קביעת תור';
+      }
+    }
+    if (predefinedKey) {
       const userMsg = { id: Date.now(), role: 'user', content: userMessage };
-      const aiMsg = { id: Date.now() + 1, role: 'assistant', content: PREDEFINED_RESPONSES[userMessage] };
+      const aiMsg = { id: Date.now() + 1, role: 'assistant', content: PREDEFINED_RESPONSES[predefinedKey] };
       setMessages(prev => [...prev, userMsg, aiMsg]);
-      // Save both messages to backend
       if (sessionId) {
         publicApi({ action: 'sendMessage', session_id: sessionId, role: 'user', content: userMessage });
-        publicApi({ action: 'sendMessage', session_id: sessionId, role: 'assistant', content: PREDEFINED_RESPONSES[userMessage] });
+        publicApi({ action: 'sendMessage', session_id: sessionId, role: 'assistant', content: PREDEFINED_RESPONSES[predefinedKey] });
       }
       return;
     }
