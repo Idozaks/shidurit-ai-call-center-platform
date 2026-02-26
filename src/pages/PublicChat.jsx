@@ -73,8 +73,12 @@ export default function PublicChat() {
   });
 
   // Auto-start chat for specific tenants (skip name input)
+  // Show welcome message immediately while session creates in background
   useEffect(() => {
     if (tenant && isAutoStart && !sessionId && !createSessionMutation.isPending) {
+      if (tenant.welcome_message && messages.length === 0) {
+        setMessages([{ id: 'welcome', role: 'assistant', content: tenant.welcome_message }]);
+      }
       createSessionMutation.mutate({ name: 'אורח' });
     }
   }, [tenant, isAutoStart, sessionId]);
