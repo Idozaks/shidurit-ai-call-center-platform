@@ -244,6 +244,26 @@ CRITICAL RULES:
           });
 
           const searchParams = extractRes.result;
+          
+          // Normalize specialty terms to exact ROFIM_SPECIALTIES names
+          if (searchParams.search_type === 'specialty' && searchParams.medicalSearchTerm) {
+            const term = searchParams.medicalSearchTerm.trim();
+            // Try exact match first
+            let matched = ROFIM_SPECIALTIES.find(s => s === term);
+            if (!matched) {
+              // Try prefix match (e.g. "אורתופד" → "אורתופדיה")
+              matched = ROFIM_SPECIALTIES.find(s => s.startsWith(term) || term.startsWith(s));
+            }
+            if (!matched) {
+              // Try substring match
+              matched = ROFIM_SPECIALTIES.find(s => s.includes(term) || term.includes(s));
+            }
+            if (matched) {
+              console.log(`[Rofim Search] Normalized specialty: "${term}" → "${matched}"`);
+              searchParams.medicalSearchTerm = matched;
+            }
+          }
+          
           extractedSearchParams = searchParams;
           console.log('[Rofim Search] LLM extracted params:', JSON.stringify(searchParams));
 
