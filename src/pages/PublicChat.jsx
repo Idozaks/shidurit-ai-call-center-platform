@@ -42,16 +42,19 @@ export default function PublicChat() {
   const urlParams = new URLSearchParams(window.location.search);
   const slug = urlParams.get('slug');
   
+  const autoStartSlugs = ['rofim'];
+  const isAutoStart = autoStartSlugs.includes(slug);
+
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [thinkingStatus, setThinkingStatus] = useState(null);
   const [sessionId, setSessionId] = useState(null);
   const [leadId, setLeadId] = useState(null);
-  const [customerName, setCustomerName] = useState('');
-  const [showNameInput, setShowNameInput] = useState(true);
+  const [customerName, setCustomerName] = useState(isAutoStart ? 'אורח' : '');
+  const [showNameInput, setShowNameInput] = useState(!isAutoStart);
   const leadIdRef = useRef(null);
-  const [chatMode, setChatMode] = useState('voice'); // 'text' or 'voice'
+  const [chatMode, setChatMode] = useState(isAutoStart ? 'text' : 'voice'); // 'text' or 'voice'
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [detailsSubmitted, setDetailsSubmitted] = useState(false);
   const messagesEndRef = useRef(null);
@@ -70,14 +73,11 @@ export default function PublicChat() {
   });
 
   // Auto-start chat for specific tenants (skip name input)
-  const autoStartSlugs = ['rofim'];
   useEffect(() => {
-    if (tenant && autoStartSlugs.includes(slug) && showNameInput && !sessionId && !createSessionMutation.isPending) {
-      setCustomerName('אורח');
-      setChatMode('text');
+    if (tenant && isAutoStart && !sessionId && !createSessionMutation.isPending) {
       createSessionMutation.mutate({ name: 'אורח' });
     }
-  }, [tenant, slug, showNameInput, sessionId]);
+  }, [tenant, isAutoStart, sessionId]);
 
   // Store rofim doctor results per message
   const [rofimDoctorsByMsgId, setRofimDoctorsByMsgId] = useState({});
