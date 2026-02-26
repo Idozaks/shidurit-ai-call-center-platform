@@ -242,7 +242,7 @@ export default function DoctorSearchModal({ open, onClose, onSubmit }) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-auto" dir="rtl">
+      <DialogContent className="max-w-md mx-auto max-h-[85vh] overflow-y-auto" dir="rtl">
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-bold text-slate-800 flex items-center justify-center gap-2">
             <Search className="w-5 h-5 text-sky-600" />
