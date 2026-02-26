@@ -790,21 +790,24 @@ ${history}
     }
   };
 
-  const sendChat = async (text) => {
+  const sendChat = async (text, { skipPredefined = false } = {}) => {
     if (!text.trim() || isTyping) return;
     const userMessage = text.trim();
     setInputValue('');
     
     // Check for predefined responses — exact match or keyword match
-    let predefinedKey = PREDEFINED_RESPONSES[userMessage] ? userMessage : null;
-    if (!predefinedKey) {
-      const trimmed = userMessage.trim();
-      // Exact short keywords that mean "book appointment"
-      const appointmentExact = ['תור', 'קביעת', 'קביעה', 'לקבוע תור', 'קביעת תור', 'קבי', 'קביעת תור לרופא'];
-      // Phrases that contain these → appointment
-      const appointmentContains = ['צריך רופא', 'מחפש רופא', 'מחפשת רופא', 'רוצה תור', 'לקבוע', 'אני צריך רופא', 'אני צריכה רופא', 'רופא', 'דוקטור', 'ד"ר'];
-      if (appointmentExact.some(kw => trimmed === kw) || appointmentContains.some(kw => trimmed.includes(kw))) {
-        predefinedKey = 'קביעת תור';
+    let predefinedKey = null;
+    if (!skipPredefined) {
+      predefinedKey = PREDEFINED_RESPONSES[userMessage] ? userMessage : null;
+      if (!predefinedKey) {
+        const trimmed = userMessage.trim();
+        // Exact short keywords that mean "book appointment"
+        const appointmentExact = ['תור', 'קביעת', 'קביעה', 'לקבוע תור', 'קביעת תור', 'קבי', 'קביעת תור לרופא'];
+        // Phrases that contain these → appointment
+        const appointmentContains = ['צריך רופא', 'מחפש רופא', 'מחפשת רופא', 'רוצה תור', 'לקבוע', 'אני צריך רופא', 'אני צריכה רופא', 'רופא', 'דוקטור', 'ד"ר'];
+        if (appointmentExact.some(kw => trimmed === kw) || appointmentContains.some(kw => trimmed.includes(kw))) {
+          predefinedKey = 'קביעת תור';
+        }
       }
     }
     if (predefinedKey) {
