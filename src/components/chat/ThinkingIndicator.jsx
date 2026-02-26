@@ -34,8 +34,8 @@ export default function ThinkingIndicator({ status }) {
       >
         <div className="flex items-center gap-2.5">
           <motion.div
-            animate={{ rotate: [0, 360] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            animate={{ opacity: [1, 0.4, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >
             <IconComponent className="w-4 h-4 text-sky-600" />
           </motion.div>
