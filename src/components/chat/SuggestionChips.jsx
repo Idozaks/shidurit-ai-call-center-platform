@@ -14,8 +14,7 @@ export const PREDEFINED_RESPONSES = {
 };
 
 export default function SuggestionChips({ tenantId, messages, onSelect, themeColor, disabled, onOpenDetailsModal, detailsSubmitted }) {
-  const [showFixedActions, setShowFixedActions] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const userMessageCount = messages.filter(m => m.role === 'user').length;
   const isFirstInteraction = userMessageCount === 0;
@@ -32,76 +31,57 @@ export default function SuggestionChips({ tenantId, messages, onSelect, themeCol
 
   const handleChipClick = (text) => {
     onSelect(text);
-    setShowFixedActions(false);
+    setOpen(false);
   };
 
-  // Don't render in the input area for first interaction (badges shown inline under welcome message)
   if (isFirstInteraction) {
     return null;
   }
 
   return (
     <div className="py-1 space-y-1">
-      {/* Master drawer toggle */}
-      <div className="flex justify-center">
+      <div className="flex items-center justify-center gap-2">
+        {showDetailsChip && (
+          <button
+            onClick={() => onOpenDetailsModal?.()}
+            disabled={disabled}
+            className="text-sm px-4 py-1.5 rounded-full border-2 transition-all whitespace-nowrap disabled:opacity-50 font-medium"
+            style={{ borderColor: '#0099cc', color: 'white', background: 'linear-gradient(135deg, #0099cc, #0077b3)' }}
+          >
+            📋 השאר פרטים
+          </button>
+        )}
         <button
-          onClick={() => setDrawerOpen(!drawerOpen)}
-          className="text-[10px] px-2 py-0.5 rounded-full flex items-center gap-0.5 transition-all"
-          style={{ color: `${themeColor}90` }}
+          onClick={() => setOpen(!open)}
+          className="text-xs px-3 py-1.5 rounded-full border border-white/50 transition-all flex items-center gap-1 hover:shadow-sm"
+          style={{ background: 'rgba(255,255,255,0.5)', color: '#0077b3' }}
         >
-          {drawerOpen ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />}
-          {drawerOpen ? 'הסתר הצעות' : 'הצג הצעות'}
+          <Grid3X3 className="w-3 h-3" />
+          הצעות
+          {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
         </button>
       </div>
 
-      {drawerOpen && (
-        <div className="space-y-2">
-          {/* Toggle button for fixed actions */}
-          <div className="flex items-center justify-center gap-2">
-            {showDetailsChip && (
-              <button
-                onClick={() => onOpenDetailsModal?.()}
-                disabled={disabled}
-                className="text-sm px-4 py-1.5 rounded-full border-2 transition-all whitespace-nowrap disabled:opacity-50 font-medium"
-                style={{ borderColor: '#0099cc', color: 'white', background: 'linear-gradient(135deg, #0099cc, #0077b3)' }}
-              >
-                📋 השאר פרטים
-              </button>
-            )}
+      {open && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          className="flex flex-wrap justify-center gap-2 overflow-hidden"
+        >
+          {INITIAL_SUGGESTIONS.map((action, i) => (
             <button
-              onClick={() => setShowFixedActions(!showFixedActions)}
-              className="text-xs px-3 py-1.5 rounded-full border border-white/50 transition-all flex items-center gap-1 hover:shadow-sm"
-              style={{ background: 'rgba(255,255,255,0.5)', color: '#0077b3' }}
+              key={`action-${i}`}
+              onClick={() => handleChipClick(action.label)}
+              disabled={disabled}
+              className="text-sm px-3.5 py-1.5 rounded-full border border-white/50 transition-all whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5 hover:shadow-lg shadow-sm"
+              style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', color: '#0077b3' }}
             >
-              <Grid3X3 className="w-3 h-3" />
-              הצעות
-              {showFixedActions ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              <action.icon className="w-3.5 h-3.5" />
+              {action.label}
             </button>
-          </div>
-
-          {/* Collapsible fixed actions */}
-          {showFixedActions && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="flex flex-wrap justify-center gap-2 overflow-hidden"
-            >
-              {INITIAL_SUGGESTIONS.map((action, i) => (
-                <button
-                  key={`action-${i}`}
-                  onClick={() => handleChipClick(action.label)}
-                  disabled={disabled}
-                  className="text-sm px-3.5 py-1.5 rounded-full border border-white/50 transition-all whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5 hover:shadow-lg shadow-sm"
-                  style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', color: '#0077b3' }}
-                >
-                  <action.icon className="w-3.5 h-3.5" />
-                  {action.label}
-                </button>
-              ))}
-            </motion.div>
-          )}
-        </div>
+          ))}
+        </motion.div>
       )}
     </div>
   );
