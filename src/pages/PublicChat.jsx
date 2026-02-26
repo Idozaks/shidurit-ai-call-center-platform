@@ -223,11 +223,10 @@ ${messages.map(m => `${m.role === 'user' ? 'לקוח' : 'רותם'}: ${m.content
       
       if (isMedicalRelated) {
         try {
-          const conversationSoFar = filteredMessages.map(m => `${m.role === 'user' ? 'לקוח' : 'נציג'}: ${m.content}`).join('\n');
-          
           // Filter out predefined suggestion messages from conversation to avoid confusing the LLM
           const predefinedLabels = new Set(Object.keys(PREDEFINED_RESPONSES));
           const filteredMessages = messages.filter(m => !(m.role === 'user' && predefinedLabels.has(m.content)));
+          const conversationSoFar = filteredMessages.map(m => `${m.role === 'user' ? 'לקוח' : 'נציג'}: ${m.content}`).join('\n');
           
           const specialtiesList = ROFIM_SPECIALTIES.join(', ');
           
