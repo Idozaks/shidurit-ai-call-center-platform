@@ -1179,7 +1179,7 @@ ${history}
       <DoctorSearchModal
         open={showDoctorSearchModal}
         onClose={() => setShowDoctorSearchModal(false)}
-        onSubmit={(text) => sendChat(text)}
+        onSubmit={(text) => sendChat(text, { skipPredefined: true })}
       />
 
       {/* Details Modal */}
