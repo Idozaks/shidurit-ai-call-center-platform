@@ -16,6 +16,7 @@ import PublicChatMenu from '../components/chat/PublicChatMenu';
 import DetailsInputModal from '../components/chat/DetailsInputModal';
 import RofimDoctorCards from '../components/chat/RofimDoctorCards';
 import ThinkingIndicator from '../components/chat/ThinkingIndicator';
+import DoctorSearchModal from '../components/chat/DoctorSearchModal';
 import ROFIM_SPECIALTIES from '../components/data/rofimSpecialties';
 
 // Helper to call the public backend function (supports both auth and non-auth)
@@ -61,6 +62,7 @@ export default function PublicChat() {
   const chatInputRef = useRef(null);
   const [sessionStatus, setSessionStatus] = useState('active');
   const [collectedDetails, setCollectedDetails] = useState({});
+  const [showDoctorSearchModal, setShowDoctorSearchModal] = useState(false);
   const [knowledgeBase, setKnowledgeBase] = useState('');
   // Tracks the user's current conversational intent: "info" = asking about procedures/specialties, "scheduling" = wants to book/find a doctor
   const [userIntent, setUserIntent] = useState(null);
