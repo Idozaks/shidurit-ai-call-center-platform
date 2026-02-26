@@ -219,11 +219,62 @@ ${messages.map(m => `${m.role === 'user' ? 'לקוח' : 'רותם'}: ${m.content
       let rofimResults = [];
       let searchActuallyPerformed = false;
       let extractedSearchParams = null;
+      
+      // If coming from the modal, use the structured params directly
+      if (modalSearchParams) {
+        extractedSearchParams = {
+          ready_to_search: true,
+          medicalSearchTerm: modalSearchParams.medicalSearchTerm,
+          search_type: modalSearchParams.search_type,
+          location: modalSearchParams.location,
+          kupatHolim: modalSearchParams.kupatHolim,
+          missing_fields: [],
+          procedure_synonyms: [],
+        };
+        
+        // Normalize specialty terms to exact ROFIM_SPECIALTIES names
+        if (extractedSearchParams.search_type === 'specialty' && extractedSearchParams.medicalSearchTerm) {
+          const term = extractedSearchParams.medicalSearchTerm.trim();
+          let matched = ROFIM_SPECIALTIES.find(s => s === term);
+          if (!matched) matched = ROFIM_SPECIALTIES.find(s => s.startsWith(term) || term.startsWith(s));
+          if (!matched) matched = ROFIM_SPECIALTIES.find(s => s.includes(term) || term.includes(s));
+          if (matched) extractedSearchParams.medicalSearchTerm = matched;
+        }
+        
+        searchActuallyPerformed = true;
+        let finalSearchTerm = extractedSearchParams.medicalSearchTerm;
+        
+        // For procedures, generate synonyms
+        if (extractedSearchParams.search_type === 'procedure') {
+          setThinkingStatus({ step: 'generating_synonyms', text: 'מחפש מונחים רפואיים דומים...' });
+          const synRes = await publicApi({
+            action: 'invokeLLM',
+            prompt: `Generate 10 alternative Hebrew names/phrasings for the medical procedure or condition: "${extractedSearchParams.medicalSearchTerm}".
+RULES:
+- Include singular↔plural variations, with/without "ניתוח"/"טיפול" prefix, shorter forms, formal medical terms, colloquial names, related specialty name.
+- All in Hebrew. Do NOT repeat the original term.`,
+            response_json_schema: {
+              type: "object",
+              properties: { synonyms: { type: "array", items: { type: "string" } } }
+            }
+          });
+          const synonyms = (synRes.result?.synonyms || []).filter(s => s && s !== extractedSearchParams.medicalSearchTerm);
+          if (synonyms.length > 0) {
+            finalSearchTerm = [extractedSearchParams.medicalSearchTerm, ...synonyms].join('|');
+          }
+        }
+        
+        console.log(`[Rofim Search - Modal] Querying: term="${finalSearchTerm}", location="${extractedSearchParams.location}", kupatHolim="${extractedSearchParams.kupatHolim}"`);
+        setThinkingStatus({ step: 'searching', text: 'מחפש רופאים במאגר...' });
+        rofimResults = await searchRofimDoctors(finalSearchTerm, extractedSearchParams.location, extractedSearchParams.kupatHolim);
+        console.log(`[Rofim Search - Modal] Got ${rofimResults.length} results`);
+      }
+      
       const medicalRegex = /רופא|רופאה|ד"ר|דר'|דר |פרופ'|פרופ |דוקטור|התמחות|מומחה|ניתוח|טיפול|בדיקה|אורולוג|קרדיולוג|אורתופד|גינקולוג|עור|עיניים|אף אוזן|נוירולוג|פנימי|ילדים|משפחה|קופת חולים|מכבי|כללית|מאוחדת|לאומית/;
       const conversationText = messages.map(m => m.content).join(' ');
       const isMedicalRelated = medicalRegex.test(content) || medicalRegex.test(conversationText);
       
-      if (isMedicalRelated) {
+      if (!modalSearchParams && isMedicalRelated) {
         try {
           // Filter out predefined suggestion messages from conversation to avoid confusing the LLM
           const predefinedLabels = new Set(Object.keys(PREDEFINED_RESPONSES));
