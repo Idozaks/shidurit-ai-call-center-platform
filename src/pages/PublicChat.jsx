@@ -326,6 +326,11 @@ CRITICAL RULES:
           extractedSearchParams = searchParams;
           console.log('[Rofim Search] LLM extracted params:', JSON.stringify(searchParams));
 
+          // Ensure all extracted params are strings (LLM may return non-string types)
+          if (searchParams.medicalSearchTerm && typeof searchParams.medicalSearchTerm !== 'string') searchParams.medicalSearchTerm = String(searchParams.medicalSearchTerm);
+          if (searchParams.location && typeof searchParams.location !== 'string') searchParams.location = String(searchParams.location);
+          if (searchParams.kupatHolim && typeof searchParams.kupatHolim !== 'string') searchParams.kupatHolim = String(searchParams.kupatHolim);
+          
           // Don't trust ready_to_search from LLM — check actual field values
           // Also reject if location is flagged as a region instead of a specific city
           const hasAllFields = searchParams.medicalSearchTerm?.trim() && searchParams.location?.trim() && searchParams.kupatHolim?.trim() && !searchParams.location_is_region;
