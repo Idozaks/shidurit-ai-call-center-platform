@@ -250,10 +250,41 @@ CRITICAL RULES:
             searchActuallyPerformed = true;
             // For procedures, build a pipe-separated term with synonyms
             let finalSearchTerm = searchParams.medicalSearchTerm;
-            if (searchParams.search_type === 'procedure' && searchParams.procedure_synonyms?.length > 0) {
-              const allTerms = [searchParams.medicalSearchTerm, ...searchParams.procedure_synonyms.filter(s => s && s !== searchParams.medicalSearchTerm)];
-              finalSearchTerm = allTerms.join('|');
-              console.log(`[Rofim Search] Procedure with synonyms: "${finalSearchTerm}"`);
+            if (searchParams.search_type === 'procedure') {
+              let synonyms = (searchParams.procedure_synonyms || []).filter(s => s && s !== searchParams.medicalSearchTerm);
+              
+              // If the extraction LLM didn't generate synonyms, make a dedicated call
+              if (synonyms.length === 0) {
+                console.log(`[Rofim Search] No synonyms from extraction LLM, generating separately for: "${searchParams.medicalSearchTerm}"`);
+                const synRes = await publicApi({
+                  action: 'invokeLLM',
+                  prompt: `Generate 10 alternative Hebrew names/phrasings for the medical procedure or condition: "${searchParams.medicalSearchTerm}".
+
+RULES:
+- MUST include singular↔plural variations (e.g. "גידול בעצם"→"גידולים בעצמות", "כריתת שקד"→"כריתת שקדים")
+- Include variations with/without "ניתוח"/"טיפול" prefix
+- Include shorter forms
+- Include formal medical terms in Hebrew
+- Include colloquial/everyday Hebrew names
+- Include the related medical specialty name if relevant (e.g. "אונקולוגיה אורתופדית" for bone tumors)
+- All terms MUST be in Hebrew
+- Do NOT repeat the original term "${searchParams.medicalSearchTerm}"`,
+                  response_json_schema: {
+                    type: "object",
+                    properties: {
+                      synonyms: { type: "array", items: { type: "string" }, description: "10 alternative Hebrew phrasings" }
+                    }
+                  }
+                });
+                synonyms = (synRes.result?.synonyms || []).filter(s => s && s !== searchParams.medicalSearchTerm);
+                console.log(`[Rofim Search] Generated synonyms:`, synonyms);
+              }
+
+              if (synonyms.length > 0) {
+                const allTerms = [searchParams.medicalSearchTerm, ...synonyms];
+                finalSearchTerm = allTerms.join('|');
+                console.log(`[Rofim Search] Procedure with synonyms: "${finalSearchTerm}"`);
+              }
             }
             console.log(`[Rofim Search] Querying handler with: term="${finalSearchTerm}", location="${searchParams.location}", kupatHolim="${searchParams.kupatHolim}"`);
             rofimResults = await searchRofimDoctors(finalSearchTerm, searchParams.location, searchParams.kupatHolim);
