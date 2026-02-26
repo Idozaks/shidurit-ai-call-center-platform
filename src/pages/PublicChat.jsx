@@ -164,19 +164,7 @@ export default function PublicChat() {
 
       // Detect if user is asking for INFO about a specialty/procedure (not booking)
       const infoIntentRegex = /מידע על|מה זה|מהו|מהי|ספר לי על|תסביר|הסבר|מה כולל|מה עושים ב|מה עושה|על מה מדבר|פרטים על|אני רוצה לדעת|מה ההבדל|מה התחום/;
-      let isInfoRequest = infoIntentRegex.test(content);
-      
-      // Also detect continuation info requests: if previous bot response was informational 
-      // and user says "עכשיו על X" or "ועל X" or "גם על X" or just a topic name after info context
-      if (!isInfoRequest) {
-        const lastBotMsg = [...messages].reverse().find(m => m.role === 'assistant')?.content || '';
-        const wasInfoResponse = /אם תרצה.*למצוא רופא|אוכל לעזור לך למצוא/.test(lastBotMsg);
-        const continuationRegex = /^(עכשיו על|ועל|גם על|ומה (עם|על|זה)|עכשיו )|^(על )/;
-        if (wasInfoResponse && (continuationRegex.test(content.trim()))) {
-          isInfoRequest = true;
-        }
-      }
-      
+      const isInfoRequest = infoIntentRegex.test(content);
       // Check that user is NOT also asking for a doctor/appointment in the same message
       const bookingSignals = /רופא|רופאה|ד"ר|תור|קביעת|מומחה|דוקטור|קופת חולים|מכבי|כללית|מאוחדת|לאומית/;
       const hasBookingSignal = bookingSignals.test(content);
