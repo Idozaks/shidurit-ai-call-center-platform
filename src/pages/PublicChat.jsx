@@ -131,6 +131,8 @@ export default function PublicChat() {
   useEffect(() => {
     if (!sessionId) return;
     const interval = setInterval(async () => {
+      // Skip polling while AI is processing to avoid rate limiting
+      if (isTyping) return;
       const sessionRes = await publicApi({ action: 'getSession', session_id: sessionId });
       const s = sessionRes.session;
       if (s) {
@@ -152,9 +154,9 @@ export default function PublicChat() {
           }))];
         });
       }
-    }, 3000);
+    }, 5000);
     return () => clearInterval(interval);
-  }, [sessionId]);
+  }, [sessionId, isTyping]);
 
   const sendMessageMutation = useMutation({
     mutationFn: async ({ content, modalSearchParams = null }) => {
