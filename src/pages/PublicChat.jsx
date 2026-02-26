@@ -11,7 +11,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from 'react-markdown';
 import VoiceChat from '../components/chat/VoiceChat';
-import SuggestionChips from '../components/chat/SuggestionChips';
+import SuggestionChips, { INITIAL_SUGGESTIONS, PREDEFINED_RESPONSES } from '../components/chat/SuggestionChips';
 import PublicChatMenu from '../components/chat/PublicChatMenu';
 import DetailsInputModal from '../components/chat/DetailsInputModal';
 import RofimDoctorCards from '../components/chat/RofimDoctorCards';
@@ -708,6 +708,19 @@ ${history}
     const userMessage = text.trim();
     setInputValue('');
     
+    // Check for predefined responses
+    if (PREDEFINED_RESPONSES[userMessage]) {
+      const userMsg = { id: Date.now(), role: 'user', content: userMessage };
+      const aiMsg = { id: Date.now() + 1, role: 'assistant', content: PREDEFINED_RESPONSES[userMessage] };
+      setMessages(prev => [...prev, userMsg, aiMsg]);
+      // Save both messages to backend
+      if (sessionId) {
+        publicApi({ action: 'sendMessage', session_id: sessionId, role: 'user', content: userMessage });
+        publicApi({ action: 'sendMessage', session_id: sessionId, role: 'assistant', content: PREDEFINED_RESPONSES[userMessage] });
+      }
+      return;
+    }
+
     // Add user message
     const newUserMsg = {
       id: Date.now(),
@@ -1014,6 +1027,29 @@ ${history}
                   </motion.div>
                 ))}
               </AnimatePresence>
+
+              {/* Initial suggestion badges under welcome message */}
+              {messages.filter(m => m.role === 'user').length === 0 && messages.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex flex-wrap gap-2 pr-13"
+                >
+                  {INITIAL_SUGGESTIONS.map((suggestion, i) => (
+                    <button
+                      key={`init-${i}`}
+                      onClick={() => sendChat(suggestion.label)}
+                      disabled={isTyping}
+                      className="text-sm px-3.5 py-1.5 rounded-full border border-white/50 transition-all whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5 hover:shadow-lg shadow-sm"
+                      style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', color: '#0077b3' }}
+                    >
+                      <suggestion.icon className="w-3.5 h-3.5" />
+                      {suggestion.label}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
 
               {/* Thinking indicator */}
               <AnimatePresence>

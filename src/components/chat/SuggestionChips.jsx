@@ -1,30 +1,17 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Phone, Clock, Info, CalendarCheck, HelpCircle, ChevronDown, ChevronUp, Grid3X3 } from 'lucide-react';
+import { Phone, Info, CalendarCheck, ChevronDown, ChevronUp, Grid3X3, UserPlus } from 'lucide-react';
 
-const publicApi = async (payload) => {
-  try {
-    const { base44 } = await import('@/api/base44Client');
-    const response = await base44.functions.invoke('publicChat', payload);
-    return response.data;
-  } catch (sdkErr) {
-    const res = await fetch(`/functions/publicChat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error(`API error: ${res.status}`);
-    return res.json();
-  }
-};
-
-const FIXED_ACTIONS = [
-  { label: 'יצירת קשר', icon: Phone },
+export const INITIAL_SUGGESTIONS = [
   { label: 'מידע על שירותים', icon: Info },
-  { label: 'שעות פעילות', icon: Clock },
   { label: 'קביעת תור', icon: CalendarCheck },
-  { label: 'שאלות נפוצות', icon: HelpCircle },
+  { label: 'יצירת קשר', icon: Phone },
+  { label: 'הצטרפות לפורטל ROFIM', icon: UserPlus },
 ];
+
+export const PREDEFINED_RESPONSES = {
+  'מידע על שירותים': `פורטל בריאות מתקדם לזימון תורים מאפשר לך למצוא ולתאם תורים לרופאים מומחים בצורה מהירה, נוחה ופשוטה. ניתן לחפש רופא לפי הליך רפואי, תחום מומחיות או סוג טיפול.\n\nהמערכת נותנת מענה לחברי קופות החולים, מבוטחי ביטוחים משלימים, וגם ללקוחות פרטיים. הפורטל מאפשר הזמנת תור ראשון זמין לכל הצרכים הרפואיים שלך.`,
+};
 
 export default function SuggestionChips({ tenantId, messages, onSelect, themeColor, disabled, onOpenDetailsModal, detailsSubmitted }) {
   const [showFixedActions, setShowFixedActions] = useState(false);
@@ -48,6 +35,7 @@ export default function SuggestionChips({ tenantId, messages, onSelect, themeCol
     setShowFixedActions(false);
   };
 
+  // Don't render in the input area for first interaction (badges shown inline under welcome message)
   if (isFirstInteraction) {
     return null;
   }
@@ -86,7 +74,7 @@ export default function SuggestionChips({ tenantId, messages, onSelect, themeCol
               style={{ background: 'rgba(255,255,255,0.5)', color: '#0077b3' }}
             >
               <Grid3X3 className="w-3 h-3" />
-              פעולות מהירות
+              הצעות
               {showFixedActions ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
           </div>
@@ -99,7 +87,7 @@ export default function SuggestionChips({ tenantId, messages, onSelect, themeCol
               exit={{ height: 0, opacity: 0 }}
               className="flex flex-wrap justify-center gap-2 overflow-hidden"
             >
-              {FIXED_ACTIONS.map((action, i) => (
+              {INITIAL_SUGGESTIONS.map((action, i) => (
                 <button
                   key={`action-${i}`}
                   onClick={() => handleChipClick(action.label)}
@@ -113,8 +101,6 @@ export default function SuggestionChips({ tenantId, messages, onSelect, themeCol
               ))}
             </motion.div>
           )}
-
-
         </div>
       )}
     </div>
