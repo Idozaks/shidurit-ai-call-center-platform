@@ -178,22 +178,24 @@ function KupaDropdown({ value, onChange }) {
       </button>
       {open && (
         <div className="absolute z-50 top-full mt-1 left-0 right-0 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden">
-          {KUPOT.map(kupa => {
-            const logo = getKupaLogo(kupa);
-            return (
-              <button
-                key={kupa}
-                type="button"
-                onClick={() => { onChange(kupa); setOpen(false); }}
-                className={`w-full px-3 py-2.5 text-right text-sm flex items-center gap-2 hover:bg-sky-50 transition-colors ${
-                  value === kupa ? 'bg-sky-50 text-sky-700 font-medium' : 'text-slate-700'
-                }`}
-              >
-                {logo && <img src={logo} alt="" className="h-5 object-contain shrink-0" />}
-                {kupa}
-              </button>
-            );
-          })}
+          <div className="grid grid-cols-3 gap-1 p-2">
+            {KUPOT.map(kupa => {
+              const logo = getKupaLogo(kupa);
+              return (
+                <button
+                  key={kupa}
+                  type="button"
+                  onClick={() => { onChange(kupa); setOpen(false); }}
+                  className={`flex flex-col items-center justify-center gap-1 p-2 rounded-lg text-xs hover:bg-sky-50 transition-colors ${
+                    value === kupa ? 'bg-sky-50 text-sky-700 font-medium ring-1 ring-sky-300' : 'text-slate-700'
+                  }`}
+                >
+                  {logo && <img src={logo} alt="" className="h-6 object-contain" />}
+                  <span>{kupa}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
