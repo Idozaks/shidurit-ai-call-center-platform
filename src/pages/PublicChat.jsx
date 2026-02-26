@@ -186,24 +186,31 @@ ${conversationSoFar}
 === PREVIOUSLY IDENTIFIED FIELDS ===
 ${prevDetailsStr}
 
-=== AVAILABLE MEDICAL SPECIALTIES (use exact names) ===
+=== AVAILABLE MEDICAL SPECIALTIES (EXACT list — use ONLY names from this list for search_type "specialty") ===
 ${specialtiesList}
 
 === TASK ===
 Extract these 3 fields by scanning the ENTIRE conversation history above:
 
-1. medicalSearchTerm - This is what will be sent to the Rofim doctor search API. It can be ONE of these:
-   a) A SPECIALTY from the list above: Map user's words to the closest match: "אורולוג"→"אורולוגיה", "עיניים"→"עיניים", "לב"→"קרדיולוגיה", "עור"→"עור ומין", "אורתופד"→"אורתופדיה".
-   b) A PROCEDURE/TREATMENT name: If the user mentions a specific procedure (e.g. "הסרת שקד שלישי", "ניתוח קטרקט", "החלפת מפרק ברך", "ביופסיה", "אנדוסקופיה"), use the procedure name AS-IS. Do NOT convert it to a specialty name.
-   c) A doctor name: If user mentions a specific doctor name, use it as-is.
+1. medicalSearchTerm - This is what will be sent to the Rofim doctor search API. Classify it as ONE of these:
+
+   a) search_type = "specialty": ONLY if the user's request maps EXACTLY to one of the specialties in the list above.
+      Examples: "אורולוג"→"אורולוגיה", "רופא עיניים"→"עיניים", "לב"→"קרדיולוגיה", "עור"→"עור ומין", "אורתופד"→"אורתופדיה".
    
-   CRITICAL: Distinguish between specialties and procedures! Examples:
-   - "אני מחפש אורולוג" → specialty → "אורולוגיה"
-   - "אני צריך הסרת שקד שלישי" → procedure → "הסרת שקד שלישי"  
-   - "אני רוצה ניתוח קטרקט" → procedure → "ניתוח קטרקט"
-   - "אני מחפש רופא עיניים" → specialty → "עיניים"
+   b) search_type = "procedure": Use this for ANYTHING that is NOT an exact specialty from the list above. This includes:
+      - Specific procedures: "הסרת שקד שלישי", "ניתוח קטרקט", "החלפת מפרק ברך"
+      - Medical conditions / symptoms / body-part issues: "גידול בעצם", "כאבי גב", "בעיות שמיעה", "פריצת דיסק"
+      - General descriptions that don't match a specialty exactly: "רופא שמטפל בגידולים", "בדיקות דם"
+      Use the user's original phrasing AS-IS for medicalSearchTerm. Do NOT convert it to a specialty name.
    
-   Set search_type to "specialty", "procedure", or "doctor_name" accordingly.
+   c) search_type = "doctor_name": If user mentions a specific doctor name, use it as-is.
+   
+   CRITICAL CLASSIFICATION RULE: If the user's request does NOT match one of the exact specialty names in the list above, it MUST be classified as "procedure" — even if it's related to a specialty. For example:
+   - "גידול בעצם" — NOT in specialty list → search_type = "procedure", medicalSearchTerm = "גידול בעצם"
+   - "בעיה בברך" — NOT in specialty list → search_type = "procedure", medicalSearchTerm = "בעיה בברך"
+   - "אורתופדיה" — IS in specialty list → search_type = "specialty", medicalSearchTerm = "אורתופדיה"
+   - "אונקולוגיה" — IS in specialty list → search_type = "specialty", medicalSearchTerm = "אונקולוגיה"
+   Do NOT "upgrade" a condition/procedure to a specialty. Keep the user's words.
 
 2. location - MUST be a specific Israeli CITY name (e.g. "חיפה", "תל אביב", "ירושלים", "באר שבע", "נצרת", "פתח תקווה", "ראשון לציון", "נתניה", "אשדוד", "חדרה", "רמת גן").
    CRITICAL: Generalized regions/areas are NOT valid cities. The following are NOT specific cities and must be REJECTED: "מרכז", "צפון", "דרום", "שרון", "שפלה", "נגב", "גליל", "גוש דן", "השרון", "עמק יזרעאל", "אזור המרכז", "אזור הצפון", "אזור הדרום", "אזור ירושלים", "אזור תל אביב", "המשולש", "עוטף עזה".

@@ -56,11 +56,11 @@ import DoctorProfile from './pages/DoctorProfile';
 import DoctorsCatalog from './pages/DoctorsCatalog';
 import Home from './pages/Home';
 import ProcedurePage from './pages/ProcedurePage';
+import PublicChat from './pages/PublicChat';
 import ShiduritSystemPrompt from './pages/ShiduritSystemPrompt';
 import SpecialtyPage from './pages/SpecialtyPage';
 import TenantDashboard from './pages/TenantDashboard';
 import WorkerLogin from './pages/WorkerLogin';
-import PublicChat from './pages/PublicChat';
 import __Layout from './Layout.jsx';
 
 
@@ -74,11 +74,11 @@ export const PAGES = {
     "DoctorsCatalog": DoctorsCatalog,
     "Home": Home,
     "ProcedurePage": ProcedurePage,
+    "PublicChat": PublicChat,
     "ShiduritSystemPrompt": ShiduritSystemPrompt,
     "SpecialtyPage": SpecialtyPage,
     "TenantDashboard": TenantDashboard,
     "WorkerLogin": WorkerLogin,
-    "PublicChat": PublicChat,
 }
 
 export const pagesConfig = {
