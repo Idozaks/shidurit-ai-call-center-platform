@@ -64,6 +64,7 @@ export default function PublicChat() {
   const [knowledgeBase, setKnowledgeBase] = useState('');
   // Tracks the user's current conversational intent: "info" = asking about procedures/specialties, "scheduling" = wants to book/find a doctor
   const [userIntent, setUserIntent] = useState(null);
+  const userIntentRef = useRef(null);
 
   const { data: tenant, isLoading: tenantLoading } = useQuery({
     queryKey: ['publicTenant', slug],
