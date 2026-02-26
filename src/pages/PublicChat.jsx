@@ -174,14 +174,15 @@ export default function PublicChat() {
       const hasInfoSignal = infoSignals.test(content);
       
       if (hasSchedulingSignal && !hasInfoSignal) {
+        userIntentRef.current = 'scheduling';
         setUserIntent('scheduling');
       } else if (hasInfoSignal && !hasSchedulingSignal) {
+        userIntentRef.current = 'info';
         setUserIntent('info');
       }
-      // If both or neither signals → keep current intent
       
-      // Determine if this message should be treated as info request
-      const currentIntent = hasSchedulingSignal ? 'scheduling' : hasInfoSignal ? 'info' : userIntent;
+      // Determine if this message should be treated as info request (use ref for fresh value inside async mutation)
+      const currentIntent = hasSchedulingSignal ? 'scheduling' : hasInfoSignal ? 'info' : userIntentRef.current;
       const isInfoRequest = currentIntent === 'info';
 
       if (isInfoRequest && !hasSchedulingSignal) {
