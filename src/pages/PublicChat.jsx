@@ -1117,6 +1117,16 @@ ${history}
                         <ReactMarkdown className={`prose prose-sm max-w-none ${message.role === 'user' ? 'prose-invert' : ''}`}>
                           {message.content}
                         </ReactMarkdown>
+                        {message.role === 'assistant' && message.content === PREDEFINED_RESPONSES['קביעת תור'] && (
+                          <Button
+                            onClick={() => setShowDoctorSearchModal(true)}
+                            className="mt-3 w-full text-white font-medium rounded-xl h-10"
+                            style={{ background: 'linear-gradient(135deg, #0099cc, #0077b3)' }}
+                          >
+                            <Search className="w-4 h-4 ml-2" />
+                            חיפוש רופא
+                          </Button>
+                        )}
                       </div>
                       {message.role === 'assistant' && rofimDoctorsByMsgId[message.id] && (
                         <RofimDoctorCards
@@ -1161,6 +1171,13 @@ ${history}
           </>
         )}
       </div>
+
+      {/* Doctor Search Modal */}
+      <DoctorSearchModal
+        open={showDoctorSearchModal}
+        onClose={() => setShowDoctorSearchModal(false)}
+        onSubmit={(text) => sendChat(text)}
+      />
 
       {/* Details Modal */}
       <DetailsInputModal
