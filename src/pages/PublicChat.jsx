@@ -113,11 +113,11 @@ export default function PublicChat() {
       setShowNameInput(false);
       setTimeout(() => chatInputRef.current?.focus(), 100);
       if (tenant?.welcome_message) {
-        setMessages([{
-          id: 'welcome',
-          role: 'assistant',
-          content: tenant.welcome_message
-        }]);
+        setMessages(prev => {
+          // Don't add duplicate welcome message if already shown
+          if (prev.some(m => m.id === 'welcome')) return prev;
+          return [{ id: 'welcome', role: 'assistant', content: tenant.welcome_message }];
+        });
       }
     }
   });
