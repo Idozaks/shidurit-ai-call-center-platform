@@ -298,10 +298,28 @@ RULES:
         }
       }
 
+      // Override extractedSearchParams missing_fields based on actual field check to prevent LLM hallucinating missing fields
+      if (extractedSearchParams) {
+        const actuallyHas = {
+          term: !!extractedSearchParams.medicalSearchTerm?.trim(),
+          location: !!extractedSearchParams.location?.trim() && !extractedSearchParams.location_is_region,
+          kupa: !!extractedSearchParams.kupatHolim?.trim()
+        };
+        const actualMissing = [];
+        if (!actuallyHas.term) actualMissing.push('תחום רפואי / התמחות');
+        if (!actuallyHas.location) actualMissing.push(extractedSearchParams.location_is_region ? 'עיר ספציפית (לא אזור)' : 'עיר');
+        if (!actuallyHas.kupa) actualMissing.push('קופת חולים');
+        extractedSearchParams.missing_fields = actualMissing;
+        extractedSearchParams.ready_to_search = actualMissing.length === 0;
+      }
+
       // Get AI response with Rofim results injected into prompt
-      // searchWasAttempted = true ONLY if we actually queried the Rofim API (all 3 fields present + specific city)
       const llmRes = await publicApi({ action: 'invokeLLM', prompt: buildPrompt(content, rofimResults, searchActuallyPerformed, extractedSearchParams), response_json_schema: null });
-      const aiResponse = llmRes.result;
+      let aiResponse = llmRes.result;
+      // Ensure aiResponse is a string (LLM may return object when response_json_schema is null)
+      if (typeof aiResponse !== 'string') {
+        aiResponse = aiResponse?.text || aiResponse?.content || aiResponse?.response || JSON.stringify(aiResponse);
+      }
 
       // Save AI response
       await publicApi({ action: 'sendMessage', session_id: sessionId, role: 'assistant', content: aiResponse });
