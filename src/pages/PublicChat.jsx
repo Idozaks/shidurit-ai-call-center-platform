@@ -643,10 +643,12 @@ ${aiResponse}`,
 
     // Build Rofim search results context
     let rofimContext = '';
+    const searchParamsSummary = extractedParams ? `\nפרמטרי חיפוש שבוצעו: התמחות/טיפול: "${extractedParams.medicalSearchTerm}", עיר: "${extractedParams.location}", קופת חולים: "${extractedParams.kupatHolim}"` : '';
+
     if (searchActuallyPerformed && rofimSearchResults && rofimSearchResults.length > 0) {
-      rofimContext = `\n\n=== תוצאות חיפוש רופאים (ממאגר rofim.org.il) - נמצאו ${rofimSearchResults.length} רופאים ===\nהכרטיסיות של הרופאים מוצגות אוטומטית מתחת להודעה שלך. אל תפרט את שמותיהם.`;
+      rofimContext = `\n\n=== תוצאות חיפוש רופאים (ממאגר rofim.org.il) - נמצאו ${rofimSearchResults.length} רופאים ===${searchParamsSummary}\nהכרטיסיות של הרופאים מוצגות אוטומטית מתחת להודעה שלך. אל תפרט את שמותיהם.\nCRITICAL: בתחילת התשובה, ציין ללקוח את פרמטרי החיפוש שבוצעו בפורמט: "חיפשתי עבורך: [התמחות/טיפול] ב[עיר], קופת חולים: [קופה]."`;
     } else if (searchActuallyPerformed && rofimSearchResults && rofimSearchResults.length === 0) {
-      rofimContext = `\n\n=== חיפוש רופאים: בוצע חיפוש אך לא נמצאו תוצאות (0 רופאים) ===\nCRITICAL: החיפוש בוצע עם כל 3 הפרטים אך לא נמצאו רופאים מתאימים. ספר ללקוח שלא נמצאו רופאים מתאימים לקריטריונים שביקש, והצע לשנות את ההתמחות, האזור, או קופת החולים ולנסות שוב.`;
+      rofimContext = `\n\n=== חיפוש רופאים: בוצע חיפוש אך לא נמצאו תוצאות (0 רופאים) ===${searchParamsSummary}\nCRITICAL: החיפוש בוצע עם כל 3 הפרטים אך לא נמצאו רופאים מתאימים. ספר ללקוח שלא נמצאו רופאים מתאימים.\nCRITICAL: בתחילת התשובה, ציין ללקוח את פרמטרי החיפוש שבוצעו בפורמט: "חיפשתי עבורך: [התמחות/טיפול] ב[עיר], קופת חולים: [קופה]." ואז הצע לשנות את ההתמחות, האזור, או קופת החולים ולנסות שוב.`;
     } else if (extractedParams) {
       // Search was NOT performed — tell the AI exactly what was detected and what's missing
       const detected = [];
