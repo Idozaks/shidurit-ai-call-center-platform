@@ -157,7 +157,7 @@ export default function PublicChat() {
   }, [sessionId]);
 
   const sendMessageMutation = useMutation({
-    mutationFn: async ({ content }) => {
+    mutationFn: async ({ content, modalSearchParams = null }) => {
       // Save user message
       setThinkingStatus({ step: 'analyzing', text: 'מנתח את הבקשה...' });
       await publicApi({ action: 'sendMessage', session_id: sessionId, role: 'user', content });
@@ -790,7 +790,7 @@ ${history}
     }
   };
 
-  const sendChat = async (text, { skipPredefined = false } = {}) => {
+  const sendChat = async (text, { skipPredefined = false, modalSearchParams = null } = {}) => {
     if (!text.trim() || isTyping) return;
     const userMessage = text.trim();
     setInputValue('');
@@ -831,7 +831,7 @@ ${history}
     setIsTyping(true);
 
     try {
-      const result = await sendMessageMutation.mutateAsync({ content: userMessage });
+      const result = await sendMessageMutation.mutateAsync({ content: userMessage, modalSearchParams });
       
       // Add AI response (only if bot responded, not when worker is active)
       if (result) {
@@ -1179,7 +1179,7 @@ ${history}
       <DoctorSearchModal
         open={showDoctorSearchModal}
         onClose={() => setShowDoctorSearchModal(false)}
-        onSubmit={(text) => sendChat(text, { skipPredefined: true })}
+        onSubmit={(text, searchParams) => sendChat(text, { skipPredefined: true, modalSearchParams: searchParams })}
       />
 
       {/* Details Modal */}

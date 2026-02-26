@@ -231,7 +231,12 @@ export default function DoctorSearchModal({ open, onClose, onSubmit }) {
     if (!canSubmit) return;
     const medicalTerm = specialty || procedure.trim();
     const text = `אני מחפש/ת ${specialty ? `רופא ${specialty}` : medicalTerm} ב${city}, קופת חולים: ${kupa}`;
-    onSubmit(text);
+    onSubmit(text, {
+      medicalSearchTerm: medicalTerm,
+      search_type: specialty ? 'specialty' : 'procedure',
+      location: city,
+      kupatHolim: kupa,
+    });
     // Reset
     setSpecialty('');
     setProcedure('');
