@@ -478,8 +478,8 @@ Extract any NEW details found. If a field was already collected and hasn't chang
     // Merge: keep old values, override with new non-null values
     const merged = { ...collectedDetails };
     for (const [key, val] of Object.entries(extracted)) {
-      if (val && val !== 'null' && val.trim() !== '') {
-        merged[key] = val;
+      if (val && val !== 'null' && (typeof val !== 'string' || val.trim() !== '')) {
+        merged[key] = typeof val === 'string' ? val : String(val);
       }
     }
 
