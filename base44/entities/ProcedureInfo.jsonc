@@ -1,0 +1,40 @@
+{
+  "name": "ProcedureInfo",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Procedure name (unique key)"
+    },
+    "description": {
+      "type": "string",
+      "description": "General description of the procedure"
+    },
+    "suitable_for": {
+      "type": "string",
+      "description": "Who is this suitable for"
+    },
+    "process": {
+      "type": "string",
+      "description": "How the procedure works"
+    },
+    "duration": {
+      "type": "string",
+      "description": "How long it takes"
+    },
+    "recovery": {
+      "type": "string",
+      "description": "Recovery period info"
+    },
+    "benefits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Main benefits"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

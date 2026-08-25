@@ -1,0 +1,84 @@
+{
+  "name": "Tenant",
+  "type": "object",
+  "properties": {
+    "company_name": {
+      "type": "string",
+      "description": "Name of the business"
+    },
+    "slug": {
+      "type": "string",
+      "description": "Unique URL slug for public chat access"
+    },
+    "business_type": {
+      "type": "string",
+      "enum": [
+        "business",
+        "clinic",
+        "other"
+      ],
+      "default": "business",
+      "description": "Type of business: business (\u05e2\u05e1\u05e7), clinic (\u05de\u05e8\u05e4\u05d0\u05d4), or other (\u05d0\u05d7\u05e8)"
+    },
+    "theme_color": {
+      "type": "string",
+      "default": "#6366f1",
+      "description": "Brand color for the chat interface"
+    },
+    "logo_url": {
+      "type": "string",
+      "description": "URL to company logo"
+    },
+    "ai_persona_name": {
+      "type": "string",
+      "default": "\u05e0\u05d5\u05e2\u05d4",
+      "description": "Name of the AI assistant"
+    },
+    "ai_voice": {
+      "type": "string",
+      "default": "nova",
+      "description": "Voice setting for TTS"
+    },
+    "system_prompt": {
+      "type": "string",
+      "description": "Custom system instructions for AI behavior"
+    },
+    "welcome_message": {
+      "type": "string",
+      "description": "Initial greeting message shown to customers"
+    },
+    "usage_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of AI interactions used"
+    },
+    "usage_limit": {
+      "type": "number",
+      "default": 100,
+      "description": "Maximum AI interactions allowed"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the tenant is active"
+    },
+    "onboarding_complete": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether onboarding is finished"
+    },
+    "closer_mode_enabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether aggressive sales mode is on"
+    },
+    "gemini_api_key": {
+      "type": "string",
+      "description": "Tenant's own Gemini API key for billing on their account"
+    }
+  },
+  "required": [
+    "company_name",
+    "slug"
+  ]
+}

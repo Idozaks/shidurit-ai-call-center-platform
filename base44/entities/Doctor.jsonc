@@ -1,0 +1,63 @@
+{
+  "name": "Doctor",
+  "type": "object",
+  "properties": {
+    "tenant_id": {
+      "type": "string",
+      "description": "Reference to the tenant"
+    },
+    "name": {
+      "type": "string",
+      "description": "Doctor's full name"
+    },
+    "specialty": {
+      "type": "string",
+      "description": "Medical specialty"
+    },
+    "procedures": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of procedures offered"
+    },
+    "clinic_location": {
+      "type": "string",
+      "description": "Clinic address"
+    },
+    "availability": {
+      "type": "string",
+      "description": "Available times/days"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Contact phone"
+    },
+    "email": {
+      "type": "string",
+      "description": "Contact email"
+    },
+    "bio": {
+      "type": "string",
+      "description": "Short biography"
+    },
+    "years_experience": {
+      "type": "number",
+      "description": "Years of experience"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Profile photo URL"
+    },
+    "is_available": {
+      "type": "boolean",
+      "default": true,
+      "description": "Currently accepting patients"
+    }
+  },
+  "required": [
+    "tenant_id",
+    "name",
+    "specialty"
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "name": "ChatSession",
+  "type": "object",
+  "properties": {
+    "tenant_id": {
+      "type": "string",
+      "description": "Reference to the tenant"
+    },
+    "lead_id": {
+      "type": "string",
+      "description": "Reference to the lead"
+    },
+    "customer_name": {
+      "type": "string",
+      "description": "Customer name"
+    },
+    "customer_phone": {
+      "type": "string",
+      "description": "Customer phone"
+    },
+    "customer_email": {
+      "type": "string",
+      "description": "Customer email"
+    },
+    "inquiry_reason": {
+      "type": "string",
+      "description": "Reason for contact"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "text",
+        "voice"
+      ],
+      "default": "text",
+      "description": "Chat mode"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "waiting_for_agent",
+        "agent_active",
+        "closed"
+      ],
+      "default": "active",
+      "description": "Session status"
+    },
+    "assigned_worker_id": {
+      "type": "string",
+      "description": "Assigned human agent"
+    },
+    "unread_count_worker": {
+      "type": "number",
+      "default": 0,
+      "description": "Unread messages for worker"
+    },
+    "collected_details": {
+      "type": "object",
+      "description": "Details collected from the customer during conversation (name, phone, email, preferred_time, etc.)",
+      "properties": {
+        "full_name": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "preferred_time": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "tenant_id"
+  ]
+}

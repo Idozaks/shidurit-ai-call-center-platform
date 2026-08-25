@@ -1,0 +1,26 @@
+{
+  "name": "ChatUser",
+  "type": "object",
+  "properties": {
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "User's email address"
+    },
+    "first_name": {
+      "type": "string",
+      "description": "User's first name"
+    },
+    "last_name": {
+      "type": "string",
+      "description": "User's last name"
+    },
+    "profile_image_url": {
+      "type": "string",
+      "description": "URL to user's profile image"
+    }
+  },
+  "required": [
+    "email"
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "name": "Lead",
+  "type": "object",
+  "properties": {
+    "tenant_id": {
+      "type": "string",
+      "description": "Reference to the tenant"
+    },
+    "customer_name": {
+      "type": "string",
+      "description": "Customer's name"
+    },
+    "customer_phone": {
+      "type": "string",
+      "description": "Customer's phone number"
+    },
+    "customer_email": {
+      "type": "string",
+      "description": "Customer's email"
+    },
+    "inquiry_reason": {
+      "type": "string",
+      "description": "Reason for inquiry"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "contacted",
+        "converted",
+        "lost"
+      ],
+      "default": "new",
+      "description": "Lead status"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "normal",
+        "high"
+      ],
+      "default": "normal",
+      "description": "Lead priority"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    },
+    "sentiment": {
+      "type": "string",
+      "enum": [
+        "positive",
+        "neutral",
+        "negative"
+      ],
+      "default": "neutral",
+      "description": "Customer sentiment"
+    },
+    "summary": {
+      "type": "string",
+      "description": "AI-generated conversation summary"
+    },
+    "ai_suggested_action": {
+      "type": "string",
+      "description": "AI recommended next action"
+    },
+    "intent_score": {
+      "type": "number",
+      "description": "Purchase intent score 0-100"
+    },
+    "urgency_level": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "low",
+      "description": "Urgency of the lead"
+    },
+    "competitor_detected": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether competitor was mentioned"
+    },
+    "facts_json": {
+      "type": "object",
+      "description": "Extracted facts from conversation"
+    },
+    "last_analysis_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last AI analysis timestamp"
+    }
+  },
+  "required": [
+    "tenant_id",
+    "customer_name"
+  ]
+}

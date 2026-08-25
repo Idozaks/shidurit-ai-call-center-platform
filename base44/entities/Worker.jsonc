@@ -1,0 +1,55 @@
+{
+  "name": "Worker",
+  "type": "object",
+  "properties": {
+    "tenant_id": {
+      "type": "string",
+      "description": "Reference to the tenant"
+    },
+    "full_name": {
+      "type": "string",
+      "description": "Worker's full name"
+    },
+    "email": {
+      "type": "string",
+      "description": "Worker's email"
+    },
+    "password": {
+      "type": "string",
+      "description": "Worker's password"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "representative",
+        "manager",
+        "admin"
+      ],
+      "default": "representative",
+      "description": "Worker's role"
+    },
+    "is_super_admin": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this worker has super admin access to all tenants"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive"
+      ],
+      "default": "active",
+      "description": "Worker status"
+    },
+    "is_online": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether worker is online"
+    }
+  },
+  "required": [
+    "tenant_id",
+    "full_name"
+  ]
+}

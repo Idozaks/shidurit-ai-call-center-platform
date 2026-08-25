@@ -1,0 +1,41 @@
+{
+  "name": "KnowledgeEntry",
+  "type": "object",
+  "properties": {
+    "tenant_id": {
+      "type": "string",
+      "description": "Reference to the tenant"
+    },
+    "title": {
+      "type": "string",
+      "description": "Entry title"
+    },
+    "category": {
+      "type": "string",
+      "default": "general",
+      "description": "Knowledge category"
+    },
+    "content": {
+      "type": "string",
+      "description": "Knowledge content"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL of uploaded file attachment"
+    },
+    "file_name": {
+      "type": "string",
+      "description": "Original name of uploaded file"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether entry is active"
+    }
+  },
+  "required": [
+    "tenant_id",
+    "title",
+    "content"
+  ]
+}

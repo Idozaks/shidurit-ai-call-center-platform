@@ -1,0 +1,59 @@
+{
+  "name": "SyntheticConversation",
+  "type": "object",
+  "properties": {
+    "tenant_id": {
+      "type": "string",
+      "description": "Reference to the tenant"
+    },
+    "worker_id": {
+      "type": "string",
+      "description": "Assigned worker for training"
+    },
+    "topic": {
+      "type": "string",
+      "description": "Conversation topic"
+    },
+    "transcript": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Conversation messages"
+    },
+    "analysis": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "string"
+        },
+        "key_takeaways": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "difficulty_level": {
+          "type": "string"
+        },
+        "recommended_approach": {
+          "type": "string"
+        }
+      },
+      "description": "AI analysis of conversation"
+    }
+  },
+  "required": [
+    "tenant_id",
+    "topic",
+    "transcript"
+  ]
+}

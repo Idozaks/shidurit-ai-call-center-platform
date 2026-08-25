@@ -1,0 +1,46 @@
+{
+  "name": "ChatMessage",
+  "type": "object",
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "description": "Reference to the chat session"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "user",
+        "assistant",
+        "system",
+        "worker"
+      ],
+      "description": "Message sender role"
+    },
+    "content": {
+      "type": "string",
+      "description": "Message content"
+    },
+    "action_type": {
+      "type": "string",
+      "description": "Action type if applicable"
+    },
+    "action_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "completed",
+        "failed"
+      ],
+      "description": "Action execution status"
+    },
+    "action_data": {
+      "type": "object",
+      "description": "Structured action data"
+    }
+  },
+  "required": [
+    "session_id",
+    "role",
+    "content"
+  ]
+}
